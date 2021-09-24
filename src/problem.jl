@@ -167,7 +167,7 @@ function get_load(x, d)
 end
 
 function get_demand_response_shift(x, n, d)
-    shift = SDDPMicrogrid.import_dso_dr_shift(x, d)
+    shift = import_dso_dr_shift(x, d)
 
     for load in 1:n.load
         # d.dr_max_shift[load] = shift[d.load2bus[load]]
