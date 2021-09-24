@@ -1,0 +1,16 @@
+name = "SDDPDSO"
+uuid = "26bedc50-1d7e-11ec-3191-79c221911b5a"
+version = "0.1.0"
+
+[deps]
+SDDP = "f4570300-c277-11e8-125c-4912f86ce65d"
+
+[compat]
+julia = "1.6"
+SDDP = "0.4"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
