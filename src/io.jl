@@ -41,132 +41,22 @@ function export_file(filepath::String, filename::String, lines::String, append::
 end
 
 
-function string_converter( self::String , tipo::Type , msg::String )
-    try
-        parse( tipo , self )
-    catch
-        error( msg )
-    end
-end
+"""
+    read_database
+"""
+function read_database(casepath::String, filepath::String="psrclasses.json"; summarize::Bool=false)
 
-function string_converter( self::SubString{String} , tipo::Type , msg::String )
-    try
-        parse( tipo , self )
-    catch
-        @show self
-        error( msg )
-    end
-end
+    # --- check file
+    !isfile(joinpath(casepath, filepath)) && error("unable to find "*filepath)
 
-function simulate_create_result_table(sims,result,header,nscn=length(sims),nstg=length(sims[1]))
+    # --- import database from json
+    data = PSRI.initialize_study(
+        PSRClassesInterface.OpenInterface(),
+        data_path = casepath
+    );
 
-    d = Dict(name => [] for name in Symbol.(header))
-    t = Int64[]
-    s = Int64[]
+    # --- list all elements
+    summarize && list_all_max_elements(data);
 
-    for scn in 1:nscn, stg in 1:nstg
-        push!(s,scn)
-        push!(t,stg)
-        i=0
-        for v in sims[scn][stg][result]
-            i+=1
-            push!(d[Symbol(header[i])], v)
-        end
-    end
-
-    r = DataFrame(scenario = s, stage = t)
-
-    for name in Symbol.(header)
-        r[!,name] = d[name]
-    end
-
-    return r
-end
-
-function simulate_create_result_table_state_var(sims,result,header,nscn=length(sims),nstg=length(sims[1]))
-
-    d = Dict(name => [] for name in Symbol.([header.*"_in";header.*"_out"]))
-    t = Int64[]
-    s = Int64[]
-
-    for scn in 1:nscn, stg in 1:nstg
-        push!(s,scn)
-        push!(t,stg)
-        i=0
-        for v in sims[scn][stg][result]
-            i+=1
-            push!(d[Symbol(header[i]*"_in" )], v.in)
-            push!(d[Symbol(header[i]*"_out")], v.out)
-        end
-    end
-
-    r = DataFrame(scenario = s, stage = t)
-
-    for name in Symbol.([header.*"_in";header.*"_out"])
-        r[!,name] = d[name]
-    end
-
-    return r
-end
-
-function simulate_create_result_dif_table(sims,result_ref,result_dif,header,nscn=length(sims),nstg=length(sims[1]))
-
-    d = Dict(name => [] for name in Symbol.(header))
-    t = Int64[]
-    s = Int64[]
-
-    for scn in 1:nscn, stg in 1:nstg
-        push!(s,scn)
-        push!(t,stg)
-        i=0
-
-        v_ref = Float64[]
-
-        for v in sims[scn][stg][result_ref]
-            push!(v_ref, v)
-        end
-
-        for v in sims[scn][stg][result_dif]
-            i+=1
-            push!(d[Symbol(header[i])], v_ref[i] - v)
-        end
-    end
-
-    r = DataFrame(scenario = s, stage = t)
-
-    for name in Symbol.(header)
-        r[!,name] = d[name]
-    end
-
-    return r
-end
-
-function export_result_usecir(sims,cir_cap,header,nscn=length(sims),nstg=length(sims[1]))
-
-    d = Dict(name => Float64[] for name in Symbol.(header))
-    t = Int64[]
-    s = Int64[]
-
-    for scn in 1:nscn, stg in 1:nstg
-        push!(s,scn)
-        push!(t,stg)
-        i=0
-
-        cirflw = abs.(sims[scn][stg][:flw])
-
-        usecir = (cirflw ./ cir_cap) .* 100
-
-        for v in usecir                  
-            i+=1
-            push!(d[Symbol(header[i])], v == Inf ? 0.0 : v)
-        end
-    end
-
-    r = DataFrame(scenario = s, stage = t)
-
-    for name in Symbol.(header)
-        r[!,name] = d[name]
-    end
-
-    return r
+    return data
 end
