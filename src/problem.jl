@@ -21,25 +21,25 @@ function add_dimensions!(par, x, n)
 end
 
 function add_batteries!(par, d)
-    par.bat_e_ini = d.batEinic .* d.batEmax  
-    par.bat_e_min = d.batEmin  
-    par.bat_e_max = d.batEmax
-    par.bat_c_eff = d.batChargeEffic  
-    par.bat_d_eff = d.batDischargeEffic 
-    par.bat_cap   = d.batPmax   
+    par.bat_e_ini = d.bat_Eini .* d.bat_Emax  
+    par.bat_e_min = d.bat_Emin  
+    par.bat_e_max = d.bat_Emax
+    par.bat_c_eff = d.bat_charge_effic  
+    par.bat_d_eff = d.bat_discharge_effic 
+    par.bat_cap   = d.bat_Pmax   
 end
 
 function add_thermal_plants!(par, d)
-    par.gen_cost = d.therCost # [$/MW]
-    par.gen_cap  = d.therPot  # [MW]
+    par.gen_cost = d.ter_cost # [$/MW]
+    par.gen_cap  = d.ter_capacity  # [MW]
 end
 
 function add_solar_plants!(par, x, n, d)
-    par.sol_cap = d.gndPot                              # [MW]   : solar plant capacity
+    par.sol_cap = d.gnd_capacity                              # [MW]   : solar plant capacity
     gnd_scn = get_gnd_scenarios(x, d)                   # [p.u.] :
     par.sol_scn = zeros(Float64, x.NSTG, x.NSCN, n.gnd) # [p.u.] : rooftop generation cenarios scn => [stg x plant]
     for i in 1:n.gnd
-        par.sol_scn[:,:,i] .= gnd_scn[d.gndCode[i]] .* d.gndPot[i]
+        par.sol_scn[:,:,i] .= gnd_scn[d.gnd_code[i]] .* d.gnd_capacity[i]
     end
 end
 
@@ -79,8 +79,8 @@ function add_demand_response!(par, x, n, d)
 end
 
 function add_circuits!(par, d)
-    par.cir_x      = d.cirX
-    par.cir_cap    = d.cirRn
+    par.cir_x      = d.cir_x
+    par.cir_cap    = d.cir_capacity
     par.cir_bus_fr = d.cirBusFrom
     par.cir_bus_to = d.cirBusTo
 end
