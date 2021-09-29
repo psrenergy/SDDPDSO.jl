@@ -15,8 +15,12 @@ module SDDPDSO
     end
 
     # --- includes
+    include("types.jl")
+    include("io.jl")
+    include("utils.jl")
     include("model.jl")
     include("problem.jl")
     include("statistics.jl")
+    include("psrclasses.jl")
 
 end # module
