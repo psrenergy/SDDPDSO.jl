@@ -112,7 +112,8 @@ end
 function set_data_circuit!(data, d)
     d.cir_name     = PSRI.get_name(data, "PSRSerie")
     d.cir_code     = PSRI.get_code(data, "PSRSerie")
-    d.cir_exist    = PSRI.mapped_vector(data, "PSRSerie", "Existing", Int32)
+    # d.cir_exist    = PSRI.mapped_vector(data, "PSRSerie", "Existing", Int32)
+    d.cir_status   = PSRI.mapped_vector(data, "PSRSerie", "Status", Int32)
     d.cir_capacity = PSRI.mapped_vector(data, "PSRSerie", "Rn", Float64)
     d.cir_x        = PSRI.mapped_vector(data, "PSRSerie", "X", Float64)
     d.cir_r        = PSRI.mapped_vector(data, "PSRSerie", "R", Float64)
@@ -122,8 +123,8 @@ end
     set_data_battery!
 """
 function set_data_battery!(data, d)
-    d.bat_code            = PSRI.get_name(data, "PSRBattery")
-    d.bat_name            = PSRI.get_code(data, "PSRBattery")
+    d.bat_code            = PSRI.get_code(data, "PSRBattery")
+    d.bat_name            = PSRI.get_name(data, "PSRBattery")
     # d.bat_Eini            = PSRI.mapped_vector(data, "PSRBattery", "Einic", Float64)
     d.bat_Emin            = PSRI.mapped_vector(data, "PSRBattery", "Emin" , Float64)
     d.bat_Emax            = PSRI.mapped_vector(data, "PSRBattery", "Emax" , Float64)
@@ -132,9 +133,8 @@ function set_data_battery!(data, d)
     d.bat_discharge_effic = PSRI.mapped_vector(data, "PSRBattery", "DischargeEffic" , Float64)
     # d.bat_charge_ramp     = PSRI.mapped_vector(data, "PSRBattery", "ChargeRamp", Float64)
     # d.bat_discharge_ramp  = PSRI.mapped_vector(data, "PSRBattery", "DischargeRamp" , Float64)
-
-    d.bat_reg_time        = PSRI.mapped_vector(data, "PSRBattery", "RegTime", Int32)
-    d.bat_flag_inter_stage = PSRI.mapped_vector(data, "PSRBattery", "FlagInterStage" , Int32)
+    # d.bat_reg_time        = PSRI.mapped_vector(data, "PSRBattery", "RegTime", Int32)
+    # d.bat_flag_inter_stage = PSRI.mapped_vector(data, "PSRBattery", "FlagInterStage" , Int32)
 end
 
 
