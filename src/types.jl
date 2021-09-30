@@ -1,4 +1,3 @@
-using Base: Float64
 mutable struct Sizes
 
     # --- Execution Parameters
