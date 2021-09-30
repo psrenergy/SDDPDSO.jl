@@ -10,37 +10,37 @@ end
 function set_dimensions!(data, n)
 
     # --- Simulation Parameters
-    n.stages    = PSRClassesInterface.max_elements(data, element)   
-    n.blocks    = PSRClassesInterface.max_elements(data, element)
-    n.scenarios = PSRClassesInterface.max_elements(data, element)
+    # n.stages    = PSRI.max_elements(data, element)   
+    # n.blocks    = PSRI.max_elements(data, element)
+    # n.scenarios = PSRI.max_elements(data, element)
 
     # --- Systems
-    n.sys = PSRClassesInterface.max_elements(data, "PSRSystem")       
+    n.sys = PSRI.max_elements(data, "PSRSystem")       
 
     # --- Areas
-    n.are = PSRClassesInterface.max_elements(data, "PSRArea")      
+    n.are = PSRI.max_elements(data, "PSRArea")      
 
     # --- Demands
-    n.dem = PSRClassesInterface.max_elements(data, "PSRDemand")
+    n.dem = PSRI.max_elements(data, "PSRDemand")
 
     # --- Generators
-    n.ther = PSRClassesInterface.max_elements(data, "PSRThermalPlant")     
-    n.hyd  = PSRClassesInterface.max_elements(data, "PSRHydroPlant")     
-    n.gnd  = PSRClassesInterface.max_elements(data, "PSRGndPlant")     
-    n.gen  = PSRClassesInterface.max_elements(data, "PSRGenerator") 
+    n.ther = PSRI.max_elements(data, "PSRThermalPlant")     
+    n.hyd  = PSRI.max_elements(data, "PSRHydroPlant")     
+    n.gnd  = PSRI.max_elements(data, "PSRGndPlant")     
+    n.gen  = PSRI.max_elements(data, "PSRGenerator") 
 
     # --- Fuels
-    n.fuel = PSRClassesInterface.max_elements(data, "PSRFuel")   
+    n.fuel = PSRI.max_elements(data, "PSRFuel")   
 
     # --- Battery
-    n.bat = PSRClassesInterface.max_elements(data, "PSRBattery")       
+    n.bat = PSRI.max_elements(data, "PSRBattery")       
 
     # --- Loads
-    n.load = PSRClassesInterface.max_elements(data, "PSRLoad")
+    n.load = PSRI.max_elements(data, "PSRLoad")
 
     # --- Network
-    n.bus = PSRClassesInterface.max_elements(data, "PSRBus") 
-    n.cir = PSRClassesInterface.max_elements(data, "PSRSerie")
+    n.bus = PSRI.max_elements(data, "PSRBus") 
+    n.cir = PSRI.max_elements(data, "PSRSerie")
 end
 
 """
@@ -58,9 +58,12 @@ function set_data!(data, n, d)
     (n.gnd  > 0) && set_data_renewable!(data, d)
 
     # --- get parameters of bus
-    (n.bus  > 0) && set_data_bus!(data, d)
+    (n.cir  > 0) && set_data_battery!(data, d)
 
     # --- get parameters of bus
+    (n.bus  > 0) && set_data_bus!(data, d)
+
+    # --- get parameters of circuit
     (n.cir  > 0) && set_data_circuits!(data, d)
 end
 
@@ -118,17 +121,17 @@ end
 """
     set_data_battery!
 """
-function set_data_circuit!(data, d)
+function set_data_battery!(data, d)
     d.bat_code            = PSRI.get_name(data, "PSRBattery")
     d.bat_name            = PSRI.get_code(data, "PSRBattery")
-    d.bat_Eini            = PSRI.mapped_vector(data, "PSRBattery", "Einic", Float64)
+    # d.bat_Eini            = PSRI.mapped_vector(data, "PSRBattery", "Einic", Float64)
     d.bat_Emin            = PSRI.mapped_vector(data, "PSRBattery", "Emin" , Float64)
     d.bat_Emax            = PSRI.mapped_vector(data, "PSRBattery", "Emax" , Float64)
     d.bat_Pmax            = PSRI.mapped_vector(data, "PSRBattery", "Pmax" , Float64)
     d.bat_charge_effic    = PSRI.mapped_vector(data, "PSRBattery", "ChargeEffic", Float64)
     d.bat_discharge_effic = PSRI.mapped_vector(data, "PSRBattery", "DischargeEffic" , Float64)
-    d.bat_charge_ramp     = PSRI.mapped_vector(data, "PSRBattery", "ChargeRamp", Float64)
-    d.bat_discharge_ramp  = PSRI.mapped_vector(data, "PSRBattery", "DischargeRamp" , Float64)
+    # d.bat_charge_ramp     = PSRI.mapped_vector(data, "PSRBattery", "ChargeRamp", Float64)
+    # d.bat_discharge_ramp  = PSRI.mapped_vector(data, "PSRBattery", "DischargeRamp" , Float64)
 
     d.bat_reg_time        = PSRI.mapped_vector(data, "PSRBattery", "RegTime", Int32)
     d.bat_flag_inter_stage = PSRI.mapped_vector(data, "PSRBattery", "FlagInterStage" , Int32)
