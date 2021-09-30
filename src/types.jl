@@ -173,117 +173,117 @@ mutable struct Data
     c_ctg :: Int32
 
     # --- Selected Step
-    s_stg :: Array{Int32}
-    s_scn :: Array{Int32}
-    s_blk :: Array{Int32}
-    s_ctg :: Array{Int32}
+    s_stg :: Vector{Int32}
+    s_scn :: Vector{Int32}
+    s_blk :: Vector{Int32}
+    s_ctg :: Vector{Int32}
 
     # --- Circuit Data
-    cir_code      :: Array{Int32} 
-    cir_name      :: Array{String} 
-    cir_status    :: Array{Int32} 
-    cir_exist     :: Array{Int32}
-    cir_monitored :: Array{Int32}
-    cir_r         :: Array{Float64}
-    cir_x         :: Array{Float64}
-    cir_capacity  :: Array{Float64}
-    cir_volt      :: Array{Float64} 
-    cirBusFrom   :: Array{Int32}
-    cirBusTo     :: Array{Int32}
-    cirSortOrder :: Array{Int32}
+    cir_code      :: Vector{Int32} 
+    cir_name      :: Vector{String} 
+    cir_status    :: Vector{Int32} 
+    cir_exist     :: Vector{Int32}
+    cir_monitored :: Vector{Int32}
+    cir_r         :: Vector{Float64}
+    cir_x         :: Vector{Float64}
+    cir_capacity  :: Vector{Float64}
+    cir_volt      :: Vector{Float64} 
+    cirBusFrom   :: Vector{Int32}
+    cirBusTo     :: Vector{Int32}
+    cirSortOrder :: Vector{Int32}
 
     # --- Bus Data
-    busCode      :: Array{Int32}
-    busName      :: Array{String}
-    busVolt      :: Array{Float64}
-    busVMin      :: Array{Float64}
-    busVMax      :: Array{Float64}
-    busSortOrder :: Array{Int32}
+    busCode      :: Vector{Int32}
+    busName      :: Vector{String}
+    busVolt      :: Vector{Float64}
+    busVMin      :: Vector{Float64}
+    busVMax      :: Vector{Float64}
+    busSortOrder :: Vector{Int32}
 
     # --- Demand Data
-    demandHour    :: Array{Float64}
-    demandBlock   :: Array{Float64}
-    demandElHour  :: Array{Float64}
-    demandElBlock :: Array{Float64}
-    demandElCost  :: Array{Float64}
+    demandHour    :: Vector{Float64}
+    demandBlock   :: Vector{Float64}
+    demandElHour  :: Vector{Float64}
+    demandElBlock :: Vector{Float64}
+    demandElCost  :: Vector{Float64}
 
     # --- Demand Response
-    dr_max_shift :: Array{Float64}
+    dr_max_shift :: Vector{Float64}
 
     # --- Load Data
-    loadCode     :: Array{Int32}
-    loadName     :: Array{String}
-    loadP        :: Array{Float64}
-    loadQ        :: Array{Float64}
+    loadCode     :: Vector{Int32}
+    loadName     :: Vector{String}
+    loadP        :: Vector{Float64}
+    loadQ        :: Vector{Float64}
 
     # --- Generator Data : General
-    gen_code      :: Array{Int32}
-    gen_name      :: Array{String}
-    genOper      :: Array{Int32}
-    genPmn       :: Array{Float64}
-    genQmn       :: Array{Float64}
-    genPmx       :: Array{Float64}
-    genQmx       :: Array{Float64}
-    genPg        :: Array{Float64}
+    gen_code      :: Vector{Int32}
+    gen_name      :: Vector{String}
+    genOper      :: Vector{Int32}
+    genPmn       :: Vector{Float64}
+    genQmn       :: Vector{Float64}
+    genPmx       :: Vector{Float64}
+    genQmx       :: Vector{Float64}
+    genPg        :: Vector{Float64}
 
     # --- Plant: thermal
-    ter_code     :: Array{Int32}
-    ter_name     :: Array{String}
-    ter_capacity :: Array{Float64}
-    ter_cost     :: Array{Float64}
-    ter_exist    :: Array{Int32}
+    ter_code     :: Vector{Int32}
+    ter_name     :: Vector{String}
+    ter_capacity :: Vector{Float64}
+    ter_cost     :: Vector{Float64}
+    ter_exist    :: Vector{Int32}
 
     # --- Plant: hydro
-    hid_code     :: Array{Int32}
-    hid_name     :: Array{String}
-    hid_capacity :: Array{Float64}
-    hid_exist    :: Array{Int32}
+    hid_code     :: Vector{Int32}
+    hid_name     :: Vector{String}
+    hid_capacity :: Vector{Float64}
+    hid_exist    :: Vector{Int32}
 
     # --- Plant: renewables
-    gnd_code     :: Array{Int32}
-    gnd_name     :: Array{String}
-    gnd_capacity :: Array{Float64}
-    gnd_exist    :: Array{Int32}
-    gnd_scn      :: Array{Float64}
+    gnd_code     :: Vector{Int32}
+    gnd_name     :: Vector{String}
+    gnd_capacity :: Vector{Float64}
+    gnd_exist    :: Vector{Int32}
+    gnd_scn      :: Vector{Float64}
 
     # --- fuel
-    fuel_code  :: Array{Int32}
-    fuel_name  :: Array{String}
-    fuel_cost  :: Array{Float64}
+    fuel_code  :: Vector{Int32}
+    fuel_name  :: Vector{String}
+    fuel_cost  :: Vector{Float64}
 
     # --- Battery
-    bat_code             :: Array{Int32}
-    bat_name             :: Array{String}
-    bat_Eini             :: Array{Float64}
-    bat_reg_time         :: Array{Int32}
-    bat_flag_inter_stage :: Array{Int32}
-    bat_charge_ramp      :: Array{Float64}
-    bat_discharge_ramp   :: Array{Float64}
-    bat_Emin             :: Array{Float64}
-    bat_Emax             :: Array{Float64}
-    bat_Pmax             :: Array{Float64}
-    bat_charge_effic     :: Array{Float64}
-    bat_discharge_effic  :: Array{Float64}
+    bat_code             :: Vector{Int32}
+    bat_name             :: Vector{String}
+    bat_Eini             :: Vector{Float64}
+    bat_reg_time         :: Vector{Int32}
+    bat_flag_inter_stage :: Vector{Int32}
+    bat_charge_ramp      :: Vector{Float64}
+    bat_discharge_ramp   :: Vector{Float64}
+    bat_Emin             :: Vector{Float64}
+    bat_Emax             :: Vector{Float64}
+    bat_Pmax             :: Vector{Float64}
+    bat_charge_effic     :: Vector{Float64}
+    bat_discharge_effic  :: Vector{Float64}
 
     # --- Mapping Data
-    therm2gen   :: Array{Int32}
-    hyd2gen     :: Array{Int32}
-    gnd2gen     :: Array{Int32}
-    bat2gen     :: Array{Int32}
-    ger2bus     :: Array{Int32}
-    bat2bus     :: Array{Int32}
-    bus2gnd     :: Array{Int32}
-    bus2hyd     :: Array{Int32}
-    bus2bat     :: Array{Int32}
-    bus2ther    :: Array{Int32}
-    bus2load    :: Array{Int32}
-    ther2fuel   :: Array{Int32}
+    therm2gen   :: Vector{Int32}
+    hyd2gen     :: Vector{Int32}
+    gnd2gen     :: Vector{Int32}
+    bat2gen     :: Vector{Int32}
+    ger2bus     :: Vector{Int32}
+    bat2bus     :: Vector{Int32}
+    bus2gnd     :: Vector{Int32}
+    bus2hyd     :: Vector{Int32}
+    bus2bat     :: Vector{Int32}
+    bus2ther    :: Vector{Int32}
+    bus2load    :: Vector{Int32}
+    ther2fuel   :: Vector{Int32}
 
 
-    dsg2dem    :: Array{Int32}
-    dsgels2dem :: Array{Int32}
-    load2dem   :: Array{Int32}
-    load2bus   :: Array{Int32}
+    dsg2dem    :: Vector{Int32}
+    dsgels2dem :: Vector{Int32}
+    load2dem   :: Vector{Int32}
+    load2bus   :: Vector{Int32}
 
     function Data(n::Sizes)
         return new()
@@ -361,19 +361,19 @@ mutable struct SDDPParameters
 
     # problem variables 
     # batteries        
-    bat_e_ini   :: Array{Float64} # [p.u.]
-    bat_e_min   :: Array{Float64} # [MWh ]
-    bat_e_max   :: Array{Float64} # [MWh ]
-    bat_c_eff   :: Array{Float64} # [%   ]
-    bat_d_eff   :: Array{Float64} # [%   ]
-    bat_cap     :: Array{Float64} # [MW  ]
+    bat_e_ini   :: Vector{Float64} # [p.u.]
+    bat_e_min   :: Vector{Float64} # [MWh ]
+    bat_e_max   :: Vector{Float64} # [MWh ]
+    bat_c_eff   :: Vector{Float64} # [%   ]
+    bat_d_eff   :: Vector{Float64} # [%   ]
+    bat_cap     :: Vector{Float64} # [MW  ]
     
     # diesel generator
-    gen_cost :: Array{Float64}
-    gen_cap  :: Array{Float64}
+    gen_cost :: Vector{Float64}
+    gen_cap  :: Vector{Float64}
 
     # solar rooftop
-    sol_cap :: Array{Float64}
+    sol_cap :: Vector{Float64}
     sol_scn :: Array{Float64,3}
 
     # import/export energy form transmission grid
@@ -383,45 +383,45 @@ mutable struct SDDPParameters
     exp_max  :: Dict{Int64, Matrix{Float64}}
 
     # electric vehicles
-    elv_e_ini :: Array{Float64} # initial storage
-    elv_e_max :: Array{Float64} # maximum storage
-    elv_cap   :: Array{Float64} # capacity
-    elv_c_hrs :: Array{Int64}   # charging hours
-    elv_c_eff :: Array{Float64} # charging efficiency
+    elv_e_ini :: Vector{Float64} # initial storage
+    elv_e_max :: Vector{Float64} # maximum storage
+    elv_cap   :: Vector{Float64} # capacity
+    elv_c_hrs :: Vector{Int64}   # charging hours
+    elv_c_eff :: Vector{Float64} # charging efficiency
 
     # demand    
-    demand        :: Array{Array{Float64}}
+    demand        :: Vector{Matrix{Float64}}
     demand_factor :: Float64
     
     # losses    
-    losses        :: Array{Array{Float64}}
+    losses        :: Vector{Matrix{Float64}}
     
     # slack
     def_cost      :: Float64
     
     # demand response
-    dem_rsp_tariff :: Array{Float64} # [$/MWh] tariff
-    dem_rsp_shift  :: Array{Float64} # [  MWh]
+    dem_rsp_tariff :: Vector{Float64} # [$/MWh] tariff
+    dem_rsp_shift  :: Vector{Float64} # [  MWh]
 
     # circuit
-    cir_x      :: Array{Float64}
-    cir_cap    :: Array{Float64}
-    cir_bus_fr :: Array{Int64}
-    cir_bus_to :: Array{Int64}
+    cir_x      :: Vector{Float64}
+    cir_cap    :: Vector{Float64}
+    cir_bus_fr :: Vector{Int64}
+    cir_bus_to :: Vector{Int64}
 
     # map
-    bus_map_sol :: Dict{Int64,Array{Int64}}
-    bus_map_gen :: Dict{Int64,Array{Int64}}
-    bus_map_bat :: Dict{Int64,Array{Int64}}
-    bus_map_elv :: Dict{Int64,Array{Int64}}
-    bus_map_dem :: Dict{Int64,Array{Int64}}
-    bus_map_rsp :: Dict{Int64,Array{Int64}}
-    bus_map_imp :: Dict{Int64,Array{Int64}}
-    bus_map_exp :: Dict{Int64,Array{Int64}}
+    bus_map_sol :: Dict{Int64,Vector{Int64}}
+    bus_map_gen :: Dict{Int64,Vector{Int64}}
+    bus_map_bat :: Dict{Int64,Vector{Int64}}
+    bus_map_elv :: Dict{Int64,Vector{Int64}}
+    bus_map_dem :: Dict{Int64,Vector{Int64}}
+    bus_map_rsp :: Dict{Int64,Vector{Int64}}
+    bus_map_imp :: Dict{Int64,Vector{Int64}}
+    bus_map_exp :: Dict{Int64,Vector{Int64}}
 
     # markov
-    transition_matrices  :: Array{Array{Float64,2},1}
-    markov_probabilities :: Array{Float64}
+    transition_matrices  :: Vector{Matrix{Float64}}
+    markov_probabilities :: Vector{Float64}
     
     # hrinj attributes
     hrinj_cst :: Dict{Int64, Matrix{Float64}}
