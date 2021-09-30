@@ -4,6 +4,8 @@ module SDDPDSO
     using PSRClassesInterface
     using SDDP
     using JuMP
+
+    const PSRI = PSRClassesInterface
     # using Statistics
     # using Libdl
     # using CSV
