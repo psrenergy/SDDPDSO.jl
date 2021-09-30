@@ -102,8 +102,8 @@ function map_elements!(par, n, d)
     par.bus_map_elv = Dict()
     par.bus_map_dem = Dict(d.load2bus[i] => [i] for i in 1:n.load)
     par.bus_map_rsp = Dict(d.load2bus[i] => [i] for i in 1:n.load)
-    par.bus_map_imp = Dict(i => [d.busCode[i]] for i in 1:n.bus if haskey(par.imp_max,d.busCode[i]))    # mudar um dia, ta bem feio
-    par.bus_map_exp = Dict(i => [d.busCode[i]] for i in 1:n.bus if haskey(par.imp_max,d.busCode[i]))    # mudar um dia, ta bem feio
+    par.bus_map_imp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
+    par.bus_map_exp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
 end
 
 function setup_parameters!(par, x, p, n, d, opt)

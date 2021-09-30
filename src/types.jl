@@ -193,12 +193,12 @@ mutable struct Data
     cirSortOrder :: Vector{Int32}
 
     # --- Bus Data
-    busCode      :: Vector{Int32}
-    busName      :: Vector{String}
-    busVolt      :: Vector{Float64}
-    busVMin      :: Vector{Float64}
-    busVMax      :: Vector{Float64}
-    busSortOrder :: Vector{Int32}
+    bus_code      :: Vector{Int32}
+    bus_name      :: Vector{String}
+    bus_volt      :: Vector{Float64}
+    bus_vmin      :: Vector{Float64}
+    bus_vmax      :: Vector{Float64}
+    bus_sort_order :: Vector{Int32}
 
     # --- Demand Data
     demandHour    :: Vector{Float64}

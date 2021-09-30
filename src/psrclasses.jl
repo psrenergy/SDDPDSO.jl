@@ -64,7 +64,7 @@ function set_data!(data, n, d)
     (n.bus  > 0) && set_data_bus!(data, d)
 
     # --- get parameters of circuit
-    (n.cir  > 0) && set_data_circuits!(data, d)
+    (n.cir  > 0) && set_data_circuit!(data, d)
 end
 
 """
