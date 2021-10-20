@@ -1,0 +1,2 @@
+﻿sddp_stages,sddp_scenarios,read_tsl_scenarios,read_external_hourly_load,read_external_hourly_gnd_scenarios,deficit_cost,run_markov_model,demand_factor,markov_states
+24,5,0,1,1,1000,0,1.0,0
