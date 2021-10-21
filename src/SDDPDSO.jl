@@ -4,12 +4,12 @@ module SDDPDSO
     using PSRClassesInterface
     using SDDP
     using JuMP
+    using CSV
+    using DataFrames
 
     const PSRI = PSRClassesInterface
     # using Statistics
     # using Libdl
-    # using CSV
-    # using DataFrames
 
     # --- version check
     @static if VERSION < v"1.6"
