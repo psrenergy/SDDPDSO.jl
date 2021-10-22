@@ -188,8 +188,8 @@ mutable struct Data
     cir_x         :: Vector{Float64}
     cir_capacity  :: Vector{Float64}
     cir_volt      :: Vector{Float64} 
-    cirBusFrom   :: Vector{Int32}
-    cirBusTo     :: Vector{Int32}
+    cir_bus_from  :: Vector{Int32}
+    cir_bus_to    :: Vector{Int32}
     cirSortOrder :: Vector{Int32}
 
     # --- Bus Data
@@ -211,10 +211,10 @@ mutable struct Data
     dr_max_shift :: Vector{Float64}
 
     # --- Load Data
-    loadCode     :: Vector{Int32}
-    loadName     :: Vector{String}
-    loadP        :: Vector{Float64}
-    loadQ        :: Vector{Float64}
+    load_code     :: Vector{Int32}
+    load_name     :: Vector{String}
+    load_p        :: Vector{Float64}
+    load_q        :: Vector{Float64}
 
     # --- Generator Data : General
     gen_code      :: Vector{Int32}
@@ -266,24 +266,25 @@ mutable struct Data
     bat_discharge_effic  :: Vector{Float64}
 
     # --- Mapping Data
-    therm2gen   :: Vector{Int32}
-    hyd2gen     :: Vector{Int32}
-    gnd2gen     :: Vector{Int32}
-    bat2gen     :: Vector{Int32}
-    ger2bus     :: Vector{Int32}
-    bat2bus     :: Vector{Int32}
-    bus2gnd     :: Vector{Int32}
-    bus2hyd     :: Vector{Int32}
-    bus2bat     :: Vector{Int32}
-    bus2ther    :: Vector{Int32}
-    bus2load    :: Vector{Int32}
-    ther2fuel   :: Vector{Int32}
+    gen2ter :: Vector{Int32}
+    gen2hid :: Vector{Int32}
+    gen2gnd :: Vector{Int32}
+    gen2bus :: Vector{Int32}
 
+    ter2bus :: Vector{Int32}
+    hid2bus :: Vector{Int32}
+    gnd2bus :: Vector{Int32}
+    bat2bus :: Vector{Int32}
+    
+    bus2gnd :: Vector{Int32}
+    bus2hid :: Vector{Int32}
+    bus2bat :: Vector{Int32}
+    bus2ter :: Vector{Int32}
+    bus2lod :: Vector{Int32}
+    
+    ter2fue :: Vector{Int32}
 
-    dsg2dem    :: Vector{Int32}
-    dsgels2dem :: Vector{Int32}
-    load2dem   :: Vector{Int32}
-    load2bus   :: Vector{Int32}
+    lod2bus :: Vector{Int32}
 
     function Data(n::Sizes)
         return new()
@@ -390,11 +391,11 @@ mutable struct SDDPParameters
     elv_c_eff :: Vector{Float64} # charging efficiency
 
     # demand    
-    demand        :: Vector{Matrix{Float64}}
+    demand        :: Vector{Vector{Float64}}
     demand_factor :: Float64
     
     # losses    
-    losses        :: Vector{Matrix{Float64}}
+    losses        :: Vector{Vector{Float64}}
     
     # slack
     def_cost      :: Float64

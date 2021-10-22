@@ -66,7 +66,7 @@ end
 
 function add_demand!(par, x, n, d)
     loads = get_load(x, d)
-    par.demand = [loads[d.loadCode[i]] for i in 1:n.load]
+    par.demand = [loads[d.load_code[i]] for i in 1:n.load]
 end
 
 function add_losses!(par, x, n, d)
@@ -81,8 +81,8 @@ end
 function add_circuits!(par, d)
     par.cir_x      = d.cir_x
     par.cir_cap    = d.cir_capacity
-    par.cir_bus_fr = d.cirBusFrom
-    par.cir_bus_to = d.cirBusTo
+    par.cir_bus_fr = d.cir_bus_from
+    par.cir_bus_to = d.cir_bus_to
 end
 
 function add_markov!(par, x)
@@ -96,19 +96,19 @@ function add_hrinj_attributes!(par, x, d)
 end
 
 function map_elements!(par, n, d)
-    par.bus_map_sol = Dict(d.bus2gnd[i]  => [i] for i in 1:n.gnd ) # swap bus
-    par.bus_map_gen = Dict(d.bus2ther[i] => [i] for i in 1:n.ther) # swap bus
-    par.bus_map_bat = Dict(d.bat2bus[i]  => [i] for i in 1:n.bat )
+    par.bus_map_sol = reverse_map_to_dict(d.gnd2bus, n.gnd) 
+    par.bus_map_gen = reverse_map_to_dict(d.ter2bus, n.ther)
+    par.bus_map_bat = reverse_map_to_dict(d.bat2bus, n.bat) 
     par.bus_map_elv = Dict()
-    par.bus_map_dem = Dict(d.load2bus[i] => [i] for i in 1:n.load)
-    par.bus_map_rsp = Dict(d.load2bus[i] => [i] for i in 1:n.load)
+    par.bus_map_dem = reverse_map_to_dict(d.lod2bus, n.load)
+    par.bus_map_rsp = reverse_map_to_dict(d.lod2bus, n.load)
     par.bus_map_imp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
     par.bus_map_exp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
 end
 
-function setup_parameters!(par, x, p, n, d, opt)
+function setup_parameters!(par, x, n, d, opt)
     # initialize solver 
-    init_xpresspsr()
+    # init_xpresspsr()
 
     # set up problem parameters
     add_sddp_parameters!(par, x, opt)
@@ -169,9 +169,10 @@ end
 function get_demand_response_shift(x, n, d)
     shift = import_dso_dr_shift(x, d)
 
+    d.dr_max_shift = zeros(Float64, n.load)
+
     for load in 1:n.load
-        # d.dr_max_shift[load] = shift[d.load2bus[load]]
-        d.dr_max_shift[load] = shift[d.loadCode[load]]
+        d.dr_max_shift[load] = shift[d.load_code[load]]
     end
 
     return d.dr_max_shift

@@ -66,3 +66,32 @@ function get_map_bus(nbus::Integer, gen2tec::Vector{Int32}, gen2bus::Vector{Int3
     end
     return map_bus
 end
+
+"""
+    map_tec_bus
+"""
+function map_tec_bus(gen2bus::Vector{Int32}, gen2tec::Vector{Int32}, ntec, ngen)
+    (ntec <= 0) && return Int32[]
+
+    tec2bus = zeros(Int32, ntec)
+
+    for i in 1:ngen
+        tec_i = gen2tec[i]
+        if tec_i != 0
+            tec2bus[tec_i] = gen2bus[i]
+        end
+    end
+
+    return tec2bus
+end
+
+"""
+    reverse_map_to_dict
+"""
+function reverse_map_to_dict(tec_map::Vector{Int32}, ntec)
+    rev_map = Dict{Int32, Vector{Int32}}(i => Int32[] for i in unique(tec_map))
+    for i in 1:ntec
+        push!(rev_map[tec_map[i]],i)
+    end
+    return rev_map
+end

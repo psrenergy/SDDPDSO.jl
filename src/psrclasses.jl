@@ -1,7 +1,29 @@
 """
     set_maps!
 """
-function set_maps!(data)
+function set_maps!(data, d, n)
+
+    # --- Load maps
+    d.lod2bus = PSRI.get_map(data, "PSRLoad", "PSRBus")
+
+    # --- Generator maps
+    d.gen2ter = PSRI.get_map(data, "PSRGenerator", "PSRThermalPlant")
+    d.gen2gnd = PSRI.get_map(data, "PSRGenerator", "PSRGndPlant")
+    d.gen2hid = PSRI.get_map(data, "PSRGenerator", "PSRHydroPlant")
+    d.gen2bus = PSRI.get_map(data, "PSRGenerator", "PSRBus")
+    
+    # d.ter2fue = PSRI.get_vector_map(data, "PSRThermalPlant", "PSRFuel", relation_type = PSRI.RELATION_1_TO_N)
+
+    # --- Network maps
+    d.cir_bus_from = PSRI.get_map(data, "PSRSerie", "PSRBus", relation_type = PSRI.RELATION_FROM)
+    d.cir_bus_to   = PSRI.get_map(data, "PSRSerie", "PSRBus", relation_type = PSRI.RELATION_TO)
+
+    # ter > bar
+    d.ter2bus = map_tec_bus(d.gen2bus, d.gen2ter, n.ther, n.gen) 
+    d.hid2bus = map_tec_bus(d.gen2bus, d.gen2hid, n.hyd, n.gen) 
+    d.gnd2bus = map_tec_bus(d.gen2bus, d.gen2gnd, n.gnd, n.gen) 
+    d.bat2bus = PSRI.get_map(data, "PSRBattery", "PSRBus")
+    d.lod2bus = PSRI.get_map(data, "PSRLoad", "PSRBus")
 end
 
 """
@@ -10,9 +32,9 @@ end
 function set_dimensions!(data, n)
 
     # --- Simulation Parameters
-    # n.stages    = PSRI.max_elements(data, element)   
-    # n.blocks    = PSRI.max_elements(data, element)
-    # n.scenarios = PSRI.max_elements(data, element)
+    n.stages    = PSRI.total_stages(data)   
+    n.blocks    = PSRI.total_scenarios(data)
+    n.scenarios = PSRI.total_blocks(data)
 
     # --- Systems
     n.sys = PSRI.max_elements(data, "PSRSystem")       
@@ -47,7 +69,10 @@ end
     set_data!
 """
 function set_data!(data, n, d)
-    
+
+    # --- get parameters of thermal plants
+    (n.load > 0) && set_data_load!(data, d)
+
     # --- get parameters of thermal plants
     (n.ther > 0) && set_data_thermal!(data, d)
 
@@ -68,14 +93,23 @@ function set_data!(data, n, d)
 end
 
 """
+    set_data_load!
+"""
+function set_data_load!(data, d)
+    d.load_name     = PSRI.get_name(data, "PSRLoad")
+    d.load_code     = PSRI.get_code(data, "PSRLoad")
+end
+
+"""
     set_data_thermal!
 """
 function set_data_thermal!(data, d)
     d.ter_name     = PSRI.get_name(data, "PSRThermalPlant")
     d.ter_code     = PSRI.get_code(data, "PSRThermalPlant")
     d.ter_exist    = PSRI.mapped_vector(data, "PSRThermalPlant", "Existing", Int32)
-    d.ter_capacity = PSRI.mapped_vector(data, "PSRThermalPlant", "PotInst", Float64)
-    # cost
+    # d.ter_capacity = PSRI.mapped_vector(data, "PSRThermalPlant", "PotInst" , Float64)
+    d.ter_capacity = PSRI.mapped_vector(data, "PSRThermalPlant", "GerMax" , Float64)
+    d.ter_cost     = 100.0 * ones(Float64, length(d.ter_capacity)) #PSRI.mapped_vector(data, "PSRThermalPlant", "CEsp", Float64, "segment", "block")
 end
 
 """
@@ -123,18 +157,18 @@ end
     set_data_battery!
 """
 function set_data_battery!(data, d)
-    d.bat_code            = PSRI.get_code(data, "PSRBattery")
-    d.bat_name            = PSRI.get_name(data, "PSRBattery")
-    # d.bat_Eini            = PSRI.mapped_vector(data, "PSRBattery", "Einic", Float64)
-    d.bat_Emin            = PSRI.mapped_vector(data, "PSRBattery", "Emin" , Float64)
-    d.bat_Emax            = PSRI.mapped_vector(data, "PSRBattery", "Emax" , Float64)
-    d.bat_Pmax            = PSRI.mapped_vector(data, "PSRBattery", "Pmax" , Float64)
-    d.bat_charge_effic    = PSRI.mapped_vector(data, "PSRBattery", "ChargeEffic", Float64)
-    d.bat_discharge_effic = PSRI.mapped_vector(data, "PSRBattery", "DischargeEffic" , Float64)
-    # d.bat_charge_ramp     = PSRI.mapped_vector(data, "PSRBattery", "ChargeRamp", Float64)
-    # d.bat_discharge_ramp  = PSRI.mapped_vector(data, "PSRBattery", "DischargeRamp" , Float64)
-    # d.bat_reg_time        = PSRI.mapped_vector(data, "PSRBattery", "RegTime", Int32)
-    # d.bat_flag_inter_stage = PSRI.mapped_vector(data, "PSRBattery", "FlagInterStage" , Int32)
+    d.bat_code             = PSRI.get_code(data, "PSRBattery")
+    d.bat_name             = PSRI.get_name(data, "PSRBattery")
+    d.bat_Eini             = PSRI.get_parms(data, "PSRBattery", "Einic", Float64)
+    d.bat_Emin             = PSRI.mapped_vector(data, "PSRBattery", "Emin" , Float64)
+    d.bat_Emax             = PSRI.mapped_vector(data, "PSRBattery", "Emax" , Float64)
+    d.bat_Pmax             = PSRI.mapped_vector(data, "PSRBattery", "Pmax" , Float64)
+    d.bat_charge_effic     = PSRI.mapped_vector(data, "PSRBattery", "ChargeEffic", Float64)
+    d.bat_discharge_effic  = PSRI.mapped_vector(data, "PSRBattery", "DischargeEffic" , Float64)
+    d.bat_charge_ramp      = PSRI.get_parms(data, "PSRBattery", "ChargeRamp", Float64)
+    d.bat_discharge_ramp   = PSRI.get_parms(data, "PSRBattery", "DischargeRamp" , Float64)
+    d.bat_reg_time         = PSRI.get_parms(data, "PSRBattery", "RegTime", Int32)
+    d.bat_flag_inter_stage = PSRI.get_parms(data, "PSRBattery", "FlagInterStage" , Int32)
 end
 
 
