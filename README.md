@@ -13,5 +13,7 @@ SDDO-DSO stands for Stochastic Dual Dynamic Programming for Distribution System 
 | [![Build Status][build-img]][build-url] | [![Codecov branch][codecov-img]][codecov-url] |[![](https://img.shields.io/badge/docs-latest-blue.svg)](https://psrenergy.github.io/SDDPDSO.jl/dev/)
 
 To use, run:
+``` julia
 ] add https://github.com/psrenergy/SDDPDSO.jl
 using SDDPDSO
+```
