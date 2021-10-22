@@ -1,0 +1,3 @@
+var documenterSearchIndex = {"docs":
+[{"location":"examples/#Examples","page":"Examples","title":"Examples","text":"","category":"section"},{"location":"manual/#Manual","page":"Manual","title":"Manual","text":"","category":"section"},{"location":"#SDDPDSO-Documentation","page":"Home","title":"SDDPDSO Documentation","text":"","category":"section"},{"location":"#Installation","page":"Home","title":"Installation","text":"","category":"section"},{"location":"","page":"Home","title":"Home","text":"This package is not registered so you can add it using Julia's Pkg manager via http or ssh:","category":"page"},{"location":"","page":"Home","title":"Home","text":"pkg> add https://github.com/psrenergy/SDDPDSO.jl.git","category":"page"}]
+}
