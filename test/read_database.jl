@@ -8,6 +8,5 @@ n = DSO.Sizes();
 DSO.set_dimensions!(data, n)
 
 d = DSO.Data(n);
+DSO.set_maps!(data, n, d)
 DSO.set_data!(data, n, d)
-
-DSO.set_maps!(data, d, n)

@@ -1,7 +1,7 @@
 """
     set_maps!
 """
-function set_maps!(data, d, n)
+function set_maps!(data, n, d)
 
     # --- Load maps
     d.lod2bus = PSRI.get_map(data, "PSRLoad", "PSRBus")
@@ -12,7 +12,7 @@ function set_maps!(data, d, n)
     d.gen2hid = PSRI.get_map(data, "PSRGenerator", "PSRHydroPlant")
     d.gen2bus = PSRI.get_map(data, "PSRGenerator", "PSRBus")
     
-    # d.ter2fue = PSRI.get_vector_map(data, "PSRThermalPlant", "PSRFuel", relation_type = PSRI.RELATION_1_TO_N)
+    d.ter2fue = PSRI.get_vector_map(data, "PSRThermalPlant", "PSRFuel"; relation_type = PSRI.RELATION_1_TO_N)
 
     # --- Network maps
     d.cir_bus_from = PSRI.get_map(data, "PSRSerie", "PSRBus", relation_type = PSRI.RELATION_FROM)
@@ -74,7 +74,7 @@ function set_data!(data, n, d)
     (n.load > 0) && set_data_load!(data, d)
 
     # --- get parameters of thermal plants
-    (n.ther > 0) && set_data_thermal!(data, d)
+    (n.ther > 0) && set_data_thermal!(data, d, n)
 
     # --- get parameters of gnd plants
     (n.hyd  > 0) && set_data_hydro!(data, d)
@@ -103,13 +103,22 @@ end
 """
     set_data_thermal!
 """
-function set_data_thermal!(data, d)
+function set_data_thermal!(data, d, n)
     d.ter_name     = PSRI.get_name(data, "PSRThermalPlant")
     d.ter_code     = PSRI.get_code(data, "PSRThermalPlant")
     d.ter_exist    = PSRI.mapped_vector(data, "PSRThermalPlant", "Existing", Int32)
-    # d.ter_capacity = PSRI.mapped_vector(data, "PSRThermalPlant", "PotInst" , Float64)
     d.ter_capacity = PSRI.mapped_vector(data, "PSRThermalPlant", "GerMax" , Float64)
-    d.ter_cost     = 100.0 * ones(Float64, length(d.ter_capacity)) #PSRI.mapped_vector(data, "PSRThermalPlant", "CEsp", Float64, "segment", "block")
+    d.ter_cost     = Float64[]
+
+    fue_cost = PSRI.mapped_vector(data, "PSRFuel", "Custo", Float64)
+
+    for i in 1:n.ther
+        cst = Float64[]
+        for j in d.ter2fue[i]
+            push!(cst, fue_cost[j])
+        end
+        push!(d.ter_cost, maximum(cst))
+    end
 end
 
 """

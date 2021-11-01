@@ -282,7 +282,7 @@ mutable struct Data
     bus2ter :: Vector{Int32}
     bus2lod :: Vector{Int32}
     
-    ter2fue :: Vector{Int32}
+    ter2fue :: Vector{Vector{Int32}}
 
     lod2bus :: Vector{Int32}
 

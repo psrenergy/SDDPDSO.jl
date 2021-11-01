@@ -14,17 +14,17 @@ casepath = joinpath(".", "data", "example_00")
     end
 
     # --- Test 01 - 
-    @testset "Read database parameters" begin
+    @testset "Setup problem" begin
         @time include("setup_problem.jl")
     end
 
     # --- Test 02 - 
-    @testset "Read database parameters" begin
+    @testset "Run SDDP model" begin
         @time include("run_model.jl")
     end
 
     # --- Test 03 - 
-    @testset "Read database parameters" begin
+    @testset "Write results" begin
         @time include("write_results.jl")
     end
 end

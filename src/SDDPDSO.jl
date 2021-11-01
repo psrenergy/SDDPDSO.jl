@@ -25,4 +25,9 @@ module SDDPDSO
     include("statistics.jl")
     include("psrclasses.jl")
 
+    # --- main
+    function main(ARGS)
+        @show ARGS
+    end
+
 end # module
