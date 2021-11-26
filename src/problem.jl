@@ -117,26 +117,26 @@ function setup_parameters!(par, x, n, d, opt)
     par.use_cir_cap = true
 
     # problem dimensions
-    add_dimensions!(par, x, n)   
-
+    add_dimensions!(par, x, n)
+    
     # problem variables 
     # batteries
-    add_batteries!(par, d)
+    (par.nbat > 0) && add_batteries!(par, d)
 
     # diesel generator
-    add_thermal_plants!(par, d)
+    (par.ngen > 0) && add_thermal_plants!(par, d)
 
     # solar rooftop nbus => [stg x scn]
-    add_solar_plants!(par, x, n, d)
+    (par.nsol > 0) && add_solar_plants!(par, x, n, d)
 
     # import/export energy form transmission grid
-    add_injections!(par, x, d)
+    (par.nload > 0) && add_injections!(par, x, d)
 
     # electric vehicles
-    add_electric_vehicles!(par, d)
+    (par.nelv > 0) && add_electric_vehicles!(par, d)
 
     # demand
-    add_demand!(par, x, n, d)
+    (par.nload > 0) && add_demand!(par, x, n, d)
 
     # losses
     add_losses!(par, x, n, d)
@@ -145,7 +145,7 @@ function setup_parameters!(par, x, n, d, opt)
     add_demand_response!(par, x, n, d)
 
     # circuit
-    add_circuits!(par, d)
+    (par.nlin > 0) && add_circuits!(par, d)
 
     # markov
     x.RMKV && add_markov!(par,x)
