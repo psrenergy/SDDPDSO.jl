@@ -114,7 +114,7 @@ function setup_parameters!(par, x, n, d, opt)
     add_sddp_parameters!(par, x, opt)
 
     # add flags
-    par.use_cir_cap = true
+    par.flag_sec_law = true
 
     # problem dimensions
     add_dimensions!(par, x, n)

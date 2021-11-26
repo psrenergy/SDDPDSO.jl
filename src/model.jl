@@ -1,8 +1,13 @@
 function add_variables_model!(m, par)
     # Define the state variable
+    
+    # --- battery storage 
     JuMP.@variable(m, par.bat_e_max[i] >= storage[i=1:par.nbat] >= par.bat_e_min[i], SDDP.State, initial_value = par.bat_e_ini[i])
 
-    JuMP.@variable(m, sum(par.demand[i]) >= total_load[i=1:par.nload] >= 0.0, SDDP.State, initial_value = 0.0)
+    # --- demand response
+    if par.flag_dem_rsp
+        JuMP.@variable(m, sum(par.demand[i]) >= total_load[i=1:par.nload] >= 0.0, SDDP.State, initial_value = 0.0)
+    end
 
     # Define the control variables
     JuMP.@variables(m, begin
@@ -22,16 +27,22 @@ function add_variables_model!(m, par)
         bus_ang[i=1:par.nbus]     >= 0
 
         # import and export energy to N1
-        imp[i=1:par.nbus]     >= 0
-        imp_max[i=1:par.nbus]
-
-        exp[i=1:par.nbus]     >= 0
-        exp_max[i=1:par.nbus]
+        if par.flag_import
+            imp[i=1:par.nbus] >= 0
+            imp_max[i=1:par.nbus]
+        end
+        
+        if par.flag_export
+            exp[i=1:par.nbus] >= 0
+            exp_max[i=1:par.nbus]
+        end
 
         # should there be a flag here?
-        dr[i=1:par.nload]     >= 0
-        dr_cur[i=1:par.nload] >= 0
-        dr_def[i=1:par.nload] >= 0
+        if par.flag_dem_rsp
+            dr[i=1:par.nload]     >= 0
+            dr_cur[i=1:par.nload] >= 0
+            dr_def[i=1:par.nload] >= 0
+        end
     end)
 end
 
@@ -80,7 +91,7 @@ function add_network_constraints!(m, par)
     
     JuMP.@constraint(m, kirchoff_second[i=1:par.nlin],flw[i] == 100.0 * (1 / par.cir_x[i]) * (ang[par.cir_bus_to[i]] - ang[par.cir_bus_fr[i]]))
     
-    if par.use_cir_cap
+    if par.flag_sec_law
         JuMP.@constraint(m, flow_capacity_p[i=1:par.nlin],flw[i] <= +par.cir_cap[i])
         JuMP.@constraint(m, flow_capacity_n[i=1:par.nlin],flw[i] >= -par.cir_cap[i])
     end
@@ -125,12 +136,17 @@ function add_energy_balance_constraints!(m, par, t)
         bat_c   = haskey(par.bus_map_bat,i) ? m[:bat_c  ][par.bus_map_bat[i]] : 0.0
         
         # load
-        losses  = par.losses[i][t]
         dem     = haskey(par.bus_map_rsp,i) ? m[:dr][par.bus_map_rsp[i]] : 0.0
+
+        # losses
+        losses  = 0.0
+        if par.flag_losses
+            losses = par.losses[i][t]
+        end
         
         # slack
-        def     = haskey(par.bus_map_dem,i) ? m[:def][par.bus_map_dem[i]] : 0.0
-        cur     = m[:cur][i]
+        def = haskey(par.bus_map_dem,i) ? m[:def][par.bus_map_dem[i]] : 0.0
+        cur = m[:cur][i]
 
         # network
         h = par.cir_bus_to .== i
@@ -140,8 +156,15 @@ function add_energy_balance_constraints!(m, par, t)
         cir_out = any(h) ? m[:flw][h] : 0.0
 
         # import/export
-        imp = haskey(par.bus_map_imp, i) ? m[:imp][i] : 0.0
-        exp = haskey(par.bus_map_exp, i) ? m[:exp][i] : 0.0
+        imp = 0.0
+        if par.flag_import 
+            imp = haskey(par.bus_map_imp, i) ? m[:imp][i] : 0.0
+        end
+
+        exp = 0.0
+        if par.flag_export
+            exp = haskey(par.bus_map_exp, i) ? m[:exp][i] : 0.0
+        end
 
         # elv
 
@@ -262,7 +285,10 @@ function build_model(par)
 
         add_export_constraints!(subproblem, par)
 
-        parameterize_scenarios!(subproblem, par, t)
+        add_stageobjective!(m, par)
+
+        # parameterize_scenarios!(subproblem, par, t)
+
     end
 
     return m

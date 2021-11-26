@@ -340,7 +340,7 @@ mutable struct Execution
         return dat[1,:]
     end
 end
-mutable struct SDDPParameters
+mutable struct Problem
 
     # problem parameters
     stages      :: Int64
@@ -429,7 +429,12 @@ mutable struct SDDPParameters
     hrinj_cap :: Dict{Int64, Matrix{Float64}}
 
     # flags
-    use_cir_cap :: Bool
+    flag_sec_law :: Bool
+    flag_import  :: Bool
+    flag_export  :: Bool
+    flag_markov  :: Bool
+    flag_losses  :: Bool
+    flag_dem_rsp :: Bool
 
-    SDDPParameters() = new()
+    Problem() = new()
 end
