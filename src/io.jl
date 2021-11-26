@@ -71,7 +71,7 @@ function import_dso_hrload(x::Execution, d::Data)
     
     hrload_scn = Dict(code => zeros(Float64, x.NSTG) for code in d.load_code)
 
-    valid_load_codes = [code for code in d.bus_code if hasproperty(hrload,"$code")]
+    valid_load_codes = [code for code in d.load_code if hasproperty(hrload,"$code")]
     
     for i in 1:size(hrload,1)
 

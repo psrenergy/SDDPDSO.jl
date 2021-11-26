@@ -144,7 +144,7 @@ function setup_parameters!(par, x, n, d, opt)
     # demand response
     add_demand_response!(par, x, n, d)
 
-    # circuit
+    # circuit   
     (par.nlin > 0) && add_circuits!(par, d)
 
     # markov
