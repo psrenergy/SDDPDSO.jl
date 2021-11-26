@@ -114,48 +114,48 @@ mutable struct Sizes
             PSRStudy_getNumberSimulations(p.istdy) , # scenarios :: Int32
 
             # # --- Systems
-            PSRCollectionElement_maxElements(p.lstsys) , # sys       :: Int32
+            PSRI.max_elements(data, "PSRSystem"),
 
             # # --- Areas
-            PSRCollectionElement_maxElements(p.lstare) , # are       :: Int32
+            PSRI.max_elements(data, "PSRArea"), # are       :: Int32
 
             # # --- Demands
-            PSRCollectionElement_maxElements(p.lstdem)    , # dem       :: Int32
-            PSRCollectionElement_maxElements(p.lstdsg)    , # dsg       :: Int32
-            PSRCollectionElement_maxElements(p.lstdsgels) , # dsgels    :: Int32
+            PSRI.max_elements(data, "PSRDemand")    , # dem       :: Int32
+            0                                       , # dsg       :: Int32
+            0                                       , # dsgels    :: Int32
 
             # # --- Generators
-            PSRCollectionElement_maxElements(p.lsthyd)  , # hyd       :: Int32
-            PSRCollectionElement_maxElements(p.lstther) , # ther      :: Int32
-            PSRCollectionElement_maxElements(p.lstgnd)  , # gnd       :: Int32
-            PSRCollectionElement_maxElements(p.lstgen)  , # gen       :: Int32
+            PSRI.max_elements(data, "PSRHydroPlantSystem")  , # hyd       :: Int32
+            PSRI.max_elements(data, "PSRThermalPlant")      , # ther      :: Int32
+            PSRI.max_elements(data, "PSRGndPlant")          , # gnd       :: Int32
+            PSRI.max_elements(data, "PSRGenerator")         , # gen       :: Int32
 
             0.0 , # PSRIOElementHourlyScenarios_totalStages(p.lstgndscn)    ,
             0.0 , # PSRIOElementHourlyScenarios_totalScenarios(p.lstgndscn) ,
             0.0 , # PSRIOElementHourlyScenarios_totalHours(p.lstgndscn)     ,
 
             # # --- Fuels
-            PSRCollectionElement_maxElements(p.lstfuel) , # fuel      :: Int32
+            PSRI.max_elements(data, "PSRFuel") , # fuel      :: Int32
 
             # # --- Battery
-            PSRCollectionElement_maxElements(p.lstbat)  , # bat       :: Int32
+            PSRI.max_elements(data, "PSRBattery")  , # bat       :: Int32
 
             # # --- Loads
-            PSRCollectionElement_maxElements(p.lstload) , # load      :: Int32
+            PSRI.max_elements(data, "PSRLoad") , # load      :: Int32
 
             # # --- Network
-            PSRCollectionElement_maxElements(p.lstbus) , # bus       :: Int32
-            PSRCollectionElement_maxElements(p.lstcir) , # cir       :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstbusdc) , # busdc     :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstldc)   , # lnkdc     :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstcirdc) , # cirdc     :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstcnv)   , # cnv       :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstlin)   , # lin       :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lsttrf)   , # trf       :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstcap)   , # cap       :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstrea)   , # rea       :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstsca)   , # sercap    :: Int32
-            sddp ? 0 : PSRCollectionElement_maxElements(p.lstlre)     # linrea    :: Int32
+            PSRI.max_elements(data, "PSRBus")                       , # bus       :: Int32
+            PSRI.max_elements(data, "PSRSerie")                     , # cir       :: Int32
+            sddp ? 0 : 0 , # busdc     :: Int32
+            sddp ? 0 : 0 , # lnkdc     :: Int32
+            sddp ? 0 : 0 , # cirdc     :: Int32
+            sddp ? 0 : 0 , # cnv       :: Int32
+            sddp ? 0 : 0 , # lin       :: Int32
+            sddp ? 0 : 0 , # trf       :: Int32
+            sddp ? 0 : 0 , # cap       :: Int32
+            sddp ? 0 : 0 , # rea       :: Int32
+            sddp ? 0 : 0 , # sercap    :: Int32
+            sddp ? 0 : 0   # linrea    :: Int32
         )
     end
 end
