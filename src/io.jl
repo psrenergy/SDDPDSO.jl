@@ -69,7 +69,7 @@ function import_dso_hrload(x::Execution, d::Data)
     # --- read external hourly scenarios cost data
     hrload = import_csvfile(x.PATH,"dso_hrload.dat")
     
-    hrload_scn = Dict(code => zeros(Float64, x.NSTG) for code in d.load_code)
+    hrload_scn = Dict(code => zeros(Float64, x.dso_stages) for code in d.load_code)
 
     valid_load_codes = [code for code in d.load_code if hasproperty(hrload,"$code")]
     
@@ -79,10 +79,10 @@ function import_dso_hrload(x::Execution, d::Data)
 
         stg = hrload_i.stage
 
-        (stg > x.NSTG) && continue
+        (stg > x.dso_stages) && continue
         
         for code in valid_load_codes
-            hrload_scn[code][stg] = x.DFACT * hrload_i["$code"]
+            hrload_scn[code][stg] = x.demand_factor * hrload_i["$code"]
         end
     end
 
@@ -98,7 +98,7 @@ function import_dso_hrgnd_scn(x::Execution, d::Data)
     # --- read external hourly scenarios cost data
     hrgnd = import_csvfile(x.PATH,"dso_hrgnd_scn.dat")
     
-    hrgnd_scn = Dict(code => zeros(Float64, x.NSTG, x.NSCN) for code in d.gnd_code) #d.bus_code[d.bus2gnd])
+    hrgnd_scn = Dict(code => zeros(Float64, x.dso_stages, x.dso_scenarios) for code in d.gnd_code) #d.bus_code[d.bus2gnd])
 
     # CHANGE TO LOAD CODES
     valid_load_codes = [code for code in d.gnd_code if hasproperty(hrgnd,"$code")] #d.bus_code[d.bus2gnd]
@@ -110,7 +110,7 @@ function import_dso_hrgnd_scn(x::Execution, d::Data)
         stg = hrgnd_i.stage
         scn = hrgnd_i.scenario
 
-        if (stg > x.NSTG) | (scn > x.NSCN)
+        if (stg > x.dso_stages) | (scn > x.dso_scenarios)
             continue
         end
 
@@ -156,7 +156,8 @@ function import_dso_hrinj_cst(x::Execution, d::Data)
     valid_codes = [code for code in d.bus_code if hasproperty(hrinj,"$code")]
     
     # --- 
-    hrinj_scn = Dict(code => zeros(Float64, x.NSTG, x.NSCN) for code in valid_codes)
+    hrinj_scn = Dict(code => zeros(Float64, x.dso_stages, x.dso_scenarios) for code in valid_codes)
+    hrinj_stg = Dict(code => zeros(Float64, x.dso_stages) for code in valid_codes)
 
     for i in 1:size(hrinj,1)
 
@@ -165,14 +166,16 @@ function import_dso_hrinj_cst(x::Execution, d::Data)
         stg = hrinj_i.stage
         scn = hrinj_i.scenario
 
-        if (stg > x.NSTG) | (scn > x.NSCN)
+        if (stg > x.dso_stages) | (scn > x.dso_scenarios)
             continue
         end
 
         for code in valid_codes
-            hrinj_scn[code][stg, scn] = hrinj_i["$code"]
+            hrinj_scn[code][stg, scn]  = hrinj_i["$code"]
+            hrinj_stg[code][stg]      += hrinj_i["$code"]/x.dso_scenarios
         end
     end
+
 
     return hrinj_scn
 end
@@ -189,7 +192,7 @@ function import_dso_hrinj_cap(x::Execution, d::Data)
     valid_codes = [code for code in d.bus_code if hasproperty(hrinj,"$code")]
     
     # --- 
-    hrinj_scn = Dict(code => zeros(Float64, x.NSTG, x.NSCN) for code in valid_codes)
+    hrinj_scn = Dict(code => zeros(Float64, x.dso_stages, x.dso_scenarios) for code in valid_codes)
 
     for i in 1:size(hrinj,1)
 
@@ -198,7 +201,7 @@ function import_dso_hrinj_cap(x::Execution, d::Data)
         stg = hrinj_i.stage
         scn = hrinj_i.scenario
 
-        if (stg > x.NSTG) | (scn > x.NSCN)
+        if (stg > x.dso_stages) | (scn > x.dso_scenarios)
             continue
         end
 
@@ -217,7 +220,7 @@ function import_dso_markov_probabilities(x::Execution)
     
     nrow, ncol = size(prob)
 
-    markov_prob = zeros(x.NSTG, x.NSCN, x.NSTT)
+    markov_prob = zeros(x.dso_stages, x.dso_scenarios, x.flag_markov_states)
 
     for i in 1:nrow
         state = 0
@@ -240,7 +243,7 @@ function import_dso_markov_transitions(x::Execution)
 
     nrow, ncol = size(tran)
     
-    markov_trans = zeros(x.NSTG, x.NSTT, x.NSTT)
+    markov_trans = zeros(x.dso_stages, x.flag_markov_states, x.flag_markov_states)
 
     for i in 1:nrow
         state_to = 0
@@ -262,7 +265,7 @@ function import_dso_markov_transitions(x::Execution)
     push!(markov_trans_reshape, reshape(markov_trans[2,1,:],1,2))
 
     # --- following stages (state n to 1/n)
-    for stage in 3:x.NSTG
+    for stage in 3:x.dso_stages
         push!(markov_trans_reshape,markov_trans[stage,:,:])
     end
 

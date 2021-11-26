@@ -25,28 +25,35 @@ function add_variables_model!(m, par)
         cur[i=1:par.nbus]         >= 0
     
         bus_ang[i=1:par.nbus]     >= 0
+    end)
 
-        # import and export energy to N1
-        if par.flag_import
+    # import energy from higher level
+    if par.flag_import
+        JuMP.@variables(m, begin
             imp[i=1:par.nbus] >= 0
             imp_max[i=1:par.nbus]
-        end
-        
-        if par.flag_export
+        end)
+    end
+
+    # export energy to higher level
+    if par.flag_export
+        JuMP.@variables(m, begin
             exp[i=1:par.nbus] >= 0
             exp_max[i=1:par.nbus]
-        end
+        end)
+    end
 
-        # should there be a flag here?
-        if par.flag_dem_rsp
+    # demand response
+    if par.flag_dem_rsp
+        JuMP.@variables(m, begin
             dr[i=1:par.nload]     >= 0
             dr_cur[i=1:par.nload] >= 0
             dr_def[i=1:par.nload] >= 0
-        end
-    end)
+        end)
+    end
 end
 
-function add_import_constraints!(m, par)
+function add_import_constraints!(m, par, t)
     imp, imp_max = m[:imp], m[:imp_max]
 
     # --- limiting energy import capacity for frontier buses  
@@ -61,12 +68,12 @@ function add_import_constraints!(m, par)
     end
 
     # --- add constraint
-    JuMP.@constraint(m, import_capacity_1[i=valid_buses]    , imp[i] <= imp_max[i])
+    JuMP.@constraint(m, import_capacity_1[i=valid_buses]    , imp[i] <= par.imp_max[i][t,1])
     JuMP.@constraint(m, import_capacity_2[i=non_valid_buses], imp[i] <= 0.0       ) 
 
 end
 
-function add_export_constraints!(m, par)
+function add_export_constraints!(m, par, t)
     exp, exp_max = m[:exp], m[:exp_max]
 
     # --- limiting energy export capacity for frontier buses
@@ -81,7 +88,7 @@ function add_export_constraints!(m, par)
     end
 
     # --- add constraint
-    JuMP.@constraint(m, export_capacity_1[i=valid_buses]    , exp[i] <= exp_max[i])
+    JuMP.@constraint(m, export_capacity_1[i=valid_buses]    , exp[i] <= par.exp_max[i][t,1])
     JuMP.@constraint(m, export_capacity_2[i=non_valid_buses], exp[i] <= 0.0       )    
 
 end
@@ -136,7 +143,10 @@ function add_energy_balance_constraints!(m, par, t)
         bat_c   = haskey(par.bus_map_bat,i) ? m[:bat_c  ][par.bus_map_bat[i]] : 0.0
         
         # load
-        dem     = haskey(par.bus_map_rsp,i) ? m[:dr][par.bus_map_rsp[i]] : 0.0
+        dem     = haskey(par.bus_map_rsp,i) ? par.demand[par.bus_map_rsp[i][1]][t] : 0.0
+        if par.flag_dem_rsp
+            dem = haskey(par.bus_map_rsp,i) ? m[:dr][par.bus_map_rsp[i]] : 0.0
+        end
 
         # losses
         losses  = 0.0
@@ -199,15 +209,40 @@ function add_demand_response_constraints!(m, par, t)
     end
 end
 
-function add_stageobjective!(m, par) # having problems here...
-    gen_die, def, cur, dr_def, dr_cur = m[:gen_die], m[:def], m[:cur], m[:dr_def], m[:dr_cur]
+function add_stageobjective!(m, par, t) # having problems here...
+    def, cur = m[:def], m[:cur]
+
+    gen_die, gen_cst = 0.0, 0.0
+    if par.ngen > 0
+        gen_die = m[:gen_die]
+        gen_cst = par.gen_cost
+    end
+
+    dr_def, dr_cur = 0.0, 0.0
+    if par.flag_dem_rsp
+        dr_def, dr_cur = m[:dr_def], m[:dr_cur]
+    end
+
+    exp, exp_cst = 0.0, 0.0
+    if par.flag_export
+        exp     = m[:exp]
+        exp_cst = Float64[par.exp_cost[i][t,1] for i in 1:par.nbus if haskey(par.bus_map_exp, i)]
+    end
+
+    imp, imp_cst = 0.0, 0.0
+    if par.flag_import
+        imp     = m[:imp]
+        imp_cst = Float64[par.imp_cost[i][t,1] for i in 1:par.nbus if haskey(par.bus_map_imp, i)]
+    end
+
 
     # Define the objective for each stage `t`. Note that we can use `t` as an
     # index for t = 1, 2, ..., 24    
     SDDP.@stageobjective(m, 
-        par.gen_cost'gen_die 
-        + sum(def * par.def_cost) + sum(cur * par.def_cost)
-        + sum(dr_def * par.def_cost * 2) + sum(dr_cur * par.def_cost * 2)
+        sum(gen_die .* gen_cst)
+        + sum(def .* par.def_cost) + sum(cur .* par.def_cost)
+        + sum(dr_def .* par.def_cost * 2) + sum(dr_cur .* par.def_cost * 2)
+        + sum(imp .* imp_cst) - sum(exp .* exp_cst)
     )
 end
 
@@ -215,7 +250,7 @@ function parameterize_solar_generation_scenarios!(m, par, t)
     gen_sol_max = m[:gen_sol_max]
 
     # Parameterize the subproblem.
-    SDDP.parameterize(m, 1:par.nscn) do ω
+    SDDP.parameterize(m, 1:par.dso_scenarios) do ω
         for i = 1:par.nsol
             JuMP.fix(gen_sol_max[i], par.sol_scn[t,ω,i])
         end
@@ -237,7 +272,7 @@ function parameterize_scenarios!(m, par, t)
     gen_die, def, cur, dr_def, dr_cur = m[:gen_die], m[:def], m[:cur], m[:dr_def], m[:dr_cur]
 
     # Parameterize the subproblem.
-    SDDP.parameterize(m, 1:par.nscn) do ω
+    SDDP.parameterize(m, 1:par.dso_scenarios) do ω
         
         # parametrize renewable generation scenarios
         for i = 1:par.nsol
@@ -279,13 +314,13 @@ function build_model(par)
     
         add_energy_balance_constraints!(subproblem, par, t)
     
-        add_demand_response_constraints!(subproblem, par, t)
+        par.flag_dem_rsp && add_demand_response_constraints!(subproblem, par, t)
 
-        add_import_constraints!(subproblem, par)
+        par.flag_import && add_import_constraints!(subproblem, par, t)
 
-        add_export_constraints!(subproblem, par)
+        par.flag_export && add_export_constraints!(subproblem, par, t)
 
-        add_stageobjective!(m, par)
+        add_stageobjective!(subproblem, par, t)
 
         # parameterize_scenarios!(subproblem, par, t)
 

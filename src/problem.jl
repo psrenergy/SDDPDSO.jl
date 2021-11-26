@@ -1,15 +1,24 @@
+function add_dso_flags!(par, x)
+    par.flag_sec_law = x.flag_sec_law == 1
+    par.flag_import  = x.flag_import  == 1
+    par.flag_export  = x.flag_export  == 1
+    par.flag_markov  = x.flag_markov  == 1
+    par.flag_losses  = false # x.flag_losses  == 1
+    par.flag_dem_rsp = x.flag_dem_rsp == 1
+end
+
 function add_sddp_parameters!(par, x, opt)
-    par.stages      = x.NSTG
+    par.stages      = x.dso_stages
     par.sense       = :Min
     par.optimizer   = JuMP.optimizer_with_attributes(opt, "OUTPUTLOG" => 0)
     par.upper_bound = 1e7
     par.lower_bound = 0.0 
-    par.def_cost    = x.DEFC
-    par.demand_factor = x.DFACT
+    par.def_cost    = x.deficit_cost
+    par.demand_factor = x.demand_factor
 end
 
 function add_dimensions!(par, x, n)
-    par.nscn   = x.NSCN       
+    par.dso_scenarios   = x.dso_scenarios       
     par.nbat   = n.bat       
     par.ngen   = n.ther
     par.nsol   = n.gnd
@@ -17,7 +26,7 @@ function add_dimensions!(par, x, n)
     par.nbus   = n.bus       
     par.nlin   = n.cir
     par.nload  = n.load
-    par.nstate = x.NSTT 
+    par.nstate = x.markov_states 
 end
 
 function add_batteries!(par, d)
@@ -37,7 +46,7 @@ end
 function add_solar_plants!(par, x, n, d)
     par.sol_cap = d.gnd_capacity                              # [MW]   : solar plant capacity
     gnd_scn = get_gnd_scenarios(x, d)                   # [p.u.] :
-    par.sol_scn = zeros(Float64, x.NSTG, x.NSCN, n.gnd) # [p.u.] : rooftop generation cenarios scn => [stg x plant]
+    par.sol_scn = zeros(Float64, x.dso_stages, x.dso_scenarios, n.gnd) # [p.u.] : rooftop generation cenarios scn => [stg x plant]
     for i in 1:n.gnd
         par.sol_scn[:,:,i] .= gnd_scn[d.gnd_code[i]] .* d.gnd_capacity[i]
     end
@@ -70,7 +79,7 @@ function add_demand!(par, x, n, d)
 end
 
 function add_losses!(par, x, n, d)
-    par.losses = [zeros(Float64,x.NSTG) for i in 1:n.bus]
+    par.losses = [zeros(Float64,x.dso_stages) for i in 1:n.bus]
 end
 
 function add_demand_response!(par, x, n, d)
@@ -110,11 +119,11 @@ function setup_parameters!(par, x, n, d, opt)
     # initialize solver 
     # init_xpresspsr()
 
+    # set up flags
+    add_dso_flags!(par, x)
+
     # set up problem parameters
     add_sddp_parameters!(par, x, opt)
-
-    # add flags
-    par.flag_sec_law = true
 
     # problem dimensions
     add_dimensions!(par, x, n)
@@ -139,19 +148,19 @@ function setup_parameters!(par, x, n, d, opt)
     (par.nload > 0) && add_demand!(par, x, n, d)
 
     # losses
-    add_losses!(par, x, n, d)
+    par.flag_losses && add_losses!(par, x, n, d)
 
     # demand response
-    add_demand_response!(par, x, n, d)
+    par.flag_dem_rsp && add_demand_response!(par, x, n, d)
 
     # circuit   
     (par.nlin > 0) && add_circuits!(par, d)
 
     # markov
-    x.RMKV && add_markov!(par,x)
+    par.flag_markov && add_markov!(par,x)
 
     # hrinj attributes (cost and cap)
-    add_hrinj_attributes!(par, x, d)
+    par.flag_import && add_hrinj_attributes!(par, x, d)
     
     # map : bus => gen 
     # (must change loop to consider 1 -> N)

@@ -1,3 +1,27 @@
+function _check_input(data, column::Symbol, default, type, message::String, throw_error::Bool=false, force::Bool=true)
+    if hasproperty(data,column)
+        default = _check_type(data[column],type,message,force)
+    elseif throw_error
+        error("unable to find key "*string(column))
+    end
+    return default
+end
+
+function _check_input(data, column::String, default, type, message::String, throw_error::Bool=false, force::Bool=true)
+    return _check_input(data, Symbol(column), default, type, message, throw_error, force)
+end
+
+function _check_type(dt,ty,msg,force)
+    if typeof(dt) != ty
+        if force
+            convert(ty,dt)
+        else
+            error(msg)
+        end
+    end
+    return dt
+end
+
 mutable struct Sizes
 
     # --- Execution Parameters
@@ -291,48 +315,53 @@ mutable struct Data
     end
 end
 mutable struct Execution
-    PATH  :: String
-    DEBUG :: Int64
-    NSTG  :: Int64
-    NSCN  :: Int64
-    NSTT  :: Int64
-    RTSL  :: Bool
-    ELOD  :: Bool
-    ESCN  :: Bool
-    RMKV  :: Bool
-    DEFC  :: Float64
-    DFACT :: Float64
+    PATH          :: String
+    DEBUG         :: Int64
+    dso_stages    :: Int64
+    dso_scenarios :: Int64
+    markov_states :: Int64
+    deficit_cost  :: Float64
+    demand_factor :: Float64
+    flag_markov   :: Int64
+    flag_export   :: Int64
+    flag_import   :: Int64
+    flag_dem_rsp  :: Int64
+    flag_sec_law  :: Int64
+
     function Execution()
         return new(
             ""   ,
+            1    ,
+            1    ,
+            0    ,
+            0    ,
+            1e4  ,
             0    ,
             0    ,
             0    ,
             0    ,
-            false,
-            false,
-            false,
-            false,
-            1e4 
+            0
         )
     end
+
     function Execution(path::String)
         !isdir(path) && error("Unable to locate case path: "*path)
         
         sddp_dso = read_execution_parameters(path::String)
 
         return new(
-            path                                             ,
-            0                                                ,
-            sddp_dso.sddp_stages                             ,
-            sddp_dso.sddp_scenarios                          ,
-            sddp_dso.markov_states                           ,
-            sddp_dso.read_tsl_scenarios == 1                 ,
-            sddp_dso.read_external_hourly_load == 1          ,
-            sddp_dso.read_external_hourly_gnd_scenarios == 1 ,
-            sddp_dso.run_markov_model == 1                   ,
-            sddp_dso.deficit_cost                            ,
-            sddp_dso.demand_factor
+            path                           ,
+            0                              ,
+            _check_input(sddp_dso, "sddp_stages"      ,     1,   Int64,                 "", true),
+            _check_input(sddp_dso, "sddp_scenarios"   ,     1,   Int64,                 "", true),
+            _check_input(sddp_dso, "markov_states"    ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "deficit_cost"     , 1.0e3, Float64, "expected float"  , false),
+            _check_input(sddp_dso, "demand_factor"    ,   1.0, Float64, "expected float"  , false),
+            _check_input(sddp_dso, "flag_markov"      ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_export"      ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_import"      ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_dem_rsp"     ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_sec_law"     ,     0,   Int64, "expected integer", false)
         )
     end
     function read_execution_parameters(path::String)
@@ -350,7 +379,7 @@ mutable struct Problem
     lower_bound :: Float64
 
     # problem dimensions
-    nscn   :: Int64
+    dso_scenarios   :: Int64
     nbat   :: Int64
     ngen   :: Int64
     nsol   :: Int64

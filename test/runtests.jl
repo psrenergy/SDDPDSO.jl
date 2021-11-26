@@ -3,7 +3,7 @@ using Test
 const DSO = SDDPDSO
 
 # ---
-casepath = joinpath(".", "data", "example_00")
+casepath = joinpath(".", "data", "example_01")
 
 # --- 
 @testset "SDDP DSO" begin
