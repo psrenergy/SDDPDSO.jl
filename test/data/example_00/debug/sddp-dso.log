@@ -1,0 +1,114 @@
+------------------------------------------------------------------------------
+                      SDDP.jl (c) Oscar Dowson, 2017-21
+
+Problem
+  Nodes           : 24
+  State variables : 88
+  Scenarios       : 5.96046e+16
+  Existing cuts   : false
+  Subproblem structure                           : (min, max)
+    Variables                                    : (1440, 1440)
+    JuMP.AffExpr in MOI.GreaterThan{Float64}     : (220, 220)
+    JuMP.VariableRef in MOI.GreaterThan{Float64} : (960, 960)
+    JuMP.AffExpr in MOI.LessThan{Float64}        : (488, 488)
+    JuMP.VariableRef in MOI.LessThan{Float64}    : (88, 89)
+    JuMP.AffExpr in MOI.EqualTo{Float64}         : (347, 432)
+Options
+  Solver          : serial mode
+  Risk measure    : SDDP.Expectation()
+  Sampling scheme : SDDP.InSampleMonteCarlo
+
+Numerical stability report
+  Non-zero Matrix range     [9e-01, 1e+05]
+  Non-zero Objective range  [1e+00, 2e+03]
+  Non-zero Bounds range     [2e-01, 4e+00]
+  Non-zero RHS range        [1e-05, 9e+02]
+WARNING: numerical stability issues detected
+  - RHS range contains small coefficients
+Very large or small absolute values of coefficients
+can cause numerical stability issues. Consider
+reformulating the model.
+
+ Iteration    Simulation       Bound         Time (s)    Proc. ID   # Solves
+------------------------------------------------------------------------------
+                      SDDP.jl (c) Oscar Dowson, 2017-21
+
+Problem
+  Nodes           : 24
+  State variables : 88
+  Scenarios       : 5.96046e+16
+  Existing cuts   : false
+  Subproblem structure                           : (min, max)
+    Variables                                    : (1440, 1440)
+    JuMP.AffExpr in MOI.GreaterThan{Float64}     : (220, 220)
+    JuMP.VariableRef in MOI.GreaterThan{Float64} : (960, 960)
+    JuMP.AffExpr in MOI.LessThan{Float64}        : (488, 488)
+    JuMP.VariableRef in MOI.LessThan{Float64}    : (88, 89)
+    JuMP.AffExpr in MOI.EqualTo{Float64}         : (347, 432)
+Options
+  Solver          : serial mode
+  Risk measure    : SDDP.Expectation()
+  Sampling scheme : SDDP.InSampleMonteCarlo
+
+Numerical stability report
+  Non-zero Matrix range     [9e-01, 1e+05]
+  Non-zero Objective range  [1e+00, 2e+03]
+  Non-zero Bounds range     [2e-01, 4e+00]
+  Non-zero RHS range        [1e-05, 9e+02]
+WARNING: numerical stability issues detected
+  - RHS range contains small coefficients
+Very large or small absolute values of coefficients
+can cause numerical stability issues. Consider
+reformulating the model.
+
+ Iteration    Simulation       Bound         Time (s)    Proc. ID   # Solves
+------------------------------------------------------------------------------
+                      SDDP.jl (c) Oscar Dowson, 2017-21
+
+Problem
+  Nodes           : 24
+  State variables : 88
+  Scenarios       : 5.96046e+16
+  Existing cuts   : false
+  Subproblem structure                           : (min, max)
+    Variables                                    : (1440, 1440)
+    JuMP.AffExpr in MOI.GreaterThan{Float64}     : (220, 220)
+    JuMP.VariableRef in MOI.GreaterThan{Float64} : (960, 960)
+    JuMP.AffExpr in MOI.LessThan{Float64}        : (488, 488)
+    JuMP.VariableRef in MOI.LessThan{Float64}    : (88, 89)
+    JuMP.AffExpr in MOI.EqualTo{Float64}         : (347, 432)
+Options
+  Solver          : serial mode
+  Risk measure    : SDDP.Expectation()
+  Sampling scheme : SDDP.InSampleMonteCarlo
+
+Numerical stability report
+  Non-zero Matrix range     [9e-01, 1e+05]
+  Non-zero Objective range  [1e+00, 2e+03]
+  Non-zero Bounds range     [2e-01, 4e+00]
+  Non-zero RHS range        [1e-05, 9e+02]
+WARNING: numerical stability issues detected
+  - RHS range contains small coefficients
+Very large or small absolute values of coefficients
+can cause numerical stability issues. Consider
+reformulating the model.
+
+ Iteration    Simulation       Bound         Time (s)    Proc. ID   # Solves
+        1    4.865521e+02   1.835627e+02   9.083000e+00          1        144
+        2    1.676263e+03   3.686691e+02   1.068700e+01          1        288
+        3    1.908807e+03   3.686691e+02   1.155000e+01          1        432
+        4    2.053410e+03   3.686691e+02   1.236400e+01          1        576
+        5    1.910213e+03   3.686691e+02   1.323900e+01          1        720
+        6    1.912407e+03   3.686691e+02   1.410300e+01          1        864
+        7    1.834035e+03   3.686691e+02   1.495500e+01          1       1008
+        8    1.900397e+03   3.686691e+02   1.581400e+01          1       1152
+        9    2.081097e+03   3.686691e+02   1.669000e+01          1       1296
+       10    2.580608e+03   3.686691e+02   1.754800e+01          1       1440
+
+Terminating training
+  Status         : iteration_limit
+  Total time (s) : 1.754800e+01
+  Total solves   : 1440
+  Best bound     :  3.686691e+02
+  Simulation CI  :  1.834379e+03 ± 3.285609e+02
+------------------------------------------------------------------------------
