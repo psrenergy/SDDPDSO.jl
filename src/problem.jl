@@ -12,7 +12,7 @@ end
 function add_sddp_parameters!(par, x, opt)
     par.stages        = x.dso_stages
     par.sense         = :Min
-    par.optimizer     = JuMP.optimizer_with_attributes(opt, "OUTPUTLOG" => 0)
+    par.optimizer     = JuMP.optimizer_with_attributes(opt) #, "OUTPUTLOG" => 0)
     par.upper_bound   = 1e7
     par.lower_bound   = 0.0 
     par.def_cost      = x.deficit_cost

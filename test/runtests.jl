@@ -24,11 +24,11 @@ opt = GLPK.Optimizer
 
     # --- Test 02 - 
     @testset "Run SDDP model" begin
-        # @time include("run_model.jl")
+        @time include("run_model.jl")
     end
 
     # --- Test 03 - 
     @testset "Write results" begin
-        # @time include("write_results.jl")
+        @time include("write_results.jl")
     end
 end
