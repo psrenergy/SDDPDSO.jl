@@ -5,18 +5,20 @@ function add_dso_flags!(par, x)
     par.flag_markov  = x.flag_markov  == 1
     par.flag_losses  = false # x.flag_losses  == 1
     par.flag_dem_rsp = x.flag_dem_rsp == 1
-    par.flag_debug   = true
-    par.flag_verbose = par.flag_debug ? true : false
+    par.flag_debug   = x.flag_debug == 1
+    par.flag_verbose = par.flag_debug ? true : (x.flag_verbose == 1)
 end
 
 function add_sddp_parameters!(par, x, opt)
-    par.stages      = x.dso_stages
-    par.sense       = :Min
-    par.optimizer   = JuMP.optimizer_with_attributes(opt, "OUTPUTLOG" => 0)
-    par.upper_bound = 1e7
-    par.lower_bound = 0.0 
-    par.def_cost    = x.deficit_cost
+    par.stages        = x.dso_stages
+    par.sense         = :Min
+    par.optimizer     = JuMP.optimizer_with_attributes(opt, "OUTPUTLOG" => 0)
+    par.upper_bound   = 1e7
+    par.lower_bound   = 0.0 
+    par.def_cost      = x.deficit_cost
     par.demand_factor = x.demand_factor
+    par.max_iter      = x.max_iter
+    par.max_time      = x.max_time
 end
 
 function add_dimensions!(par, x, n)

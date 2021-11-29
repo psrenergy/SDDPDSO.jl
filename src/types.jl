@@ -322,11 +322,16 @@ mutable struct Execution
     markov_states :: Int64
     deficit_cost  :: Float64
     demand_factor :: Float64
+    max_iter      :: Int64
+    max_time      :: Float64
     flag_markov   :: Int64
     flag_export   :: Int64
     flag_import   :: Int64
     flag_dem_rsp  :: Int64
     flag_sec_law  :: Int64
+    flag_debug    :: Int64
+    flag_verbose  :: Int64
+
 
     function Execution()
         return new(
@@ -335,11 +340,15 @@ mutable struct Execution
             1    ,
             0    ,
             0    ,
-            1e4  ,
+            1.0e4,
+            1.0  ,
+            10   ,
+            60.0 ,
             0    ,
             0    ,
             0    ,
             0    ,
+            1    ,
             0
         )
     end
@@ -357,11 +366,15 @@ mutable struct Execution
             _check_input(sddp_dso, "markov_states"    ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "deficit_cost"     , 1.0e3, Float64, "expected float"  , false),
             _check_input(sddp_dso, "demand_factor"    ,   1.0, Float64, "expected float"  , false),
+            _check_input(sddp_dso, "max_iter"         ,    50,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "max_time"         ,  60.0, Float64, "expected float"  , false),
             _check_input(sddp_dso, "flag_markov"      ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_export"      ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_import"      ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_dem_rsp"     ,     0,   Int64, "expected integer", false),
-            _check_input(sddp_dso, "flag_sec_law"     ,     0,   Int64, "expected integer", false)
+            _check_input(sddp_dso, "flag_sec_law"     ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_debug"       ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_verbose"     ,     0,   Int64, "expected integer", false),
         )
     end
     function read_execution_parameters(path::String)
@@ -377,6 +390,8 @@ mutable struct Problem
     optimizer   # :: Float64
     upper_bound :: Float64
     lower_bound :: Float64
+    max_iter    :: Int64
+    max_time    :: Float64
 
     # problem dimensions
     dso_scenarios   :: Int64
