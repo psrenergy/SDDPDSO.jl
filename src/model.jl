@@ -209,40 +209,29 @@ function add_demand_response_constraints!(m, par, t)
     end
 end
 
-function add_stageobjective!(m, par, t) # having problems here...
-    def, cur = m[:def], m[:cur]
-
-    gen_die, gen_cst = 0.0, 0.0
-    if par.ngen > 0
-        gen_die = m[:gen_die]
-        gen_cst = par.gen_cost
-    end
-
-    dr_def, dr_cur = 0.0, 0.0
-    if par.flag_dem_rsp
-        dr_def, dr_cur = m[:dr_def], m[:dr_cur]
-    end
-
-    exp, exp_cst = 0.0, 0.0
-    if par.flag_export
-        exp     = m[:exp]
-        exp_cst = Float64[par.exp_cost[i][t,1] for i in 1:par.nbus if haskey(par.bus_map_exp, i)]
-    end
-
-    imp, imp_cst = 0.0, 0.0
-    if par.flag_import
-        imp     = m[:imp]
-        imp_cst = Float64[par.imp_cost[i][t,1] for i in 1:par.nbus if haskey(par.bus_map_imp, i)]
-    end
-
+function add_stageobjective!(m, par, t)
+    
+    obj_ter    = get_objective_thermal(m, par, t)
+    
+    obj_def    = get_objective_deficit(m, par)
+    
+    obj_cur    = get_objective_curtailment(m, par)
+    
+    obj_dr_def = get_objective_demand_response_deficit(m, par)
+    
+    obj_dr_cur = get_objective_demand_response_curtailment(m, par)
+    
+    obj_imp    = get_objective_import(m, par, t)
+    
+    obj_exp    = get_objective_export(m, par, t)
 
     # Define the objective for each stage `t`. Note that we can use `t` as an
     # index for t = 1, 2, ..., 24    
     SDDP.@stageobjective(m, 
-        sum(gen_die .* gen_cst)
-        + sum(def .* par.def_cost) + sum(cur .* par.def_cost)
-        + sum(dr_def .* par.def_cost * 2) + sum(dr_cur .* par.def_cost * 2)
-        + sum(imp .* imp_cst) - sum(exp .* exp_cst)
+        obj_ter
+        + obj_def + obj_cur 
+        + obj_dr_def + obj_dr_cur
+        + obj_imp - obj_exp
     )
 end
 
