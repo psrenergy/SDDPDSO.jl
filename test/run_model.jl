@@ -11,5 +11,10 @@ end
 # --- set seed
 
 
-# --- rodar o modelo
+# --- train model
 DSO.SDDP.train(m, iteration_limit = 10, log_file = joinpath(x.PATH,"debug","sddp-dso.log"))
+
+# --- simulate model
+vars = [:bus_ang,:flw,:gen_die,:gen_sol,:gen_sol_max,:bat_c,:bat_d,:storage,:def,:cur,:dr,:dr_def,:dr_cur,:total_load,:imp,:exp,:imp_max,:exp_max]
+
+sims = DSO.SDDP.simulate(m, 10, vars; skip_undefined_variables=true);
