@@ -464,6 +464,8 @@ mutable struct Problem
     flag_markov  :: Bool
     flag_losses  :: Bool
     flag_dem_rsp :: Bool
+    flag_debug   :: Bool
+    flag_verbose :: Bool
 
     Problem() = new()
 end

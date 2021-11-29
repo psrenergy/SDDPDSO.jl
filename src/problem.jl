@@ -5,6 +5,8 @@ function add_dso_flags!(par, x)
     par.flag_markov  = x.flag_markov  == 1
     par.flag_losses  = false # x.flag_losses  == 1
     par.flag_dem_rsp = x.flag_dem_rsp == 1
+    par.flag_debug   = true
+    par.flag_verbose = par.flag_debug ? true : false
 end
 
 function add_sddp_parameters!(par, x, opt)
