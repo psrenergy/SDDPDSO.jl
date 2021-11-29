@@ -213,13 +213,13 @@ function add_stageobjective!(m, par, t)
     
     obj_ter    = get_objective_thermal(m, par, t)
     
-    obj_def    = get_objective_deficit(m, par)
+    obj_def    = get_objective_deficit(m, par, t)
     
-    obj_cur    = get_objective_curtailment(m, par)
+    obj_cur    = get_objective_curtailment(m, par, t)
     
-    obj_dr_def = get_objective_demand_response_deficit(m, par)
+    obj_dr_def = get_objective_demand_response_deficit(m, par, t)
     
-    obj_dr_cur = get_objective_demand_response_curtailment(m, par)
+    obj_dr_cur = get_objective_demand_response_curtailment(m, par, t)
     
     obj_imp    = get_objective_import(m, par, t)
     
@@ -309,6 +309,8 @@ function build_model(par)
 
         par.flag_export && add_export_constraints!(subproblem, par, t)
 
+        parameterize_solar_generation_scenarios!(subproblem, par, t)
+        
         add_stageobjective!(subproblem, par, t)
 
         # parameterize_scenarios!(subproblem, par, t)
