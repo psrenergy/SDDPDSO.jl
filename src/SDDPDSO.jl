@@ -23,6 +23,7 @@ module SDDPDSO
     include("model.jl")
     include("stageobjective.jl")
     include("problem.jl")
+    include("results.jl")
     include("statistics.jl")
     include("psrclasses.jl")
 
