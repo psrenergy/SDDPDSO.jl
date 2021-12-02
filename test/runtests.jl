@@ -38,7 +38,7 @@ Bin_set = [0,1]
 
     # --- Test 03 - 
     @testset "Write results" begin
-        @time include("write_results.jl")
+        # @time include("write_results.jl")
     end
 
 end
