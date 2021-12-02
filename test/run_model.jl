@@ -9,7 +9,7 @@ for i in [1, 2, par.stages]
 end
 
 # --- set seed
-
+Random.seed!(1111)
 
 # --- train model
 DSO.SDDP.train(m, iteration_limit = par.max_iter, log_file = joinpath(x.PATH,"debug","sddp-dso.log"))
