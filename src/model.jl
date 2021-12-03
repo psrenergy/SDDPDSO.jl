@@ -143,7 +143,7 @@ function add_energy_balance_constraints!(m, par, t)
         bat_c   = haskey(par.bus_map_bat,i) ? m[:bat_c  ][par.bus_map_bat[i]] : 0.0
         
         # load
-        dem     = haskey(par.bus_map_rsp,i) ? par.demand[par.bus_map_rsp[i][1]][t] : 0.0
+        dem     = haskey(par.bus_map_dem,i) ? sum(par.demand[j][t] for j in par.bus_map_dem[i]) : 0.0
         if par.flag_dem_rsp
             dem = haskey(par.bus_map_rsp,i) ? m[:dr][par.bus_map_rsp[i]] : 0.0
         end

@@ -103,20 +103,24 @@ function add_markov!(par, x)
     par.transition_matrices  = import_dso_markov_transitions(x)
 end
 
-function add_hrinj_attributes!(par, x, d)
-    par.hrinj_cst = import_dso_hrinj_cst(x,d)
-    par.hrinj_cap = import_dso_hrinj_cap(x, d)
-end
-
 function map_elements!(par, n, d)
     par.bus_map_sol = reverse_map_to_dict(d.gnd2bus, n.gnd) 
     par.bus_map_gen = reverse_map_to_dict(d.ter2bus, n.ther)
     par.bus_map_bat = reverse_map_to_dict(d.bat2bus, n.bat) 
     par.bus_map_elv = Dict()
     par.bus_map_dem = reverse_map_to_dict(d.lod2bus, n.load)
-    par.bus_map_rsp = reverse_map_to_dict(d.lod2bus, n.load)
-    par.bus_map_imp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
-    par.bus_map_exp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
+
+    if par.flag_dem_rsp
+        par.bus_map_rsp = reverse_map_to_dict(d.lod2bus, n.load)
+    end
+
+    if par.flag_import
+        par.bus_map_imp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
+    end
+
+    if par.flag_export
+        par.bus_map_exp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
+    end
 end
 
 function setup_parameters!(par, x, n, d, opt)
@@ -143,7 +147,7 @@ function setup_parameters!(par, x, n, d, opt)
     (par.nsol > 0) && add_solar_plants!(par, x, n, d)
 
     # import/export energy form transmission grid
-    (par.nload > 0) && add_injections!(par, x, d)
+    (par.flag_import | par.flag_export) && add_injections!(par, x, d)
 
     # electric vehicles
     (par.nelv > 0) && add_electric_vehicles!(par, d)
@@ -163,9 +167,6 @@ function setup_parameters!(par, x, n, d, opt)
     # markov
     par.flag_markov && add_markov!(par,x)
 
-    # hrinj attributes (cost and cap)
-    par.flag_import && add_hrinj_attributes!(par, x, d)
-    
     # map : bus => gen 
     # (must change loop to consider 1 -> N)
     map_elements!(par, n, d)

@@ -203,25 +203,25 @@ mutable struct Data
     s_ctg :: Vector{Int32}
 
     # --- Circuit Data
-    cir_code      :: Vector{Int32} 
-    cir_name      :: Vector{String} 
-    cir_status    :: Vector{Int32} 
-    cir_exist     :: Vector{Int32}
-    cir_monitored :: Vector{Int32}
-    cir_r         :: Vector{Float64}
-    cir_x         :: Vector{Float64}
-    cir_capacity  :: Vector{Float64}
-    cir_volt      :: Vector{Float64} 
-    cir_bus_from  :: Vector{Int32}
-    cir_bus_to    :: Vector{Int32}
-    cirSortOrder :: Vector{Int32}
+    cir_code       :: Vector{Int32} 
+    cir_name       :: Vector{String} 
+    cir_status     :: Vector{Int32} 
+    cir_exist      :: Vector{Int32}
+    cir_monitored  :: Vector{Int32}
+    cir_r          :: Vector{Float64}
+    cir_x          :: Vector{Float64}
+    cir_capacity   :: Vector{Float64}
+    cir_volt       :: Vector{Float64} 
+    cir_bus_from   :: Vector{Int32}
+    cir_bus_to     :: Vector{Int32}
+    cir_sort_order :: Vector{Int32}
 
     # --- Bus Data
-    bus_code      :: Vector{Int32}
-    bus_name      :: Vector{String}
-    bus_volt      :: Vector{Float64}
-    bus_vmin      :: Vector{Float64}
-    bus_vmax      :: Vector{Float64}
+    bus_code       :: Vector{Int32}
+    bus_name       :: Vector{String}
+    bus_volt       :: Vector{Float64}
+    bus_vmin       :: Vector{Float64}
+    bus_vmax       :: Vector{Float64}
     bus_sort_order :: Vector{Int32}
 
     # --- Demand Data

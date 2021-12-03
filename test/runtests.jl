@@ -6,6 +6,9 @@ const DSO = SDDPDSO
 # ---
 casepath = joinpath(".", "data", "example_00")
 
+# --- initialize DSO
+DSO.initialize(casepath)
+
 # ---
 opt = GLPK.Optimizer
 

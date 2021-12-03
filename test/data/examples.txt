@@ -1,0 +1,5 @@
+example 00: IEEE129 buses, 24 hours, 5 scenarios
+
+example 01: hibrid plant, 2 buses, 72 hours, 10 scenarios
+
+example 02: IEEE129 buses, 72 hours, 20 scenarios
