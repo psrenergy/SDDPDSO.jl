@@ -454,6 +454,15 @@ mutable struct Problem
     cir_bus_fr :: Vector{Int64}
     cir_bus_to :: Vector{Int64}
 
+    # set
+    set_bus     :: Vector{Int64}
+    set_cir     :: Vector{Int64}
+    set_dem     :: Vector{Int64}
+    set_dem_rsp :: Vector{Int64}
+    set_bat     :: Vector{Int64}
+    set_gnd     :: Vector{Int64}
+    set_ter     :: Vector{Int64}
+
     # map
     bus_map_sol :: Dict{Int64,Vector{Int64}}
     bus_map_gen :: Dict{Int64,Vector{Int64}}

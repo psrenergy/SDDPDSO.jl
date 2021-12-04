@@ -6,7 +6,7 @@ function add_variables_model!(m, par)
 
     # --- demand response
     if par.flag_dem_rsp
-        JuMP.@variable(m, sum(par.demand[i]) >= total_load[i=1:par.nload] >= 0.0, SDDP.State, initial_value = 0.0)
+        JuMP.@variable(m, sum(par.demand[i]) >= total_load[i=par.set_dem_rsp] >= 0.0, SDDP.State, initial_value = 0.0)
     end
 
     # Define the control variables
@@ -46,9 +46,9 @@ function add_variables_model!(m, par)
     # demand response
     if par.flag_dem_rsp
         JuMP.@variables(m, begin
-            dr[i=1:par.nload]     >= 0
-            dr_cur[i=1:par.nload] >= 0
-            dr_def[i=1:par.nload] >= 0
+            dr[i=par.set_dem_rsp]     >= 0
+            dr_cur[i=par.set_dem_rsp] >= 0
+            dr_def[i=par.set_dem_rsp] >= 0
         end)
     end
 end
@@ -145,7 +145,7 @@ function add_energy_balance_constraints!(m, par, t)
         # load
         dem     = haskey(par.bus_map_dem,i) ? sum(par.demand[j][t] for j in par.bus_map_dem[i]) : 0.0
         if par.flag_dem_rsp
-            dem = haskey(par.bus_map_rsp,i) ? m[:dr][par.bus_map_rsp[i]] : 0.0
+            dem = haskey(par.bus_map_rsp,i) ? m[:dr][par.bus_map_rsp[i]] : dem
         end
 
         # losses
@@ -195,17 +195,17 @@ function add_demand_response_constraints!(m, par, t)
     dr, dr_def, dr_cur, total_load = m[:dr], m[:dr_def], m[:dr_cur], m[:total_load]
 
     # Load sum over periods
-    JuMP.@constraint(m, dr_sum[i=1:par.nload],
+    JuMP.@constraint(m, dr_sum[i=par.set_dem_rsp],
         total_load[i].out == total_load[i].in + dr[i] + dr_def[i] - dr_cur[i] 
     )
 
     # Shift
-    JuMP.@constraint(m, dr_shift_ub[i=1:par.nload], dr[i] <= par.demand[i][t] * (1 + par.dem_rsp_shift[i]))
-    JuMP.@constraint(m, dr_shift_lb[i=1:par.nload], dr[i] >= par.demand[i][t] * (1 - par.dem_rsp_shift[i]))
+    JuMP.@constraint(m, dr_shift_ub[i=par.set_dem_rsp], dr[i] <= par.demand[i][t] * (1 + par.dem_rsp_shift[i]))
+    JuMP.@constraint(m, dr_shift_lb[i=par.set_dem_rsp], dr[i] >= par.demand[i][t] * (1 - par.dem_rsp_shift[i]))
 
     # Load Integral
     if t == par.stages
-        JuMP.@constraint(m, dr_integral[i=1:par.nload], total_load[i].out == sum(par.demand[i]))
+        JuMP.@constraint(m, dr_integral[i=par.set_dem_rsp], total_load[i].out == sum(par.demand[i]))
     end
 end
 

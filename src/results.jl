@@ -1,4 +1,4 @@
-function export_results(x, n, d, sims)
+function export_results(x, n, d, par, sims)
     
     if n.cir > 0
         CSV.write(
@@ -61,22 +61,22 @@ function export_results(x, n, d, sims)
     if x.flag_dem_rsp == 1
         CSV.write(
             joinpath(x.PATH,"results","demand_response_accumulated_load.csv"),
-            simulate_create_result_table_state_var(sims,:total_load,d.bus_name[d.lod2bus])
+            simulate_create_result_table_state_var(sims,:total_load,d.load_name[par.set_dem_rsp])
         )
 
         CSV.write(
             joinpath(x.PATH,"results","demand_response_load.csv"),
-            simulate_create_result_table(sims,:dr,d.bus_name[d.lod2bus])
+            simulate_create_result_table(sims,:dr,d.load_name[par.set_dem_rsp])
         )
 
         CSV.write(
             joinpath(x.PATH,"results","demand_response_deficit.csv"),
-            simulate_create_result_table(sims,:dr_def,d.bus_name[d.lod2bus])
+            simulate_create_result_table(sims,:dr_def,d.load_name[par.set_dem_rsp])
         )
 
         CSV.write(
             joinpath(x.PATH,"results","demand_response_curtailment.csv"),
-            simulate_create_result_table(sims,:dr_cur,d.bus_name[d.lod2bus])
+            simulate_create_result_table(sims,:dr_cur,d.load_name[par.set_dem_rsp])
         )
     end
 

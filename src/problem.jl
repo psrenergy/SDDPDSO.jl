@@ -112,6 +112,11 @@ function map_elements!(par, n, d)
 
     if par.flag_dem_rsp
         par.bus_map_rsp = reverse_map_to_dict(d.lod2bus, n.load)
+        for i in keys(par.bus_map_rsp)
+            filter!(x -> x ∈ par.set_dem_rsp, par.bus_map_rsp[i])
+            
+            isempty(par.bus_map_rsp[i]) && delete!(par.bus_map_rsp, i) 
+        end
     end
 
     if par.flag_import
@@ -120,6 +125,20 @@ function map_elements!(par, n, d)
 
     if par.flag_export
         par.bus_map_exp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
+    end
+end
+
+function filter_sets!(par)
+    # set
+    par.set_bus     = collect(1:par.nbus)
+    par.set_cir     = collect(1:par.nlin)
+    par.set_dem     = collect(1:par.nload)
+    par.set_bat     = collect(1:par.nbat)
+    par.set_gnd     = collect(1:par.nsol)
+    par.set_ter     = collect(1:par.ngen)
+    
+    if par.flag_dem_rsp
+        par.set_dem_rsp = Int64[i for i in 1:par.nload if par.dem_rsp_shift[i] > 0.0]
     end
 end
 
@@ -166,6 +185,9 @@ function setup_parameters!(par, x, n, d, opt)
 
     # markov
     par.flag_markov && add_markov!(par,x)
+
+    # filter necessary set
+    filter_sets!(par)
 
     # map : bus => gen 
     # (must change loop to consider 1 -> N)
