@@ -203,9 +203,8 @@ function add_demand_response_constraints!(m, par, t)
     JuMP.@constraint(m, dr_shift_ub[i=par.set_dem_rsp], dr[i] <= par.demand[i][t] * (1 + par.dem_rsp_shift[i]))
     JuMP.@constraint(m, dr_shift_lb[i=par.set_dem_rsp], dr[i] >= par.demand[i][t] * (1 - par.dem_rsp_shift[i]))
 
-    # Load Integral
-    if t == par.stages
-        JuMP.@constraint(m, dr_integral[i=par.set_dem_rsp], total_load[i].out == sum(par.demand[i]))
+    if mod(t,24) == 0
+        JuMP.@constraint(m, dr_integral[i=par.set_dem_rsp], total_load[i].out == sum(par.demand[i][1:t]))
     end
 end
 
