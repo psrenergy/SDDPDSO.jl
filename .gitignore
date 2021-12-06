@@ -35,6 +35,6 @@ test/data/example_00/reports/
 test/data/example_01/debug/
 test/data/example_01/results/
 test/data/example_01/reports/
-test/data/example_02/
-# test/data/example_02/debug/
-# test/data/example_02/results/
+test/data/example_02/debug/
+test/data/example_02/results/
+test/data/example_02/reports/
