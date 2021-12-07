@@ -88,7 +88,7 @@ function report_ter_att_per_bus(x, n, d, par)
                 agt_ref_code = d.ter_code[par.bus_map_gen[i][j]]
                 agt_ref_name = d.ter_name[par.bus_map_gen[i][j]]
                 agt_ref_cap  = d.ter_capacity[par.bus_map_gen[i][j]]
-                agt_ref_cst  = d.ter_capacity[par.bus_map_gen[i][j]]
+                agt_ref_cst  = d.ter_cost[par.bus_map_gen[i][j]]
 
                 push!(report_lines, agt_name * ",$agt_code," * agt_ref_name * ",$agt_ref_code,$agt_ref_cap,$agt_ref_cst")
             end
