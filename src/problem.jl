@@ -124,7 +124,7 @@ function map_elements!(par, n, d)
     end
 
     if par.flag_export
-        par.bus_map_exp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.imp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
+        par.bus_map_exp = Dict(i => [d.bus_code[i]] for i in 1:n.bus if haskey(par.exp_max,d.bus_code[i]))    # mudar um dia, ta bem feio
     end
 end
 
