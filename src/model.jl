@@ -68,7 +68,7 @@ function add_import_constraints!(m, par, t)
     end
 
     # --- add constraint
-    JuMP.@constraint(m, import_capacity_1[i=valid_buses]    , imp[i] <= par.imp_max[i][t,1])
+    JuMP.@constraint(m, import_capacity_1[i=valid_buses]    , imp[i] <= sum(par.imp_max[j][t,1] for j in par.bus_map_imp[i]))
     JuMP.@constraint(m, import_capacity_2[i=non_valid_buses], imp[i] <= 0.0       ) 
 
 end
@@ -88,7 +88,7 @@ function add_export_constraints!(m, par, t)
     end
 
     # --- add constraint
-    JuMP.@constraint(m, export_capacity_1[i=valid_buses]    , exp[i] <= par.exp_max[i][t,1])
+    JuMP.@constraint(m, export_capacity_1[i=valid_buses]    , exp[i] <= sum(par.imp_exp[j][t,1] for j in par.bus_map_exp[i]))
     JuMP.@constraint(m, export_capacity_2[i=non_valid_buses], exp[i] <= 0.0       )    
 
 end
