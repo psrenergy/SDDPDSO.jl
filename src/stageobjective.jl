@@ -52,7 +52,7 @@ function get_objective_import(m, par, t)
     brick = 0.0
     if par.flag_import
         par.flag_verbose && print("> stage objective ($t): grid import")
-        brick = sum(m[:imp][i] * par.imp_cost[i][t,1] for i in 1:par.nbus if haskey(par.bus_map_imp, i))
+        brick = sum(m[:imp][i] * sum(par.imp_cost[j][t,1] for j in par.bus_map_imp[i]) for i in keys(par.bus_map_imp))
         par.flag_debug && begin @show brick end
     end
     return brick
@@ -62,7 +62,7 @@ function get_objective_export(m, par, t)
     brick = 0.0
     if par.flag_export
         par.flag_verbose && print("> stage objective ($t): grid export")
-        brick = sum(m[:exp][i] * par.exp_cost[i][t,1] for i in 1:par.nbus if haskey(par.bus_map_exp, i))
+        brick = sum(m[:exp][i] * sum(par.exp_cost[j][t,1] for j in par.bus_map_exp[i]) for i in keys(par.bus_map_exp))
         par.flag_debug && begin @show brick end
     end
     return brick
