@@ -328,6 +328,7 @@ mutable struct Execution
     flag_export   :: Int64
     flag_import   :: Int64
     flag_dem_rsp  :: Int64
+    flag_bat      :: Int64
     flag_sec_law  :: Int64
     flag_debug    :: Int64
     flag_verbose  :: Int64
@@ -372,11 +373,12 @@ mutable struct Execution
             _check_input(sddp_dso, "flag_export"      ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_import"      ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_dem_rsp"     ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_bat"         ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_sec_law"     ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_debug"       ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_verbose"     ,     0,   Int64, "expected integer", false),
         )
-    end
+    end 
     function read_execution_parameters(path::String)
         dat = import_csvfile(path,"dso_sddp.dat")
         return dat[1,:]
@@ -488,6 +490,7 @@ mutable struct Problem
     flag_markov  :: Bool
     flag_losses  :: Bool
     flag_dem_rsp :: Bool
+    flag_bat     :: Bool
     flag_debug   :: Bool
     flag_verbose :: Bool
 

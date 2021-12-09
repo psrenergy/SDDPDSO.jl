@@ -2,8 +2,9 @@ function add_variables_model!(m, par)
     # Define the state variable
     
     # --- battery storage 
-    JuMP.@variable(m, par.bat_e_max[i] >= storage[i=1:par.nbat] >= par.bat_e_min[i], SDDP.State, initial_value = par.bat_e_ini[i])
-
+    if par.flag_bat
+        JuMP.@variable(m, par.bat_e_max[i] >= storage[i=1:par.nbat] >= par.bat_e_min[i], SDDP.State, initial_value = par.bat_e_ini[i])
+    end
     # --- demand response
     if par.flag_dem_rsp
         JuMP.@variable(m, sum(par.demand[i]) >= total_load[i=par.set_dem_rsp] >= 0.0, SDDP.State, initial_value = 0.0)
@@ -139,9 +140,14 @@ function add_energy_balance_constraints!(m, par, t)
         gen_die = haskey(par.bus_map_gen,i) ? m[:gen_die][par.bus_map_gen[i]] : 0.0
 
         # battery
-        bat_d   = haskey(par.bus_map_bat,i) ? m[:bat_d  ][par.bus_map_bat[i]] : 0.0
-        bat_c   = haskey(par.bus_map_bat,i) ? m[:bat_c  ][par.bus_map_bat[i]] : 0.0
-        
+        if par.flag_bat
+            bat_d   = haskey(par.bus_map_bat,i) ? m[:bat_d  ][par.bus_map_bat[i]] : 0.0
+            bat_c   = haskey(par.bus_map_bat,i) ? m[:bat_c  ][par.bus_map_bat[i]] : 0.0
+        else
+            bat_d = 0.0
+            bat_c = 0.0
+        end
+
         # load
         dem     = haskey(par.bus_map_dem,i) ? sum(par.demand[j][t] for j in par.bus_map_dem[i]) : 0.0
         if par.flag_dem_rsp
@@ -296,7 +302,7 @@ function build_model(par)
     
         add_generation_constraints!(subproblem, par)
         
-        add_battery_constraints!(subproblem, par)
+        par.flag_bat && add_battery_constraints!(subproblem, par)
     
         add_solar_generation_constraints!(subproblem, par)
     
