@@ -41,7 +41,7 @@ function export_results(x, n, d, par, sims)
         simulate_create_result_table(sims,:cur,["cur$i" for i in 1:n.bus])
     )
 
-    if n.bat > 0
+    if n.bat > 0 && (par.flag_bat)
         CSV.write(
             joinpath(x.PATH,"results","battery_discharge.csv"),
             simulate_create_result_table(sims,:bat_d,d.bat_name)

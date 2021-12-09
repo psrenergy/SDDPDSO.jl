@@ -5,7 +5,8 @@ function add_dso_flags!(par, x)
     par.flag_markov  = x.flag_markov  == 1
     par.flag_losses  = false # x.flag_losses  == 1
     par.flag_dem_rsp = x.flag_dem_rsp == 1
-    par.flag_debug   = x.flag_debug == 1
+    par.flag_bat     = x.flag_bat     == 1
+    par.flag_debug   = x.flag_debug   == 1
     par.flag_verbose = par.flag_debug ? true : (x.flag_verbose == 1)
 end
 
@@ -157,7 +158,7 @@ function setup_parameters!(par, x, n, d, opt)
     
     # problem variables 
     # batteries
-    (par.nbat > 0) && add_batteries!(par, d)
+    (par.nbat > 0) && (par.flag_bat) && add_batteries!(par, d)
 
     # diesel generator
     (par.ngen > 0) && add_thermal_plants!(par, d)
