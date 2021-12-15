@@ -1,0 +1,1 @@
+To run the documentation run `julia --project=docs` and then `include("docs\\make.jl")`

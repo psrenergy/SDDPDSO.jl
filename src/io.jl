@@ -10,7 +10,9 @@ function import_csvfile(path::String, name::String)
 end
 
 """
-    import_file
+    import_file(path::String, name::String)
+
+readlines from file on path.
 """
 function import_file(path::String, name::String)
     iopath = joinpath(path , name )

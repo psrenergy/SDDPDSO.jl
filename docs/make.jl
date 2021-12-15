@@ -10,6 +10,7 @@ makedocs(;
     authors="psrenergy",
     pages=[
         "Home" => "index.md",
+        "theory.md",
         "manual.md",
         "examples.md"
     ],
