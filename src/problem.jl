@@ -8,6 +8,7 @@ function add_dso_flags!(par, x)
     par.flag_bat     = x.flag_bat     == 1
     par.flag_debug   = x.flag_debug   == 1
     par.flag_verbose = par.flag_debug ? true : (x.flag_verbose == 1)
+    par.flag_CSV     = x.flag_CSV   == 1
 end
 
 function add_sddp_parameters!(par, x, opt)

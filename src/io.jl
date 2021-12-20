@@ -273,3 +273,75 @@ function import_dso_markov_transitions(x::Execution)
 
     return markov_trans_reshape
 end
+
+function export_as_graf(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_as_graf(results_sim, result_name, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        initial_stage = INITIAL_STAGE,
+        initial_year = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS                
+            PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name], t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
+
+function export_dif_as_graf(x, results_sim, result_name1, result_name2, filepath, filename, AGENTS; UNIT::String="", CSV=false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_dif_as_graf(results_sim, result_name1, result_name2, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV=false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        initial_stage = INITIAL_STAGE,
+        initial_year = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS                
+            PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name1]-results_sim[s][t][result_name2], t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end

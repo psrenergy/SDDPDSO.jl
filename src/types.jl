@@ -332,7 +332,7 @@ mutable struct Execution
     flag_sec_law  :: Int64
     flag_debug    :: Int64
     flag_verbose  :: Int64
-
+    flag_CSV      :: Int64
 
     function Execution()
         return new(
@@ -377,6 +377,7 @@ mutable struct Execution
             _check_input(sddp_dso, "flag_sec_law"     ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_debug"       ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_verbose"     ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_csv"         ,     0,   Int64, "expected integer", false)
         )
     end 
     function read_execution_parameters(path::String)
@@ -493,6 +494,7 @@ mutable struct Problem
     flag_bat     :: Bool
     flag_debug   :: Bool
     flag_verbose :: Bool
+    flag_CSV     :: Bool
 
     Problem() = new()
 end
