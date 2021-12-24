@@ -1,1 +1,1 @@
-# Thoery
+# Theory
