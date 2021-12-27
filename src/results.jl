@@ -65,6 +65,7 @@ function export_results(x, n, d, par, sims)
             joinpath(x.PATH,"results","battery_storage.csv"),
             simulate_create_result_table_state_var(sims,:storage,d.bat_name)
         )
+        # export_StateVar_as_graf(x, sims, :storage, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
         # export_as_graf(x, sims, :storage, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
     end
 
@@ -99,7 +100,7 @@ function export_results(x, n, d, par, sims)
             joinpath(x.PATH,"results","energy_import.csv"),
             simulate_create_result_table(sims,:imp,d.bus_name)
         )
-        export_as_graf(x, sims, :dr_cur, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import", d.load_name)
+        # export_as_graf(x, sims, :dr_cur, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import", d.load_name)
 
         CSV.write(
             joinpath(x.PATH,"results","energy_import_capacity.csv"),

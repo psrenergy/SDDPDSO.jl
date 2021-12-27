@@ -302,6 +302,7 @@ function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SC
     # --- store data
     for t = 1:STAGES
         for s = 1:SCENARIOS                
+
             PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name], t, s, 1)
         end
     end
@@ -339,6 +340,52 @@ function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, fi
     for t = 1:STAGES
         for s = 1:SCENARIOS                
             PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name1]-results_sim[s][t][result_name2], t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
+
+function export_StateVar_as_graf(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_StateVar_as_graf(results_sim, result_name, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_StateVar_as_graf(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    StateVar_AGENTS = String[]
+    for a in AGENTS
+        push!(StateVar_AGENTS,String(Symbol(a.*"_in")))
+        push!(StateVar_AGENTS,String(Symbol(a.*"_out")))
+    end
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS           ,
+        stages    = STAGES              ,
+        agents    = StateVar_AGENTS     ,
+        unit      = UNIT                ,
+        # optional:
+        initial_stage = INITIAL_STAGE,
+        initial_year = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS      
+            # for v in results_sim[s][t][result_name]
+            #     PSRClassesInterface.write_registry(graf, [v.in], t, s,  1)
+            #     PSRClassesInterface.write_registry(graf, [v.out], t, s, 1)
+            # end
+            PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name], t, s,  1)
         end
     end
 
