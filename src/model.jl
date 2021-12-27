@@ -185,7 +185,7 @@ function add_energy_balance_constraints!(m, par, t)
         # elv
 
         # balance constraint
-        JuMP.@constraint(m, [i],
+        energy_balance = JuMP.@constraint(m,
             + sum(cir_in ) - sum(cir_out)
             + sum(gen_sol) + sum(gen_die)
             + sum(bat_d  ) - sum(bat_c  )
@@ -193,7 +193,7 @@ function add_energy_balance_constraints!(m, par, t)
             == sum(dem) + sum(losses) 
             - sum(def) + cur
         )
-
+        JuMP.set_name(energy_balance, "energy_balance_$i")
     end
 end
 
