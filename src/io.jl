@@ -381,14 +381,21 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
     # --- store data
     for t = 1:STAGES
         for s = 1:SCENARIOS      
-            # for v in results_sim[s][t][result_name]
-            #     PSRClassesInterface.write_registry(graf, [v.in], t, s,  1)
-            #     PSRClassesInterface.write_registry(graf, [v.out], t, s, 1)
-            # end
-            PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name], t, s,  1)
+            aux = Float64[]
+            for v in results_sim[s][t][result_name]
+                push!(aux,v.in)
+                push!(aux,v.out)
+            end
+            PSRClassesInterface.write_registry(graf, aux, t, s,  1)
         end
     end
 
     # --- close graf
     PSRClassesInterface.close(graf)
 end
+
+# function export_BusCMO()
+#     cref = JuMP.constraint_by_name(m[3].subproblem, "energy_balance_123")
+#     JuMP.dual(cref)
+# end
+

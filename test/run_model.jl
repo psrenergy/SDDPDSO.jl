@@ -17,8 +17,12 @@ DSO.SDDP.train(m, iteration_limit = par.max_iter, log_file = joinpath(x.PATH,"de
 # --- simulate model
 vars = [:bus_ang,:flw,:gen_die,:gen_sol,:gen_sol_max,:bat_c,:bat_d,:storage,:def,:cur,:dr,:dr_def,:dr_cur,:total_load,:imp,:exp,:imp_max,:exp_max]
 
-sims = DSO.SDDP.simulate(m, 10, vars; skip_undefined_variables=true);
-
-println("Dual variable CMO")
-# a = JuMP.getdual(energyBalance_constraint[1])
-# println(a)
+sims = DSO.SDDP.simulate(
+    m,
+    10,
+    custom_recorders = Dict{Symbol,Function}(
+        :shadow_price => (sp::JuMP.Model) -> Float64[JuMP.dual(JuMP.constraint_by_name(sp,"energy_balance_$i")) for i in 1:par.nbus],
+    ), 
+    vars;
+    skip_undefined_variables=true
+);

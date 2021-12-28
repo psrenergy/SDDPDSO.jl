@@ -65,8 +65,7 @@ function export_results(x, n, d, par, sims)
             joinpath(x.PATH,"results","battery_storage.csv"),
             simulate_create_result_table_state_var(sims,:storage,d.bat_name)
         )
-        # export_StateVar_as_graf(x, sims, :storage, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
-        # export_as_graf(x, sims, :storage, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
+        export_StateVar_as_graf(x, sims, :storage, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
     end
 
     if x.flag_dem_rsp == 1
@@ -74,14 +73,14 @@ function export_results(x, n, d, par, sims)
             joinpath(x.PATH,"results","demand_response_accumulated_load.csv"),
             simulate_create_result_table_state_var(sims,:total_load,d.load_name[par.set_dem_rsp])
         )
-        # export_as_graf(x, sims, :storage, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
+        export_StateVar_as_graf(x, sims, :total_load, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
 
         CSV.write(
             joinpath(x.PATH,"results","demand_response_load.csv"),
             simulate_create_result_table(sims,:dr,d.load_name[par.set_dem_rsp])
         )
         # export_as_graf(x, sims, :dr, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_demand_response_load", d.load_name[par.set_dem_rsp])
-
+        
         CSV.write(
             joinpath(x.PATH,"results","demand_response_deficit.csv"),
             simulate_create_result_table(sims,:dr_def,d.load_name[par.set_dem_rsp])
@@ -108,6 +107,9 @@ function export_results(x, n, d, par, sims)
         )
         export_as_graf(x, sims, :imp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_capacity", d.bus_name)
     end
+
+    #Marginal cost export 
+    export_as_graf(x, sims, :shadow_price, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_Bus_Marginal_Cost", d.bus_name)
 
     if x.flag_export == 1
         CSV.write(
