@@ -216,19 +216,19 @@ end
 
 function add_stageobjective!(m, par, t)
     
-    obj_ter    = get_objective_thermal(m, par, t)
+    obj_ter    = get_stageobjective_thermal(m, par, t)
     
-    obj_def    = get_objective_deficit(m, par, t)
+    obj_def    = get_stageobjective_deficit(m, par, t)
     
-    obj_cur    = get_objective_curtailment(m, par, t)
+    obj_cur    = get_stageobjective_curtailment(m, par, t)
     
-    obj_dr_def = get_objective_demand_response_deficit(m, par, t)
+    obj_dr_def = get_stageobjective_demand_response_deficit(m, par, t)
     
-    obj_dr_cur = get_objective_demand_response_curtailment(m, par, t)
+    obj_dr_cur = get_stageobjective_demand_response_curtailment(m, par, t)
     
-    obj_imp    = get_objective_import(m, par, t)
+    obj_imp    = get_stageobjective_import(m, par, t)
     
-    obj_exp    = get_objective_export(m, par, t)
+    obj_exp    = get_stageobjective_export(m, par, t)
 
     # Define the objective for each stage `t`. Note that we can use `t` as an
     # index for t = 1, 2, ..., 24    

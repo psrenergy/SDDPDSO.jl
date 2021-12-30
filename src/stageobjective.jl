@@ -1,4 +1,4 @@
-function get_objective_thermal(m, par, t)
+function get_stageobjective_thermal(m, par, t)
     brick = 0.0
     if par.ngen > 0
         par.flag_verbose && print("> stage objective ($t): thermal")
@@ -8,7 +8,7 @@ function get_objective_thermal(m, par, t)
     return brick
 end
 
-function get_objective_deficit(m, par, t)
+function get_stageobjective_deficit(m, par, t)
     brick = 0.0
     if true # should add flag here?
         par.flag_verbose && print("> stage objective ($t): deficit")
@@ -18,7 +18,7 @@ function get_objective_deficit(m, par, t)
     return brick
 end
 
-function get_objective_curtailment(m, par, t)
+function get_stageobjective_curtailment(m, par, t)
     brick = 0.0
     if true # should add flag here?
         par.flag_verbose && print("> stage objective ($t): curtailment")
@@ -28,7 +28,7 @@ function get_objective_curtailment(m, par, t)
     return brick
 end
 
-function get_objective_demand_response_deficit(m, par, t)
+function get_stageobjective_demand_response_deficit(m, par, t)
     brick = 0.0
     if par.flag_dem_rsp
         par.flag_verbose && print("> stage objective ($t): demand response deficit")
@@ -38,7 +38,7 @@ function get_objective_demand_response_deficit(m, par, t)
     return brick
 end
 
-function get_objective_demand_response_curtailment(m, par, t)
+function get_stageobjective_demand_response_curtailment(m, par, t)
     brick = 0.0
     if par.flag_dem_rsp
         par.flag_verbose && print("> stage objective ($t): demand response curtailment")
@@ -48,7 +48,7 @@ function get_objective_demand_response_curtailment(m, par, t)
     return brick
 end
 
-function get_objective_import(m, par, t)
+function get_stageobjective_import(m, par, t)
     brick = 0.0
     if par.flag_import
         par.flag_verbose && print("> stage objective ($t): grid import")
@@ -58,7 +58,7 @@ function get_objective_import(m, par, t)
     return brick
 end
 
-function get_objective_export(m, par, t)
+function get_stageobjective_export(m, par, t)
     brick = 0.0
     if par.flag_export
         par.flag_verbose && print("> stage objective ($t): grid export")
