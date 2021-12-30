@@ -19,9 +19,9 @@ vars = [:bus_ang,:flw,:gen_die,:gen_sol,:gen_sol_max,:bat_c,:bat_d,:storage,:def
 
 sims = DSO.SDDP.simulate(
     m,
-    10,
+    5,
     custom_recorders = Dict{Symbol,Function}(
-        :shadow_price => (sp::JuMP.Model) -> Float64[JuMP.dual(JuMP.constraint_by_name(sp,"energy_balance_$i")) for i in 1:par.nbus],
+        :shadow_price => (sp::DSO.JuMP.Model) -> Float64[DSO.JuMP.dual(DSO.JuMP.constraint_by_name(sp,"energy_balance_$i")) for i in 1:par.nbus],
     ), 
     vars;
     skip_undefined_variables=true

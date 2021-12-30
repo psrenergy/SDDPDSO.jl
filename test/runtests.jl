@@ -33,13 +33,17 @@ Bin_set = [0,1]
         @time include("setup_problem.jl")
     end
 
-
+    # --- Test 03 - 
+    @testset "Run deterministic model" begin
+        @time include("run_deterministic_model.jl")
+    end
+    
     # --- Test 02 - 
     @testset "Run SDDP model" begin
         @time include("run_model.jl")
     end
 
-    # --- Test 03 - 
+    # --- Test 04 - 
     @testset "Write results" begin
         # @time include("write_results.jl")
     end
