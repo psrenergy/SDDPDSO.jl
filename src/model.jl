@@ -1,6 +1,7 @@
 function add_variables_model!(m, par)
-    # Define the state variable
-    
+    par.flag_verbose && println("> adding state variables")
+
+    # Define the state variable  
     # --- battery storage 
     if par.flag_bat
         JuMP.@variable(m, par.bat_e_max[i] >= storage[i=1:par.nbat] >= par.bat_e_min[i], SDDP.State, initial_value = par.bat_e_ini[i])
@@ -10,11 +11,9 @@ function add_variables_model!(m, par)
         JuMP.@variable(m, sum(par.demand[i]) >= total_load[i=par.set_dem_rsp] >= 0.0, SDDP.State, initial_value = 0.0)
     end
 
+    par.flag_verbose && println("> adding control variables")
     # Define the control variables
-    JuMP.@variables(m, begin
-        bat_c[i=1:par.nbat]       >= 0
-        bat_d[i=1:par.nbat]       >= 0
-            
+    JuMP.@variables(m, begin           
         gen_die[i=1:par.ngen]     >= 0
             
         gen_sol[i=1:par.nsol]     >= 0
@@ -27,6 +26,14 @@ function add_variables_model!(m, par)
     
         bus_ang[i=1:par.nbus]     >= 0
     end)
+
+    # battery
+    if par.flag_bat
+        JuMP.@variables(m, begin
+            bat_c[i=1:par.nbat] >= 0
+            bat_d[i=1:par.nbat] >= 0
+        end)
+    end
 
     # import energy from higher level
     if par.flag_import
@@ -55,6 +62,8 @@ function add_variables_model!(m, par)
 end
 
 function add_import_constraints!(m, par, t)
+    par.flag_verbose && println("> adding constraints: energy import")
+
     imp, imp_max = m[:imp], m[:imp_max]
 
     # --- limiting energy import capacity for frontier buses  
@@ -75,6 +84,8 @@ function add_import_constraints!(m, par, t)
 end
 
 function add_export_constraints!(m, par, t)
+    par.flag_verbose && println("> adding constraints: energy export")
+
     exp, exp_max = m[:exp], m[:exp_max]
 
     # --- limiting energy export capacity for frontier buses
@@ -95,6 +106,8 @@ function add_export_constraints!(m, par, t)
 end
 
 function add_network_constraints!(m, par)
+    par.flag_verbose && println("> adding constraints: network")
+
     flw, ang = m[:flw], m[:bus_ang]
     
     JuMP.@constraint(m, kirchoff_second[i=1:par.nlin],flw[i] == 100.0 * (1 / par.cir_x[i]) * (ang[par.cir_bus_to[i]] - ang[par.cir_bus_fr[i]]))
@@ -106,6 +119,8 @@ function add_network_constraints!(m, par)
 end
 
 function add_generation_constraints!(m, par)
+    par.flag_verbose && println("> adding constraints: thermal operation")
+
     gen_die = m[:gen_die]
 
     JuMP.@constraint(m, gen_capacity_max[i=1:par.ngen],gen_die[i] <= +par.gen_cap[i])
@@ -113,6 +128,8 @@ function add_generation_constraints!(m, par)
 end
 
 function add_battery_constraints!(m, par)
+    par.flag_verbose && println("> adding constraints: battery operation")
+
     bat_c, bat_d, storage = m[:bat_c], m[:bat_d], m[:storage]
 
     JuMP.@constraint(m, bat_balance[i=1:par.nbat],
@@ -125,6 +142,8 @@ function add_battery_constraints!(m, par)
 end
 
 function add_solar_generation_constraints!(m, par)
+    par.flag_verbose && println("> adding constraints: renewable operation")
+
     gen_sol, gen_sol_max = m[:gen_sol], m[:gen_sol_max]
 
     # --- solar capacity constraint
@@ -132,6 +151,7 @@ function add_solar_generation_constraints!(m, par)
 end
 
 function add_energy_balance_constraints!(m, par, t)
+    par.flag_verbose && println("> adding constraints: nodal energy balance")
 
     for i in 1:par.nbus
 
@@ -198,6 +218,8 @@ function add_energy_balance_constraints!(m, par, t)
 end
 
 function add_demand_response_constraints!(m, par, t)
+    par.flag_verbose && println("> adding constraints: demand response")
+
     dr, dr_def, dr_cur, total_load = m[:dr], m[:dr_def], m[:dr_cur], m[:total_load]
 
     # Load sum over periods
@@ -215,6 +237,7 @@ function add_demand_response_constraints!(m, par, t)
 end
 
 function add_stageobjective!(m, par, t)
+    par.flag_verbose && println("> adding stageobjective")
     
     obj_ter    = get_stageobjective_thermal(m, par, t)
     
@@ -241,6 +264,8 @@ function add_stageobjective!(m, par, t)
 end
 
 function parameterize_solar_generation_scenarios!(m, par, t)
+    par.flag_verbose && println("> adding constraints: renewable scenarios")
+
     gen_sol_max = m[:gen_sol_max]
 
     # Parameterize the subproblem.
@@ -252,6 +277,7 @@ function parameterize_solar_generation_scenarios!(m, par, t)
 end
 
 function parameterize_scenarios!(m, par, t)
+    par.flag_verbose && println("> adding constraints: ")
     
     # renewable
     gen_sol_max = m[:gen_sol_max]
@@ -317,8 +343,6 @@ function build_model(par)
         parameterize_solar_generation_scenarios!(subproblem, par, t)
         
         add_stageobjective!(subproblem, par, t)
-
-        # parameterize_scenarios!(subproblem, par, t)
 
     end
 
