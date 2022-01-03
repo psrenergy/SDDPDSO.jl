@@ -1,4 +1,5 @@
 function calculate_losses_rf2(r, f, pu=true)
+    r = pu ? r : r / 100
     f = pu ? f : f / 100
     return r * f * f 
 end
@@ -73,8 +74,8 @@ function get_bus_losses_from_deterministc(par, m) # change name...
             cir_losses *= 100.0
 
             # distribute half of the losses for each bus
-            bus_losses[par.cir_bus_fr[c]][t] = cir_losses ./ 2
-            bus_losses[par.cir_bus_to[c]][t] = cir_losses ./ 2
+            bus_losses[par.cir_bus_fr[c]][t] += cir_losses ./ 2
+            bus_losses[par.cir_bus_to[c]][t] += cir_losses ./ 2
         end 
     end
 
