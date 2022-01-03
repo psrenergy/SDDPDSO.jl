@@ -330,6 +330,7 @@ mutable struct Execution
     flag_dem_rsp  :: Int64
     flag_bat      :: Int64
     flag_sec_law  :: Int64
+    flag_losses   :: Int64
     flag_debug    :: Int64
     flag_verbose  :: Int64
     flag_CSV      :: Int64
@@ -345,6 +346,7 @@ mutable struct Execution
             1.0  ,
             10   ,
             60.0 ,
+            0    ,
             0    ,
             0    ,
             0    ,
@@ -375,6 +377,7 @@ mutable struct Execution
             _check_input(sddp_dso, "flag_dem_rsp"     ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_bat"         ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_sec_law"     ,     0,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_losses"      ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_debug"       ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_verbose"     ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_csv"         ,     0,   Int64, "expected integer", false)
@@ -453,6 +456,7 @@ mutable struct Problem
 
     # circuit
     cir_x      :: Vector{Float64}
+    cir_r      :: Vector{Float64}
     cir_cap    :: Vector{Float64}
     cir_bus_fr :: Vector{Int64}
     cir_bus_to :: Vector{Int64}

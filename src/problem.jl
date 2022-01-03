@@ -3,7 +3,7 @@ function add_dso_flags!(par, x)
     par.flag_import  = x.flag_import  == 1
     par.flag_export  = x.flag_export  == 1
     par.flag_markov  = x.flag_markov  == 1
-    par.flag_losses  = false # x.flag_losses  == 1
+    par.flag_losses  = x.flag_losses  == 1
     par.flag_dem_rsp = x.flag_dem_rsp == 1
     par.flag_bat     = x.flag_bat     == 1
     par.flag_debug   = x.flag_debug   == 1
@@ -95,6 +95,7 @@ end
 
 function add_circuits!(par, d)
     par.cir_x      = d.cir_x
+    par.cir_r      = d.cir_r
     par.cir_cap    = d.cir_capacity
     par.cir_bus_fr = d.cir_bus_from
     par.cir_bus_to = d.cir_bus_to

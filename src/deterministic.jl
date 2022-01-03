@@ -296,10 +296,6 @@ end
 
 function build_deterministic_model(par)
 
-    # REQUIRES UPDATE!
-    par.flag_dem_rsp = false
-    # 
-
     m = JuMP.Model(par.optimizer)
 
     add_deterministic_variables_model!(m, par)
