@@ -193,9 +193,9 @@ function add_deterministic_energy_balance_constraints!(m, par)
 
         # losses
         losses  = 0.0
-        if par.flag_losses
-            losses = par.losses[i][t]
-        end
+        # if par.flag_losses
+        #     losses = par.losses[i][t]
+        # end
         
         # slack
         def = haskey(par.bus_map_dem,i) ? m[:def][t, par.bus_map_dem[i]] : 0.0
@@ -254,24 +254,22 @@ function add_deterministic_demand_response_constraints!(m, par)
 end # NOT WORKING YET
 
 function add_deterministic_objective!(m, par)
-    par.flag_verbose && println("> objective")
+    par.flag_verbose && print("> objective:")
+
+    # --- initialize expression
+    expr = JuMP.AffExpr(0.0)
     
-    obj_ter    = get_objective_thermal(m, par)
-    obj_def    = get_objective_deficit(m, par)
-    obj_cur    = get_objective_curtailment(m, par)
-    obj_dr_def = get_objective_demand_response_deficit(m, par)
-    obj_dr_cur = get_objective_demand_response_curtailment(m, par)
-    obj_imp    = get_objective_import(m, par)
-    obj_exp    = get_objective_export(m, par)
+    set_objective_thermal!(m, par, expr)
+    set_objective_deficit!(m, par, expr)
+    set_objective_curtailment!(m, par, expr)
+    set_objective_demand_response_deficit!(m, par, expr)
+    set_objective_demand_response_curtailment!(m, par, expr)
+    set_objective_import!(m, par, expr)
+    set_objective_export!(m, par, expr)
 
     # Define the objective for each stage `t`. Note that we can use `t` as an
     # index for t = 1, 2, ..., 24    
-    JuMP.@objective(m, Min,
-        obj_ter
-        + obj_def + obj_cur 
-        + obj_dr_def + obj_dr_cur
-        + obj_imp - obj_exp
-    )
+    JuMP.@objective(m, Min, expr)
 end
 
 function add_deterministic_renewable_capacity_constraints!(m, par)
