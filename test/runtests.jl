@@ -2,7 +2,12 @@ import SDDPDSO
 using Test
 using GLPK
 using Random
+using PSRIO
+
 const DSO = SDDPDSO
+
+using PSRIO
+@show psrio = PSRIO.create()
 
 # ---
 casepath = joinpath(".", "data", "example_00")
