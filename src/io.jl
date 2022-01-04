@@ -394,8 +394,43 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
     PSRClassesInterface.close(graf)
 end
 
-# function export_BusCMO()
-#     cref = JuMP.constraint_by_name(m[3].subproblem, "energy_balance_123")
-#     JuMP.dual(cref)
-# end
+function export_as_graf_convertingArray(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_as_graf_convertingArray(results_sim, result_name, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
 
+function export_as_graf_convertingArray(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        initial_stage = INITIAL_STAGE,
+        initial_year = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS                
+            len = length(results_sim[s][t][result_name])
+            converted_results = Vector{Float64}(undef,len)
+            for i in eachindex(results_sim[s][t][result_name])
+                converted_results[i]= results_sim[s][t][result_name][i]
+            end
+            PSRClassesInterface.write_registry(graf, converted_results, t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
