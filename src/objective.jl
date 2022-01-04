@@ -1,70 +1,89 @@
-function get_objective_thermal(m, par)
-    brick = 0.0
+function set_objective_thermal!(m, par, expr)
+   
     if par.ngen > 0
-        par.flag_verbose && println("> objective: thermal")
-        brick = sum(m[:gen_die][t,i] * par.gen_cost[i] for t in 1:par.stages for i in 1:par.ngen)
-        par.flag_debug && begin @show brick end
+        par.flag_verbose && print(" + thermal")
+
+        for t in 1:par.stages, i in 1:par.ngen
+            JuMP.add_to_expression!(expr, par.gen_cost[i], m[:gen_die][t,i])
+        end
+
+        # par.flag_debug && begin @show brick end
     end
-    return brick
 end
 
-function get_objective_deficit(m, par)
-    brick = 0.0
+function set_objective_deficit!(m, par, expr)
     if true # should add flag here?
-        par.flag_verbose && println("> objective: deficit")
-        brick = sum(m[:def][t,i] .* par.def_cost for t in 1:par.stages for i in 1:par.nload)
-        par.flag_debug && begin @show brick end
+        par.flag_verbose && print(" + deficit")
+
+        for t in 1:par.stages, i in 1:par.nload
+            JuMP.add_to_expression!(expr, par.def_cost, m[:def][t,i])
+        end
+
+        # par.flag_debug && begin @show brick end
     end
-    return brick
 end
 
-function get_objective_curtailment(m, par)
-    brick = 0.0
+function set_objective_curtailment!(m, par, expr)
     if true # should add flag here?
-        par.flag_verbose && println("> objective: curtailment")
-        brick = sum(m[:cur][t,i] .* par.def_cost .* 1.01 for t in 1:par.stages for i in 1:par.nbus)
-        par.flag_debug && begin @show brick end
+        par.flag_verbose && print(" + curtailment")
+
+        for t in 1:par.stages, i in 1:par.nbus
+            JuMP.add_to_expression!(expr, par.def_cost * 1.01, m[:cur][t,i])
+        end
+
+        # par.flag_debug && begin @show brick end
     end
-    return brick
 end
 
-function get_objective_demand_response_deficit(m, par)
-    brick = 0.0
+function set_objective_demand_response_deficit!(m, par, expr)
     if par.flag_dem_rsp
-        par.flag_verbose && println("> objective: demand response deficit")
-        brick = sum(m[:dr_def][t,i] .* par.def_cost .* 1.02 for t in 1:par.stages for i in 1:par.nload)
-        par.flag_debug && begin @show brick end
+        par.flag_verbose && print("+ demand response deficit")
+
+        for t in 1:par.stages, i in 1:par.nload
+            JuMP.add_to_expression!(expr, par.def_cost * 1.02, m[:dr_def][t,i])
+        end
+
+        # par.flag_debug && begin @show brick end
     end
-    return brick
 end
 
-function get_objective_demand_response_curtailment(m, par)
-    brick = 0.0
+function set_objective_demand_response_curtailment!(m, par, expr)
     if par.flag_dem_rsp
-        par.flag_verbose && println("> objective: demand response curtailment")
-        brick = sum(m[:dr_cur][t,i] .* par.def_cost .* 1.03 for t in 1:par.stages for i in 1:par.nload)
-        par.flag_debug && begin @show brick end
+        par.flag_verbose && print(" + demand response curtailment")
+
+        for t in 1:par.stages, i in 1:par.nload
+            JuMP.add_to_expression!(expr, par.def_cost * 1.03, m[:dr_cur][t,i])
+        end
+
+        # par.flag_debug && begin @show brick end
     end
-    return brick
 end
 
-function get_objective_import(m, par)
-    brick = 0.0
+function set_objective_import!(m, par, expr)
     if par.flag_import
-        par.flag_verbose && println("> objective: grid import")
-        brick = sum(m[:imp][t,i] * sum(par.imp_cost[j][t,1] for j in par.bus_map_imp[i]) for i in keys(par.bus_map_imp) for t in 1:par.stages)
-        par.flag_debug && begin @show brick end
+        par.flag_verbose && print(" + grid import")
+
+        for t in 1:par.stages, i in keys(par.bus_map_imp)
+            cst = sum(par.imp_cost[j][t,1] for j in par.bus_map_imp[i])
+            
+            JuMP.add_to_expression!(expr, cst, m[:imp][t,i])
+        end
+
+        # par.flag_debug && begin @show brick end
     end
-    return brick
 end
 
-function get_objective_export(m, par)
-    brick = 0.0
+function set_objective_export!(m, par, expr)
     if par.flag_export
-        par.flag_verbose && println("> objective: grid export")
-        brick = sum(m[:exp][t,i] * sum(par.exp_cost[j][t,1] for j in par.bus_map_exp[i]) for i in keys(par.bus_map_exp) for t in 1:par.stages)
-        par.flag_debug && begin @show brick end
+        par.flag_verbose && print(" - grid export")
+
+        for t in 1:par.stages, i in keys(par.bus_map_exp)
+            cst = sum(par.exp_cost[j][t,1] for j in par.bus_map_exp[i])
+            
+            JuMP.add_to_expression!(expr, -cst, m[:exp][t,i])
+        end
+
+        # par.flag_debug && begin @show brick end
     end
-    return brick
 end
 

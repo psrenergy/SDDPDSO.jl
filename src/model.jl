@@ -237,30 +237,22 @@ function add_demand_response_constraints!(m, par, t)
 end
 
 function add_stageobjective!(m, par, t)
-    par.flag_verbose && println("> adding stageobjective")
+    par.flag_verbose && print("> adding stageobjective $(t):")
     
-    obj_ter    = get_stageobjective_thermal(m, par, t)
-    
-    obj_def    = get_stageobjective_deficit(m, par, t)
-    
-    obj_cur    = get_stageobjective_curtailment(m, par, t)
-    
-    obj_dr_def = get_stageobjective_demand_response_deficit(m, par, t)
-    
-    obj_dr_cur = get_stageobjective_demand_response_curtailment(m, par, t)
-    
-    obj_imp    = get_stageobjective_import(m, par, t)
-    
-    obj_exp    = get_stageobjective_export(m, par, t)
+    # --- initialize expression
+    expr = JuMP.AffExpr(0.0)
+
+    set_stageobjective_thermal!(m, par, expr)
+    set_stageobjective_deficit!(m, par, expr)    
+    set_stageobjective_curtailment!(m, par, expr)
+    set_stageobjective_demand_response_deficit!(m, par, expr)
+    set_stageobjective_demand_response_curtailment!(m, par, expr)
+    set_stageobjective_import!(m, par, expr, t)
+    set_stageobjective_export!(m, par, expr, t)
 
     # Define the objective for each stage `t`. Note that we can use `t` as an
     # index for t = 1, 2, ..., 24    
-    SDDP.@stageobjective(m, 
-        obj_ter
-        + obj_def + obj_cur 
-        + obj_dr_def + obj_dr_cur
-        + obj_imp - obj_exp
-    )
+    SDDP.@stageobjective(m, expr)
 end
 
 function parameterize_solar_generation_scenarios!(m, par, t)
