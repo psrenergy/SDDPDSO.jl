@@ -7,6 +7,7 @@ module SDDPDSO
     using CSV
     using DataFrames
     using Statistics
+    using PSRIO
 
     const PSRI = PSRClassesInterface
     # using Statistics
@@ -35,6 +36,13 @@ module SDDPDSO
     # --- main
     function main(ARGS)
         @show ARGS
+
+        psrio = PSRIO.create()
+
+        PSRIO.run(psrio, [raw"d:\Downloads\Example_PSRIO"], 
+        recipes=[raw".\deps\psrio-scripts\sddpdso\dashboard.lua"], 
+        model="none", 
+        verbose=3)
     end
 
     # --- initialize

@@ -1,0 +1,3 @@
+[submodule "deps/psrio-scripts"]
+	path = deps/psrio-scripts
+	url = ../psrio-scripts.git
