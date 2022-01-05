@@ -81,3 +81,7 @@ function get_bus_losses_from_deterministc(par, m) # change name...
 
     return bus_losses
 end
+
+function get_stagewise_losses(par)
+    return 100.0 .* Float64[sum(par.losses[i][t] for i in 1:par.nload) / sum(par.demand[i][t] for i in 1:par.nload) for t in 1:par.stages]
+end
