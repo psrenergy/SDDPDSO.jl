@@ -1,5 +1,5 @@
 function add_deterministic_variables_model!(m, par)
-    par.flag_verbose && println("> variables: control")
+    par.flag_debug && println("> variables: control")
    
     # Define the control variables
     JuMP.@variables(m, begin
@@ -59,7 +59,7 @@ function add_deterministic_variables_model!(m, par)
 end
 
 function add_deterministic_import_constraints!(m, par)
-    par.flag_verbose && println("> constraints: energy import")
+    par.flag_debug && println("> constraints: energy import")
 
     imp, imp_max = m[:imp], m[:imp_max]
 
@@ -81,7 +81,7 @@ function add_deterministic_import_constraints!(m, par)
 end
 
 function add_deterministic_export_constraints!(m, par)
-    par.flag_verbose && println("> constraints: energy export")
+    par.flag_debug && println("> constraints: energy export")
 
     exp, exp_max = m[:exp], m[:exp_max]
 
@@ -103,7 +103,7 @@ function add_deterministic_export_constraints!(m, par)
 end
 
 function add_deterministic_network_constraints!(m, par)
-    par.flag_verbose && println("> constraints: network")
+    par.flag_debug && println("> constraints: network")
 
     flw, ang = m[:flw], m[:bus_ang]
     
@@ -118,7 +118,7 @@ function add_deterministic_network_constraints!(m, par)
 end
 
 function add_deterministic_generation_constraints!(m, par)
-    par.flag_verbose && println("> constraints: thermal operation")
+    par.flag_debug && println("> constraints: thermal operation")
 
     gen_die = m[:gen_die]
 
@@ -127,7 +127,7 @@ function add_deterministic_generation_constraints!(m, par)
 end
 
 function add_deterministic_battery_constraints!(m, par)
-    par.flag_verbose && println("> constraints: battery operation")
+    par.flag_debug && println("> constraints: battery operation")
 
     bat_c, bat_d, bat_e = m[:bat_c], m[:bat_d], m[:bat_e]
 
@@ -168,7 +168,7 @@ function add_deterministic_battery_constraints!(m, par)
 end
 
 function add_deterministic_energy_balance_constraints!(m, par)
-    par.flag_verbose && println("> constraints: nodal energy balance")
+    par.flag_debug && println("> constraints: nodal energy balance")
 
     for t in 1:par.stages, i in 1:par.nbus
 
@@ -235,7 +235,7 @@ function add_deterministic_energy_balance_constraints!(m, par)
 end
 
 function add_deterministic_demand_response_constraints!(m, par)
-    par.flag_verbose && println("> constraints: demand response")
+    par.flag_debug && println("> constraints: demand response")
 
     dr, dr_def, dr_cur, total_load = m[:dr], m[:dr_def], m[:dr_cur], m[:total_load]
 
@@ -254,7 +254,7 @@ function add_deterministic_demand_response_constraints!(m, par)
 end # NOT WORKING YET
 
 function add_deterministic_objective!(m, par)
-    par.flag_verbose && print("> objective:")
+    par.flag_debug && print("> objective:")
 
     # --- initialize expression
     expr = JuMP.AffExpr(0.0)
@@ -273,7 +273,7 @@ function add_deterministic_objective!(m, par)
 end
 
 function add_deterministic_renewable_capacity_constraints!(m, par)
-    par.flag_verbose && println("> constraints: renewable operation")
+    par.flag_debug && println("> constraints: renewable operation")
 
     gen_sol, gen_sol_max = m[:gen_sol], m[:gen_sol_max]
 
@@ -282,7 +282,7 @@ function add_deterministic_renewable_capacity_constraints!(m, par)
 end
 
 function add_deterministic_renewable_generation!(m, par)
-    par.flag_verbose && println("> constraints: renewable scenario")
+    par.flag_debug && println("> constraints: renewable scenario")
 
     gen_sol_max = m[:gen_sol_max]
 
