@@ -1,5 +1,5 @@
 function add_variables_model!(m, par)
-    par.flag_verbose && println("> adding state variables")
+    par.flag_debug && println("> adding state variables")
 
     # Define the state variable  
     # --- battery storage 
@@ -11,7 +11,7 @@ function add_variables_model!(m, par)
         JuMP.@variable(m, sum(par.demand[i]) >= total_load[i=par.set_dem_rsp] >= 0.0, SDDP.State, initial_value = 0.0)
     end
 
-    par.flag_verbose && println("> adding control variables")
+    par.flag_debug && println("> adding control variables")
     # Define the control variables
     JuMP.@variables(m, begin           
         gen_die[i=1:par.ngen]     >= 0
@@ -62,7 +62,7 @@ function add_variables_model!(m, par)
 end
 
 function add_import_constraints!(m, par, t)
-    par.flag_verbose && println("> adding constraints: energy import")
+    par.flag_debug && println("> adding constraints: energy import")
 
     imp, imp_max = m[:imp], m[:imp_max]
 
@@ -84,7 +84,7 @@ function add_import_constraints!(m, par, t)
 end
 
 function add_export_constraints!(m, par, t)
-    par.flag_verbose && println("> adding constraints: energy export")
+    par.flag_debug && println("> adding constraints: energy export")
 
     exp, exp_max = m[:exp], m[:exp_max]
 
@@ -106,7 +106,7 @@ function add_export_constraints!(m, par, t)
 end
 
 function add_network_constraints!(m, par)
-    par.flag_verbose && println("> adding constraints: network")
+    par.flag_debug && println("> adding constraints: network")
 
     flw, ang = m[:flw], m[:bus_ang]
     
@@ -119,7 +119,7 @@ function add_network_constraints!(m, par)
 end
 
 function add_generation_constraints!(m, par)
-    par.flag_verbose && println("> adding constraints: thermal operation")
+    par.flag_debug && println("> adding constraints: thermal operation")
 
     gen_die = m[:gen_die]
 
@@ -128,7 +128,7 @@ function add_generation_constraints!(m, par)
 end
 
 function add_battery_constraints!(m, par)
-    par.flag_verbose && println("> adding constraints: battery operation")
+    par.flag_debug && println("> adding constraints: battery operation")
 
     bat_c, bat_d, storage = m[:bat_c], m[:bat_d], m[:storage]
 
@@ -142,7 +142,7 @@ function add_battery_constraints!(m, par)
 end
 
 function add_solar_generation_constraints!(m, par)
-    par.flag_verbose && println("> adding constraints: renewable operation")
+    par.flag_debug && println("> adding constraints: renewable operation")
 
     gen_sol, gen_sol_max = m[:gen_sol], m[:gen_sol_max]
 
@@ -151,7 +151,7 @@ function add_solar_generation_constraints!(m, par)
 end
 
 function add_energy_balance_constraints!(m, par, t)
-    par.flag_verbose && println("> adding constraints: nodal energy balance")
+    par.flag_debug && println("> adding constraints: nodal energy balance")
 
     for i in 1:par.nbus
 
@@ -218,7 +218,7 @@ function add_energy_balance_constraints!(m, par, t)
 end
 
 function add_demand_response_constraints!(m, par, t)
-    par.flag_verbose && println("> adding constraints: demand response")
+    par.flag_debug && println("> adding constraints: demand response")
 
     dr, dr_def, dr_cur, total_load = m[:dr], m[:dr_def], m[:dr_cur], m[:total_load]
 
@@ -237,7 +237,7 @@ function add_demand_response_constraints!(m, par, t)
 end
 
 function add_stageobjective!(m, par, t)
-    par.flag_verbose && print("> adding stageobjective $(t):")
+    par.flag_debug && print("> adding stageobjective $(t):")
     
     # --- initialize expression
     expr = JuMP.AffExpr(0.0)
@@ -256,7 +256,7 @@ function add_stageobjective!(m, par, t)
 end
 
 function parameterize_solar_generation_scenarios!(m, par, t)
-    par.flag_verbose && println("> adding constraints: renewable scenarios")
+    par.flag_debug && println("> adding constraints: renewable scenarios")
 
     gen_sol_max = m[:gen_sol_max]
 
@@ -269,7 +269,7 @@ function parameterize_solar_generation_scenarios!(m, par, t)
 end
 
 function parameterize_scenarios!(m, par, t)
-    par.flag_verbose && println("> adding constraints: ")
+    par.flag_debug && println("> adding constraints: ")
     
     # renewable
     gen_sol_max = m[:gen_sol_max]
