@@ -1,5 +1,8 @@
 function export_results(x, n, d, par, sims)
     
+    Demanda_Matriz = TransformaDemandaMatriz(par.bus_map_dem,par.demand,n.bus,par.stages)
+    export_3D_Matrix_as_graf(x,Demanda_Matriz, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_original_demand", d.bus_name)
+
     if n.cir > 0
         CSV.write(
             joinpath(x.PATH,"results","cirflw.csv"),
@@ -73,7 +76,7 @@ function export_results(x, n, d, par, sims)
             joinpath(x.PATH,"results","demand_response_accumulated_load.csv"),
             simulate_create_result_table_state_var(sims,:total_load,d.load_name[par.set_dem_rsp])
         )
-        export_StateVar_as_graf(x, sims, :total_load, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
+        export_StateVar_as_graf(x, sims, :total_load, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_demand_response_accumulated_load", d.load_name[par.set_dem_rsp])
 
         CSV.write(
             joinpath(x.PATH,"results","demand_response_load.csv"),
