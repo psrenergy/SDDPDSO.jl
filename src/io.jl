@@ -491,3 +491,76 @@ function TransformaDemandaMatriz(MapaDemanda,MatrizDemanda,qtd_buses,n_stages)
     end
     return Demand_Matrix
 end
+
+function export_result_usecir(sims,cir_cap,header,nscn=length(sims),nstg=length(sims[1]))
+
+    d = Dict(name => Float64[] for name in Symbol.(header))
+    t = Int64[]
+    s = Int64[]
+
+    for scn in 1:nscn, stg in 1:nstg
+        push!(s,scn)
+        push!(t,stg)
+        i=0
+
+        cirflw = abs.(sims[scn][stg][:flw])
+
+        usecir = (cirflw ./ cir_cap) .* 100
+
+        for v in usecir                  
+            i+=1
+            push!(d[Symbol(header[i])], v == Inf ? 0.0 : v)
+        end
+    end
+
+    r = DataFrame(scenario = s, stage = t)
+
+    for name in Symbol.(header)
+        r[!,name] = d[name]
+    end
+
+    return r
+end
+
+function export_result_usecir_as_graf(x, n, results_sim, cir_cap, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        stage_type = PSRI.STAGE_DAY,
+        initial_stage = INITIAL_STAGE,
+        initial_year  = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS         
+            cirflw = abs.(results_sim[s][t][:flw])
+            usecir = (cirflw ./ cir_cap) .* 100
+            
+            for i in 1:n.cir                  
+                usecir[i] == Inf ? 0.0 : usecir[i]
+            end
+            PSRClassesInterface.write_registry(graf, usecir, t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end

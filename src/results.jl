@@ -10,6 +10,9 @@ function export_results(x, n, d, par, sims)
         )
 
         export_as_graf(x, sims, :flw, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_cirflw", d.cir_name)
+
+        export_result_usecir_as_graf(x, n, sims, d.cir_capacity, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_cirUse", d.cir_name)
+
         # CSV.write(
         #     joinpath(x.PATH,"results","usecir.csv"),
         #     export_result_usecir(sims,d.cir_capacity,d.cir_name)
@@ -99,6 +102,12 @@ function export_results(x, n, d, par, sims)
 
     #Marginal cost export 
     export_as_graf(x, sims, :shadow_price, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_Bus_Marginal_Cost", d.bus_name)
+
+    # Circuit use % 
+    CSV.write(
+    joinpath(x.PATH,"results","usecir.csv"),
+    export_result_usecir(sims,d.cir_capacity,d.cir_name)
+    )
 
     if x.flag_import == 1
         CSV.write(
