@@ -77,7 +77,7 @@ function set_stageobjective_export!(m, par, expr, t)
     if par.flag_export
         par.flag_debug && print(" - grid export")
 
-        for t in 1:par.stages, i in keys(par.bus_map_exp)
+        for i in keys(par.bus_map_exp)
             cst = sum(par.exp_cost[j][t,1] for j in par.bus_map_exp[i])
             
             JuMP.add_to_expression!(expr, -cst, m[:exp][i])
