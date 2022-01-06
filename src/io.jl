@@ -295,8 +295,9 @@ function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SC
         agents    = AGENTS     ,
         unit      = UNIT       ,
         # optional:
+        stage_type = PSRI.STAGE_DAY,
         initial_stage = INITIAL_STAGE,
-        initial_year = INITIAL_YEAR
+        initial_year  = INITIAL_YEAR
     )
 
     # --- store data
@@ -332,6 +333,7 @@ function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, fi
         agents    = AGENTS     ,
         unit      = UNIT       ,
         # optional:
+        stage_type = PSRI.STAGE_DAY,
         initial_stage = INITIAL_STAGE,
         initial_year = INITIAL_YEAR
     )
@@ -355,11 +357,11 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
 
     FILE_NAME = joinpath(filepath, filename)
 
-    StateVar_AGENTS = String[]
-    for a in AGENTS
-        push!(StateVar_AGENTS,String(Symbol(a.*"_in")))
-        push!(StateVar_AGENTS,String(Symbol(a.*"_out")))
-    end
+    # StateVar_AGENTS = String[]
+    # for a in AGENTS
+    #     push!(StateVar_AGENTS,String(Symbol(a.*"_in")))
+    #     # push!(StateVar_AGENTS,String(Symbol(a.*"_out")))
+    # end
 
     # --- open graf file
     graf = PSRClassesInterface.open(
@@ -371,9 +373,10 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
         
         scenarios = SCENARIOS           ,
         stages    = STAGES              ,
-        agents    = StateVar_AGENTS     ,
+        agents    = AGENTS              ,
         unit      = UNIT                ,
         # optional:
+        stage_type = PSRI.STAGE_DAY,
         initial_stage = INITIAL_STAGE,
         initial_year = INITIAL_YEAR
     )
@@ -384,7 +387,7 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
             aux = Float64[]
             for v in results_sim[s][t][result_name]
                 push!(aux,v.in)
-                push!(aux,v.out)
+                # push!(aux,v.out)
             end
             PSRClassesInterface.write_registry(graf, aux, t, s,  1)
         end
@@ -415,6 +418,7 @@ function export_as_graf_convertingArray(results_sim, result_name, filepath, file
         agents    = AGENTS     ,
         unit      = UNIT       ,
         # optional:
+        stage_type = PSRI.STAGE_DAY,
         initial_stage = INITIAL_STAGE,
         initial_year = INITIAL_YEAR
     )
@@ -433,4 +437,57 @@ function export_as_graf_convertingArray(results_sim, result_name, filepath, file
 
     # --- close graf
     PSRClassesInterface.close(graf)
+end
+
+function export_3D_Matrix_as_graf(x, D_Matrix, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_3D_Matrix_as_graf(D_Matrix, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_3D_Matrix_as_graf(D_Matrix, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        stage_type = PSRI.STAGE_DAY,
+        initial_stage = INITIAL_STAGE,
+        initial_year  = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS                
+            results = D_Matrix[:,t,1]
+            PSRClassesInterface.write_registry(graf, results, t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
+
+function TransformaDemandaMatriz(MapaDemanda,MatrizDemanda,qtd_buses,n_stages)
+    Demand_Matrix=zeros(qtd_buses,n_stages,1)
+    for bus in 1:qtd_buses, stg in 1:n_stages
+        if haskey(MapaDemanda,bus)==true    
+
+            mapa=MapaDemanda[bus][1]
+            demanda=MatrizDemanda[mapa][stg]
+            Demand_Matrix[bus,stg,1]=demanda
+        else
+            Demand_Matrix[bus,stg,1]=0
+        end
+    end
+    return Demand_Matrix
 end
