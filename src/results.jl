@@ -3,6 +3,12 @@ function export_results(x, n, d, par, sims)
     Demanda_Matriz = TransformaDemandaMatriz(par.bus_map_dem,par.demand,n.bus,par.stages)
     export_3D_Matrix_as_graf(x,Demanda_Matriz, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_original_demand", d.bus_name)
 
+    Upper_DR = TransformaDemandaMatriz_UpperRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_shift)
+    export_3D_Matrix_as_graf(x,Upper_DR, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_DR_UpperBound", d.bus_name)
+
+    Lower_DR = TransformaDemandaMatriz_LowerRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_shift)
+    export_3D_Matrix_as_graf(x,Lower_DR, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_DR_LowerBound", d.bus_name)
+
     if n.cir > 0
         CSV.write(
             joinpath(x.PATH,"results","cirflw.csv"),
@@ -25,6 +31,8 @@ function export_results(x, n, d, par, sims)
             simulate_create_result_table(sims,:gen_die,d.ter_name)
         )
         export_as_graf(x, sims, :gen_die, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_diesel_generation", d.ter_name)
+        export_gen_die_use_as_graf(x, sims, par.gen_cap, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_diesel_use", d.ter_name)
+        export_gen_die_cost_as_graf(x, sims, par.gen_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_diesel_gen_cost", d.ter_name)
     end
 
     if n.gnd > 0
