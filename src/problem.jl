@@ -60,16 +60,15 @@ function add_solar_plants!(par, x, n, d)
 end
 
 function add_injections!(par, x, d)
-    hrinj_cst = import_dso_hrinj_cst(x, d)
-    hrinj_cap = import_dso_hrinj_cap(x, d)
+    if par.flag_import
+        # --- N2 is importing energy from N1 at cost $/MWh
+        par.imp_max, par.imp_cost = import_injections(x, d, false)
+    end
 
-    # --- N2 is importing energy from N1 at cost $/MWh
-    par.imp_cost = deepcopy(hrinj_cst)
-    par.imp_max  = deepcopy(hrinj_cap)
-
-    # --- N2 is expoting energy to N1 at cost $/MWh
-    par.exp_cost = deepcopy(hrinj_cst)
-    par.exp_max  = deepcopy(hrinj_cap)
+    if par.flag_export
+        # --- N2 is expoting energy to N1 at cost $/MWh
+        par.exp_max, par.exp_cost = import_injections(x, d, true)
+    end
 end
 
 function add_electric_vehicles!(par, d)
@@ -199,7 +198,7 @@ function setup_parameters!(par, x, n, d, opt)
 end
 
 function get_gnd_scenarios(x, d)
-    return import_dso_hrgnd_scn(x, d)
+    return import_renewable_generation_scenarios(x, d)
 end
 
 function get_load(x, d)
@@ -207,7 +206,7 @@ function get_load(x, d)
 end
 
 function get_demand_response_shift(x, n, d)
-    shift = import_dso_dr_shift(x, d)
+    shift = import_demand_response_shift(x, d)
 
     d.dr_max_shift = zeros(Float64, n.load)
 
