@@ -71,7 +71,7 @@ function import_dso_hrload(x::Execution, d::Data)
     # --- read external hourly scenarios cost data
     hrload = import_csvfile(x.PATH,"dso_hrload.dat")
     
-    hrload_scn = Dict(code => zeros(Float64, x.dso_stages) for code in d.load_code)
+    hrload_scn = Dict(code => zeros(Float64, x.stages) for code in d.load_code)
 
     valid_load_codes = [code for code in d.load_code if hasproperty(hrload,"$code")]
     
@@ -81,7 +81,7 @@ function import_dso_hrload(x::Execution, d::Data)
 
         stg = hrload_i.stage
 
-        (stg > x.dso_stages) && continue
+        (stg > x.stages) && continue
         
         for code in valid_load_codes
             hrload_scn[code][stg] = x.demand_factor * hrload_i["$code"]
@@ -100,7 +100,7 @@ function import_dso_hrgnd_scn(x::Execution, d::Data)
     # --- read external hourly scenarios cost data
     hrgnd = import_csvfile(x.PATH,"dso_hrgnd_scn.dat")
     
-    hrgnd_scn = Dict(code => zeros(Float64, x.dso_stages, x.dso_scenarios) for code in d.gnd_code) #d.bus_code[d.bus2gnd])
+    hrgnd_scn = Dict(code => zeros(Float64, x.stages, x.scenarios) for code in d.gnd_code) #d.bus_code[d.bus2gnd])
 
     # CHANGE TO LOAD CODES
     valid_load_codes = [code for code in d.gnd_code if hasproperty(hrgnd,"$code")] #d.bus_code[d.bus2gnd]
@@ -112,7 +112,7 @@ function import_dso_hrgnd_scn(x::Execution, d::Data)
         stg = hrgnd_i.stage
         scn = hrgnd_i.scenario
 
-        if (stg > x.dso_stages) | (scn > x.dso_scenarios)
+        if (stg > x.stages) | (scn > x.scenarios)
             continue
         end
 
@@ -158,8 +158,8 @@ function import_dso_hrinj_cst(x::Execution, d::Data)
     valid_codes = [code for code in d.bus_code if hasproperty(hrinj,"$code")]
     
     # --- 
-    hrinj_scn = Dict(code => zeros(Float64, x.dso_stages, x.dso_scenarios) for code in valid_codes)
-    hrinj_stg = Dict(code => zeros(Float64, x.dso_stages) for code in valid_codes)
+    hrinj_scn = Dict(code => zeros(Float64, x.stages, x.scenarios) for code in valid_codes)
+    hrinj_stg = Dict(code => zeros(Float64, x.stages) for code in valid_codes)
 
     for i in 1:size(hrinj,1)
 
@@ -168,13 +168,13 @@ function import_dso_hrinj_cst(x::Execution, d::Data)
         stg = hrinj_i.stage
         scn = hrinj_i.scenario
 
-        if (stg > x.dso_stages) | (scn > x.dso_scenarios)
+        if (stg > x.stages) | (scn > x.scenarios)
             continue
         end
 
         for code in valid_codes
             hrinj_scn[code][stg, scn]  = hrinj_i["$code"]
-            hrinj_stg[code][stg]      += hrinj_i["$code"]/x.dso_scenarios
+            hrinj_stg[code][stg]      += hrinj_i["$code"]/x.scenarios
         end
     end
 
@@ -194,7 +194,7 @@ function import_dso_hrinj_cap(x::Execution, d::Data)
     valid_codes = [code for code in d.bus_code if hasproperty(hrinj,"$code")]
     
     # --- 
-    hrinj_scn = Dict(code => zeros(Float64, x.dso_stages, x.dso_scenarios) for code in valid_codes)
+    hrinj_scn = Dict(code => zeros(Float64, x.stages, x.scenarios) for code in valid_codes)
 
     for i in 1:size(hrinj,1)
 
@@ -203,7 +203,7 @@ function import_dso_hrinj_cap(x::Execution, d::Data)
         stg = hrinj_i.stage
         scn = hrinj_i.scenario
 
-        if (stg > x.dso_stages) | (scn > x.dso_scenarios)
+        if (stg > x.stages) | (scn > x.scenarios)
             continue
         end
 
@@ -222,7 +222,7 @@ function import_dso_markov_probabilities(x::Execution)
     
     nrow, ncol = size(prob)
 
-    markov_prob = zeros(x.dso_stages, x.dso_scenarios, x.flag_markov_states)
+    markov_prob = zeros(x.stages, x.scenarios, x.flag_markov_states)
 
     for i in 1:nrow
         state = 0
@@ -245,7 +245,7 @@ function import_dso_markov_transitions(x::Execution)
 
     nrow, ncol = size(tran)
     
-    markov_trans = zeros(x.dso_stages, x.flag_markov_states, x.flag_markov_states)
+    markov_trans = zeros(x.stages, x.flag_markov_states, x.flag_markov_states)
 
     for i in 1:nrow
         state_to = 0
@@ -267,7 +267,7 @@ function import_dso_markov_transitions(x::Execution)
     push!(markov_trans_reshape, reshape(markov_trans[2,1,:],1,2))
 
     # --- following stages (state n to 1/n)
-    for stage in 3:x.dso_stages
+    for stage in 3:x.stages
         push!(markov_trans_reshape,markov_trans[stage,:,:])
     end
 
@@ -275,7 +275,7 @@ function import_dso_markov_transitions(x::Execution)
 end
 
 function export_as_graf(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_as_graf(results_sim, result_name, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_as_graf(results_sim, result_name, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -313,7 +313,7 @@ function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SC
 end
 
 function export_dif_as_graf(x, results_sim, result_name1, result_name2, filepath, filename, AGENTS; UNIT::String="", CSV=false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_dif_as_graf(results_sim, result_name1, result_name2, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_dif_as_graf(results_sim, result_name1, result_name2, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV=false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -350,7 +350,7 @@ function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, fi
 end
 
 function export_StateVar_as_graf(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_StateVar_as_graf(results_sim, result_name, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_StateVar_as_graf(results_sim, result_name, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_StateVar_as_graf(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -398,7 +398,7 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
 end
 
 function export_as_graf_convertingArray(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_as_graf_convertingArray(results_sim, result_name, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_as_graf_convertingArray(results_sim, result_name, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_as_graf_convertingArray(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -440,7 +440,7 @@ function export_as_graf_convertingArray(results_sim, result_name, filepath, file
 end
 
 function export_3D_Matrix_as_graf(x, D_Matrix, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_3D_Matrix_as_graf(D_Matrix, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_3D_Matrix_as_graf(D_Matrix, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_3D_Matrix_as_graf(D_Matrix, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -560,7 +560,7 @@ function export_result_usecir(sims,cir_cap,header,nscn=length(sims),nstg=length(
 end
 
 function export_result_usecir_as_graf(x, n, results_sim, cir_cap, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -641,7 +641,7 @@ function export_results_cost_as_graf(results_sim,result_name, results_cost, file
 end
 
 function export_gen_die_use_as_graf(x, results_sim, die_cap, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)

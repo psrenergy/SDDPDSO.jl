@@ -12,7 +12,7 @@ function add_dso_flags!(par, x)
 end
 
 function add_sddp_parameters!(par, x, opt)
-    par.stages        = x.dso_stages
+    par.stages        = x.stages
     par.sense         = :Min
     par.optimizer     = JuMP.optimizer_with_attributes(opt) #, "OUTPUTLOG" => 0)
     par.upper_bound   = 1e9
@@ -24,15 +24,16 @@ function add_sddp_parameters!(par, x, opt)
 end
 
 function add_dimensions!(par, x, n)
-    par.dso_scenarios   = x.dso_scenarios       
-    par.nbat   = n.bat       
-    par.ngen   = n.ther
-    par.nsol   = n.gnd
-    par.nelv   = 0       
-    par.nbus   = n.bus       
-    par.nlin   = n.cir
-    par.nload  = n.load
-    par.nstate = x.markov_states 
+    par.scenarios     = x.scenarios 
+    par.sim_scenarios = x.sim_scenarios      
+    par.nbat          = n.bat       
+    par.ngen          = n.ther
+    par.nsol          = n.gnd
+    par.nelv          = 0       
+    par.nbus          = n.bus       
+    par.nlin          = n.cir
+    par.nload         = n.load
+    par.nstate        = x.markov_states 
 end
 
 function add_batteries!(par, d)
@@ -52,7 +53,7 @@ end
 function add_solar_plants!(par, x, n, d)
     par.sol_cap = d.gnd_capacity                              # [MW]   : solar plant capacity
     gnd_scn = get_gnd_scenarios(x, d)                   # [p.u.] :
-    par.sol_scn = zeros(Float64, x.dso_stages, x.dso_scenarios, n.gnd) # [p.u.] : rooftop generation cenarios scn => [stg x plant]
+    par.sol_scn = zeros(Float64, x.stages, x.scenarios, n.gnd) # [p.u.] : rooftop generation cenarios scn => [stg x plant]
     for i in 1:n.gnd
         par.sol_scn[:,:,i] .= gnd_scn[d.gnd_code[i]] .* d.gnd_capacity[i]
     end
@@ -85,7 +86,7 @@ function add_demand!(par, x, n, d)
 end
 
 function add_losses!(par, x, n, d)
-    par.losses = [zeros(Float64,x.dso_stages) for i in 1:n.bus]
+    par.losses = [zeros(Float64,x.stages) for i in 1:n.bus]
 end
 
 function add_demand_response!(par, x, n, d)
