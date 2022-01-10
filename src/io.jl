@@ -603,7 +603,7 @@ function export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filenam
 end
 
 function export_results_cost_as_graf(x, results_sim,result_name, results_cost, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_results_cost_as_graf(results_sim,result_name, results_cost, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_results_cost_as_graf(results_sim,result_name, results_cost, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
  
 function export_results_cost_as_graf(results_sim,result_name, results_cost, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -679,11 +679,11 @@ function export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, ST
 end
 
 
-function export_stage_objective_as_graf(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_stage_objective_as_graf(results_sim, result_name, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+function export_stage_objective_as_graf(x, results_sim, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_stage_objective_as_graf(results_sim, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
-function export_stage_objective_as_graf(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+function export_stage_objective_as_graf(results_sim, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
 
     FILE_NAME = joinpath(filepath, filename)
 
@@ -709,7 +709,7 @@ function export_stage_objective_as_graf(results_sim, result_name, filepath, file
     for t = 1:STAGES
         for s = 1:SCENARIOS                
 
-            PSRClassesInterface.write_registry(graf, [results_sim[s][t][result_name]], t, s, 1)
+            PSRClassesInterface.write_registry(graf, [results_sim[s][t][:stage_objective]], t, s, 1)
         end
     end
 
@@ -718,7 +718,7 @@ function export_stage_objective_as_graf(results_sim, result_name, filepath, file
 end
 
 function export_imp_exp_cost_as_graf(x, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
  
 function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -756,6 +756,45 @@ function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict,
                 end
             end
             PSRClassesInterface.write_registry(graf, imp_exp_calc_costs, t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
+
+function export_losses_as_graf(x, par, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_losses_as_graf(par, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_losses_as_graf(par, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    stage_average_losses = get_stagewise_losses(par)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        stage_type = PSRI.STAGE_DAY,
+        initial_stage = INITIAL_STAGE,
+        initial_year  = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS                
+            PSRClassesInterface.write_registry(graf, [stage_average_losses[t]], t, s, 1)
         end
     end
 

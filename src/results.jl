@@ -145,7 +145,10 @@ function export_results(x, n, d, par, sims)
         joinpath(x.PATH,"results","stage_objective_function.csv"),
         simulate_create_result_table(sims,:stage_objective,["stage_objective_function"])
     )
-    export_stage_objective_as_graf(x, sims, :stage_objective, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_objective_function", ["stage_objective_function"])
+    export_stage_objective_as_graf(x, sims, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_objective_function", ["stage_objective_function"])
+
+    #losses
+    export_losses_as_graf(x, par, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_average_losses", ["stage_average_losses (%)"])
 
 end
 
