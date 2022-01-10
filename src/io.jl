@@ -497,16 +497,13 @@ function TransformaDemandaMatriz_UpperRD(MapaDemanda,MatrizDemanda,qtd_buses,n_s
     Demand_Matrix=zeros(qtd_buses,n_stages,1)
     for bus in 1:qtd_buses, stg in 1:n_stages
         if haskey(MapaDemanda,bus)    
-
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
-            
-            if bus in dem_rsp_buses
+            if mapa in dem_rsp_buses
                 Demand_Matrix[bus,stg,1]=demanda*(1+dem_rsp_shifts[mapa])
             else
                 Demand_Matrix[bus,stg,1]=demanda
             end
-
         else
             Demand_Matrix[bus,stg,1]=0
         end
@@ -518,16 +515,13 @@ function TransformaDemandaMatriz_LowerRD(MapaDemanda,MatrizDemanda,qtd_buses,n_s
     Demand_Matrix=zeros(qtd_buses,n_stages,1)
     for bus in 1:qtd_buses, stg in 1:n_stages
         if haskey(MapaDemanda,bus)    
-
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
-            
-            if bus in dem_rsp_buses
+            if mapa in dem_rsp_buses
                 Demand_Matrix[bus,stg,1]=demanda*(1-dem_rsp_shifts[mapa])
             else
                 Demand_Matrix[bus,stg,1]=demanda
             end
-
         else
             Demand_Matrix[bus,stg,1]=0
         end
