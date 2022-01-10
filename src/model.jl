@@ -261,7 +261,7 @@ function parameterize_solar_generation_scenarios!(m, par, t)
     gen_sol_max = m[:gen_sol_max]
 
     # Parameterize the subproblem.
-    SDDP.parameterize(m, 1:par.dso_scenarios) do ω
+    SDDP.parameterize(m, 1:par.scenarios) do ω
         for i = 1:par.nsol
             JuMP.fix(gen_sol_max[i], par.sol_scn[t,ω,i])
         end
@@ -284,7 +284,7 @@ function parameterize_scenarios!(m, par, t)
     gen_die, def, cur, dr_def, dr_cur = m[:gen_die], m[:def], m[:cur], m[:dr_def], m[:dr_cur]
 
     # Parameterize the subproblem.
-    SDDP.parameterize(m, 1:par.dso_scenarios) do ω
+    SDDP.parameterize(m, 1:par.scenarios) do ω
         
         # parametrize renewable generation scenarios
         for i = 1:par.nsol

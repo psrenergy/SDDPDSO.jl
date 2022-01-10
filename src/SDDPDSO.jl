@@ -119,7 +119,7 @@ module SDDPDSO
 
         sims = SDDP.simulate(
             m,
-            5,
+            par.sim_scenarios,
             custom_recorders = Dict{Symbol,Function}(
                 :shadow_price => (sp::JuMP.Model) -> Float64[JuMP.dual(JuMP.constraint_by_name(sp,"energy_balance_$i")) for i in 1:par.nbus],
             ), 
@@ -141,6 +141,8 @@ module SDDPDSO
         # =====================
         # 5. WRITING DASHBOARD?
         # =====================
+
+        return x, par, m, sims
     end
 
     function set_deterministic_losses!(par, x)

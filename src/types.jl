@@ -317,8 +317,9 @@ end
 mutable struct Execution
     PATH          :: String
     DEBUG         :: Int64
-    dso_stages    :: Int64
-    dso_scenarios :: Int64
+    stages        :: Int64
+    scenarios     :: Int64
+    sim_scenarios :: Int64
     markov_states :: Int64
     deficit_cost  :: Float64
     demand_factor :: Float64
@@ -340,7 +341,8 @@ mutable struct Execution
             ""   ,
             1    ,
             1    ,
-            0    ,
+            1    ,
+            1    ,
             0    ,
             1.0e4,
             1.0  ,
@@ -366,6 +368,7 @@ mutable struct Execution
             0                              ,
             _check_input(sddp_dso, "sddp_stages"      ,     1,   Int64,                 "", true),
             _check_input(sddp_dso, "sddp_scenarios"   ,     1,   Int64,                 "", true),
+            _check_input(sddp_dso, "sim_scenarios"    ,     1,   Int64,                 "", true),
             _check_input(sddp_dso, "markov_states"    ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "deficit_cost"     , 1.0e3, Float64, "expected float"  , false),
             _check_input(sddp_dso, "demand_factor"    ,   1.0, Float64, "expected float"  , false),
@@ -391,16 +394,19 @@ end
 mutable struct Problem
 
     # problem parameters
-    stages      :: Int64
     sense       # :: Symbol
     optimizer   # :: Float64
     upper_bound :: Float64
     lower_bound :: Float64
     max_iter    :: Int64
     max_time    :: Float64
-
+    
     # problem dimensions
-    dso_scenarios   :: Int64
+    stages        :: Int64
+    scenarios     :: Int64
+    sim_scenarios :: Int64
+
+    # number of elements
     nbat   :: Int64
     ngen   :: Int64
     nsol   :: Int64
@@ -409,6 +415,7 @@ mutable struct Problem
     nlin   :: Int64
     nload  :: Int64
     nstate :: Int64
+    ndays  :: Int64
 
     # problem variables 
     # batteries        
@@ -489,16 +496,17 @@ mutable struct Problem
     hrinj_cap :: Dict{Int64, Matrix{Float64}}
 
     # flags
-    flag_sec_law :: Bool
-    flag_import  :: Bool
-    flag_export  :: Bool
-    flag_markov  :: Bool
-    flag_losses  :: Bool
-    flag_dem_rsp :: Bool
-    flag_bat     :: Bool
-    flag_debug   :: Bool
-    flag_verbose :: Bool
-    flag_CSV     :: Bool
+    flag_sec_law  :: Bool
+    flag_import   :: Bool
+    flag_export   :: Bool
+    flag_markov   :: Bool
+    flag_losses   :: Bool
+    flag_dem_rsp  :: Bool
+    flag_bat      :: Bool
+    flag_debug    :: Bool
+    flag_verbose  :: Bool
+    flag_CSV      :: Bool
+    flag_add_days :: Bool
 
     Problem() = new()
 end

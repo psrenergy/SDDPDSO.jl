@@ -39,6 +39,15 @@ test/data/example_01/reports/
 test/data/example_02/debug/
 test/data/example_02/results/
 test/data/example_02/reports/
+
+test/data/case_studies
+
+
+
+
+
+
+
 test/runMultitests-local.jl
 test/runtests-local.jl
 test/data/example_Validacao/results/stage_objective_function_0.csv
