@@ -38,12 +38,12 @@ module SDDPDSO
     function main(ARGS)
         @show ARGS
 
-        psrio = PSRIO.create()
+        # psrio = PSRIO.create()
 
-        PSRIO.run(psrio, [raw"d:\Downloads\Example_PSRIO"], 
-        recipes=[raw".\deps\psrio-scripts\sddpdso\dashboard.lua"], 
-        model="none", 
-        verbose=3)
+        # PSRIO.run(psrio, [joinpath(casepath,"results")], 
+        # recipes=[raw".\deps\psrio-scripts\sddpdso\dashboard.lua"], 
+        # model="none", 
+        # verbose=3)
     end
 
     # --- run
@@ -133,14 +133,25 @@ module SDDPDSO
         # 4. WRITING RESULTS
         # ==================
         println("Writing results")
-        
+
+        clear_results(casepath)
         export_results(x, n, d, par, sims)
 
 
 
         # =====================
-        # 5. WRITING DASHBOARD?
+        # 5. WRITING DASHBOARD
         # =====================
+
+        psrio = PSRIO.create()
+
+        PSRIO.run(psrio, [joinpath(casepath,"results")], 
+        recipes=[raw".\deps\psrio-scripts\sddpdso\dashboard.lua"], 
+        model="none", 
+        verbose=3)
+
+        return x, par, m, sims
+        
     end
 
     function set_deterministic_losses!(par, x)
