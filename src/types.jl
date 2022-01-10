@@ -368,7 +368,7 @@ mutable struct Execution
             0                              ,
             _check_input(sddp_dso, "sddp_stages"      ,     1,   Int64,                 "", true),
             _check_input(sddp_dso, "sddp_scenarios"   ,     1,   Int64,                 "", true),
-            _check_input(sddp_dso, "sim_scenarios"    ,     1,   Int64,                 "", true),
+            _check_input(sddp_dso, "sim_scenarios"    ,     1,   Int64,                 "", false),
             _check_input(sddp_dso, "markov_states"    ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "deficit_cost"     , 1.0e3, Float64, "expected float"  , false),
             _check_input(sddp_dso, "demand_factor"    ,   1.0, Float64, "expected float"  , false),

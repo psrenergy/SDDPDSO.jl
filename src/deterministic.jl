@@ -296,6 +296,8 @@ function build_deterministic_model(par)
 
     m = JuMP.Model(par.optimizer)
 
+    JuMP.set_silent(m)
+
     add_deterministic_variables_model!(m, par)
 
     add_deterministic_network_constraints!(m, par)
