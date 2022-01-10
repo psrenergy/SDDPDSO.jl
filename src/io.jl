@@ -608,11 +608,11 @@ function export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filenam
     PSRClassesInterface.close(graf)
 end
 
-function export_gen_die_cost_as_graf(x, results_sim, die_cost, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_gen_die_cost_as_graf(results_sim, die_cost, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+function export_results_cost_as_graf(x, results_sim,result_name, results_cost, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_results_cost_as_graf(results_sim,result_name, results_cost, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
-
-function export_gen_die_cost_as_graf(results_sim, die_cost, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+ 
+function export_results_cost_as_graf(results_sim,result_name, results_cost, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
 
     FILE_NAME = joinpath(filepath, filename)
 
@@ -637,8 +637,8 @@ function export_gen_die_cost_as_graf(results_sim, die_cost, filepath, filename, 
     # --- store data
     for t = 1:STAGES
         for s = 1:SCENARIOS         
-            diesel_gen_cost = results_sim[s][t][:gen_die].*die_cost
-            PSRClassesInterface.write_registry(graf, diesel_gen_cost, t, s, 1)
+            results_calc_cost = results_sim[s][t][result_name].*results_cost
+            PSRClassesInterface.write_registry(graf, results_calc_cost, t, s, 1)
         end
     end
 
@@ -677,6 +677,91 @@ function export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, ST
         for s = 1:SCENARIOS         
             die_use = (results_sim[s][t][:gen_die]./die_cap).*100
             PSRClassesInterface.write_registry(graf, die_use, t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
+
+
+function export_stage_objective_as_graf(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_stage_objective_as_graf(results_sim, result_name, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_stage_objective_as_graf(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        stage_type = PSRI.STAGE_DAY,
+        initial_stage = INITIAL_STAGE,
+        initial_year  = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS                
+
+            PSRClassesInterface.write_registry(graf, [results_sim[s][t][result_name]], t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
+
+function export_imp_exp_cost_as_graf(x, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.dso_stages, x.dso_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+ 
+function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    n_agents = length(AGENTS)
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        stage_type = PSRI.STAGE_DAY,
+        initial_stage = INITIAL_STAGE,
+        initial_year  = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS         
+            imp_exp_calc_costs = zeros(n_agents)
+            for i in 1:n_agents
+                if haskey(imp_exp_cost_dict,i)
+                    imp_exp_calc_costs[i] = imp_exp_cost_dict[i][t,s]*results_sim[s][t][result_name][i]
+                else
+                    imp_exp_calc_costs[i] = 0
+                end
+            end
+            PSRClassesInterface.write_registry(graf, imp_exp_calc_costs, t, s, 1)
         end
     end
 

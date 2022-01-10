@@ -96,7 +96,7 @@ function reverse_map_to_dict(tec_map::Vector{Int32}, ntec)
     return rev_map
 end
 
-function clean_results(casepath)
+function clear_results(casepath)
     rm(joinpath(casepath,"results"), recursive = true)
     mkdir(joinpath(casepath,"results"))
     return
