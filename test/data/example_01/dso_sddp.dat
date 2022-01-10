@@ -1,2 +1,2 @@
-sddp_stages,sddp_scenarios,deficit_cost,markov_states,demand_factor,max_iter,max_time,flag_markov,flag_import,flag_export,flag_dem_rsp,flag_sec_law,flag_verbose,flag_debug
-72,10,4000,0,1,50,60,0,0,1,0,0,1,1
+sddp_stages,sddp_scenarios,sim_scenarios,deficit_cost,markov_states,demand_factor,max_iter,max_time,flag_markov,flag_import,flag_export,flag_dem_rsp,flag_sec_law,flag_verbose,flag_debug
+72,10,5,4000,0,1,50,60,0,0,1,0,0,1,1
