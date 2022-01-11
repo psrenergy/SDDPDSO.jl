@@ -383,7 +383,7 @@ mutable struct Execution
             _check_input(sddp_dso, "flag_losses"      ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_debug"       ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_verbose"     ,     0,   Int64, "expected integer", false),
-            _check_input(sddp_dso, "flag_csv"         ,     0,   Int64, "expected integer", false)
+            _check_input(sddp_dso, "flag_csv"         ,     1,   Int64, "expected integer", false)
         )
     end 
     function read_execution_parameters(path::String)
