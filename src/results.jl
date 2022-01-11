@@ -76,7 +76,7 @@ function export_results(x, n, d, par, sims, m)
         export_StateVar_as_graf(x, sims, :storage, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name)
     end
 
-    if x.flag_dem_rsp == 1
+    if par.flag_dem_rsp
         Upper_DR = TransformaDemandaMatriz_UpperRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_shift)
         export_3D_Matrix_as_graf(x,Upper_DR, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_DR_UpperBound", d.bus_name)
     
@@ -111,7 +111,7 @@ function export_results(x, n, d, par, sims, m)
     #Marginal cost export 
     export_as_graf(x, sims, :shadow_price, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_bus_marginal_cost", d.bus_name)
 
-    if x.flag_import == 1
+    if par.flag_import
         CSV.write(
             joinpath(x.PATH,"results","energy_import.csv"),
             simulate_create_result_table(sims,:imp,d.bus_name)
@@ -127,7 +127,7 @@ function export_results(x, n, d, par, sims, m)
 
     end
 
-    if x.flag_export == 1
+    if par.flag_export
         CSV.write(
             joinpath(x.PATH,"results","energy_export.csv"),
             simulate_create_result_table(sims,:exp,d.bus_name)

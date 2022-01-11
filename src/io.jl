@@ -261,7 +261,7 @@ function import_dso_markov_transitions(x::Execution)
 end
 
 function export_as_graf(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_as_graf(results_sim, result_name, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_as_graf(results_sim, result_name, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -299,7 +299,7 @@ function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SC
 end
 
 function export_dif_as_graf(x, results_sim, result_name1, result_name2, filepath, filename, AGENTS; UNIT::String="", CSV=false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_dif_as_graf(results_sim, result_name1, result_name2, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_dif_as_graf(results_sim, result_name1, result_name2, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV=false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -336,7 +336,7 @@ function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, fi
 end
 
 function export_StateVar_as_graf(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_StateVar_as_graf(results_sim, result_name, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_StateVar_as_graf(results_sim, result_name, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_StateVar_as_graf(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -384,7 +384,7 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
 end
 
 function export_as_graf_convertingArray(x, results_sim, result_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_as_graf_convertingArray(results_sim, result_name, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_as_graf_convertingArray(results_sim, result_name, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_as_graf_convertingArray(results_sim, result_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -426,7 +426,7 @@ function export_as_graf_convertingArray(results_sim, result_name, filepath, file
 end
 
 function export_3D_Matrix_as_graf(x, D_Matrix, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_3D_Matrix_as_graf(D_Matrix, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_3D_Matrix_as_graf(D_Matrix, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_3D_Matrix_as_graf(D_Matrix, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -546,7 +546,7 @@ function export_result_usecir(sims,cir_cap,header,nscn=length(sims),nstg=length(
 end
 
 function export_result_usecir_as_graf(x, n, results_sim, cir_cap, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -589,7 +589,7 @@ function export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filenam
 end
 
 function export_results_cost_as_graf(x, results_sim,result_name, results_cost, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_results_cost_as_graf(results_sim,result_name, results_cost, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_results_cost_as_graf(results_sim,result_name, results_cost, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
  
 function export_results_cost_as_graf(results_sim,result_name, results_cost, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -627,7 +627,7 @@ function export_results_cost_as_graf(results_sim,result_name, results_cost, file
 end
 
 function export_gen_die_use_as_graf(x, results_sim, die_cap, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -666,7 +666,7 @@ end
 
 
 function export_stage_objective_as_graf(x, results_sim, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_stage_objective_as_graf(results_sim, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_stage_objective_as_graf(results_sim, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_stage_objective_as_graf(results_sim, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -704,7 +704,7 @@ function export_stage_objective_as_graf(results_sim, filepath, filename, STAGES,
 end
 
 function export_imp_exp_cost_as_graf(x, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
  
 function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -736,7 +736,7 @@ function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict,
             imp_exp_calc_costs = zeros(n_agents)
             for i in 1:n_agents
                 if haskey(imp_exp_cost_dict,i)
-                    imp_exp_calc_costs[i] = imp_exp_cost_dict[i][t]*results_sim[s][t][result_name][i]
+                    imp_exp_calc_costs[i] = imp_exp_cost_dict[i][t,1]*results_sim[s][t][result_name][i]
                 else
                     imp_exp_calc_costs[i] = 0
                 end
@@ -750,7 +750,7 @@ function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict,
 end
 
 function export_losses_as_graf(x, par, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_losses_as_graf(par, filepath, filename, x.stages, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_losses_as_graf(par, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_losses_as_graf(par, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
