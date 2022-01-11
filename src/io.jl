@@ -93,9 +93,9 @@ end
 
 
 """
-    import_dso_hrgnd_scn
+    import_renewable_generation_scenarios
 """
-function import_dso_hrgnd_scn(x::Execution, d::Data)
+function import_renewable_generation_scenarios(x::Execution, d::Data)
     
     # --- read external hourly scenarios cost data
     hrgnd = import_csvfile(x.PATH,"dso_hrgnd_scn.dat")
@@ -125,9 +125,9 @@ function import_dso_hrgnd_scn(x::Execution, d::Data)
 end
 
 """
-    import_dso_dr_shift
+    import_demand_response_shift
 """
-function import_dso_dr_shift(x::Execution, d::Data)
+function import_demand_response_shift(x::Execution, d::Data)
     
     # --- read external hourly scenarios cost data
     dr_shift = import_csvfile(x.PATH,"dso_dr_shift.dat")[1,:]
@@ -147,74 +147,60 @@ function import_dso_dr_shift(x::Execution, d::Data)
 end
 
 """
-    import_dso_hrinj_cst
+    import_injections
 """
-function import_dso_hrinj_cst(x::Execution, d::Data)
-    
-    # --- read external hourly scenarios cost data
-    hrinj = import_csvfile(x.PATH,"dso_hrinj_cst_scn.dat")
-    
-    # --- 
-    valid_codes = [code for code in d.bus_code if hasproperty(hrinj,"$code")]
-    
-    # --- 
-    hrinj_scn = Dict(code => zeros(Float64, x.stages, x.scenarios) for code in valid_codes)
-    hrinj_stg = Dict(code => zeros(Float64, x.stages) for code in valid_codes)
+function import_injections(x::Execution, d::Data, is_export::Bool)
 
-    for i in 1:size(hrinj,1)
+    name     = is_export ? "imp"    : "exp"
+    fullname = is_export ? "import" : "export"
 
-        hrinj_i = hrinj[i,:]
+    # --- read external hourly cost data
+    inj_cap = import_csvfile(x.PATH,"dso_hrcp_" * name * ".dat")
+    inj_cst = import_csvfile(x.PATH,"dso_hrct_" * name * ".dat")
 
-        stg = hrinj_i.stage
-        scn = hrinj_i.scenario
+    # --- by-pass user input error
+    valid_codes_cap = [code for code in d.bus_code if hasproperty(inj_cap,"$code")]
+    valid_codes_cst = [code for code in d.bus_code if hasproperty(inj_cap,"$code")]
+    valid_codes     = intersect(valid_codes_cap, valid_codes_cst)
 
-        if (stg > x.stages) | (scn > x.scenarios)
+    # error check 1
+    if (length(valid_codes_cap) != length(valid_codes_cst))
+        error(fullname * "capacity and costs are not compatible, please verify input data")
+    end
+
+    # error check 2
+    if (length(valid_codes) != length(valid_codes_cst)) | (length(valid_codes) != length(valid_codes_cap))
+        error(fullname * " capacity and costs are not compatible, please verify input data")
+    end
+
+    # ---
+    capacity = Dict(code => zeros(Float64, x.stages, 1) for code in valid_codes)
+    cost     = Dict(code => zeros(Float64, x.stages, 1) for code in valid_codes)
+
+
+    for i in 1:size(inj_cap,1)
+
+        # get row data
+        cap, cst = inj_cap[i,:], inj_cst[i,:]
+
+        stg, scn = cap.stage, cap.scenario
+
+        if (stg > x.stages) | (scn > 1)
             continue
         end
 
         for code in valid_codes
-            hrinj_scn[code][stg, scn]  = hrinj_i["$code"]
-            hrinj_stg[code][stg]      += hrinj_i["$code"]/x.scenarios
+            capacity[code][stg, 1] = cap["$code"]
+            cost[code][stg, 1]     = cst["$code"]
         end
     end
 
-
-    return hrinj_scn
+    return capacity, cost
 end
 
 """
-    import_dso_hrinj_cap
+    import_dso_markov_probabilities
 """
-function import_dso_hrinj_cap(x::Execution, d::Data)
-    
-    # --- read external hourly scenarios cost data
-    hrinj = import_csvfile(x.PATH,"dso_hrinj_cap_scn.dat")
-    
-    # --- 
-    valid_codes = [code for code in d.bus_code if hasproperty(hrinj,"$code")]
-    
-    # --- 
-    hrinj_scn = Dict(code => zeros(Float64, x.stages, x.scenarios) for code in valid_codes)
-
-    for i in 1:size(hrinj,1)
-
-        hrinj_i = hrinj[i,:]
-
-        stg = hrinj_i.stage
-        scn = hrinj_i.scenario
-
-        if (stg > x.stages) | (scn > x.scenarios)
-            continue
-        end
-
-        for code in valid_codes
-            hrinj_scn[code][stg, scn] = hrinj_i["$code"]
-        end
-    end
-
-    return hrinj_scn
-end
-
 function import_dso_markov_probabilities(x::Execution)
     
     # --- read 
