@@ -1,4 +1,4 @@
-function export_results(x, n, d, par, sims)
+function export_results(x, n, d, par, sims, m)
     
     Demanda_Matriz = TransformaDemandaMatriz(par.bus_map_dem,par.demand,n.bus,par.stages)
     export_3D_Matrix_as_graf(x,Demanda_Matriz, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_original_demand", d.bus_name)
@@ -109,7 +109,7 @@ function export_results(x, n, d, par, sims)
     end
 
     #Marginal cost export 
-    export_as_graf(x, sims, :shadow_price, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_Bus_Marginal_Cost", d.bus_name)
+    export_as_graf(x, sims, :shadow_price, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_bus_marginal_cost", d.bus_name)
 
     if x.flag_import == 1
         CSV.write(
@@ -147,8 +147,13 @@ function export_results(x, n, d, par, sims)
     )
     export_stage_objective_as_graf(x, sims, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_objective_function", ["stage_objective_function"])
 
+    convergence_table = calculate_convergence_table(x,m);
+    export_conv_table_as_graf(x, convergence_table, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_convergence_data", ["Simulation Value", "Lower Bound", "Difference (%)"])                                  
+
     #losses
-    export_losses_as_graf(x, par, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_average_losses", ["stage_average_losses (%)"])
+    if par.flag_losses
+        export_losses_as_graf(x, par, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_average_losses", ["stage_average_losses (%)"])
+    end
 
 end
 

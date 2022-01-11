@@ -101,3 +101,18 @@ function clear_results(casepath)
     mkdir(joinpath(casepath,"results"))
     return
 end
+
+function calculate_convergence_table(x,m)
+    sims_array   = zeros(x.max_iter)
+    bounds_array = zeros(x.max_iter)
+    i = 1
+    for i in 1:x.max_iter
+        sims_value  = m.most_recent_training_results.log[i].simulation_value
+        bound_value = m.most_recent_training_results.log[i].bound
+        sims_array[i]   = sims_value
+        bounds_array[i] = bound_value
+    end
+    convergence_df = DataFrame(SimulationValue = sims_array, LowerBound = bounds_array)
+    convergence_df[!,"% Diff"] = abs.(convergence_df[!,"SimulationValue"] - convergence_df[!,"LowerBound"]).*100 ./ convergence_df[!,"SimulationValue"]
+    return convergence_df
+end
