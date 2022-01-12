@@ -151,8 +151,8 @@ end
 """
 function import_injections(x::Execution, d::Data, is_export::Bool)
 
-    name     = is_export ? "imp"    : "exp"
-    fullname = is_export ? "import" : "export"
+    name     = is_export ? "exp"    : "imp"
+    fullname = is_export ? "export" : "import"
 
     # --- read external hourly cost data
     inj_cap = import_csvfile(x.PATH,"dso_hrcp_" * name * ".dat")
