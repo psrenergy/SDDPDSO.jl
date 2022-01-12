@@ -21,12 +21,12 @@ function export_results(x, n, d, par, sims, m)
 
     if n.ther > 0
         CSV.write(
-            joinpath(x.PATH,"results","diesel_generation.csv"),
+            joinpath(x.PATH,"results","thermal_generation.csv"),
             simulate_create_result_table(sims,:gen_die,d.ter_name)
         )
-        export_as_graf(x, sims, :gen_die, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_diesel_generation", d.ter_name)
-        export_gen_die_use_as_graf(x, sims, par.gen_cap, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_diesel_use", d.ter_name)
-        export_results_cost_as_graf(x, sims,:gen_die, par.gen_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_diesel_gen_cost", d.ter_name)
+        export_as_graf(x, sims, :gen_die, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_generation", d.ter_name)
+        export_gen_die_use_as_graf(x, sims, par.gen_cap, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_use", d.ter_name)
+        export_results_cost_as_graf(x, sims,:gen_die, par.gen_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_gen_cost", d.ter_name)
     end
 
     if n.gnd > 0
@@ -138,7 +138,7 @@ function export_results(x, n, d, par, sims, m)
             simulate_create_result_table(sims,:exp_max,d.bus_name)
         )
         export_as_graf(x, sims, :exp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_capacity", d.bus_name)
-        export_imp_exp_cost_as_graf(x, sims, :exp, par.exp_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_imp_cost", d.bus_name)
+        export_imp_exp_cost_as_graf(x, sims, :exp, par.exp_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_exp_cost", d.bus_name)
     end
 
     CSV.write(
@@ -147,9 +147,10 @@ function export_results(x, n, d, par, sims, m)
     )
     export_stage_objective_as_graf(x, sims, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_objective_function", ["stage_objective_function"])
 
-    convergence_table = calculate_convergence_table(x,m);
-    export_conv_table_as_graf(x, convergence_table, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_convergence_data", ["Simulation Value", "Lower Bound", "Difference (%)"])                                  
-
+    if par.flag_bat || par.flag_dem_rsp
+        convergence_table = calculate_convergence_table(x,m);
+        export_conv_table_as_graf(x, convergence_table, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_convergence_data", ["Simulation Value", "Lower Bound", "Difference (%)"]);                                  
+    end
     #losses
     if par.flag_losses
         export_losses_as_graf(x, par, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_average_losses", ["stage_average_losses (%)"])
