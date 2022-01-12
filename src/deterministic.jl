@@ -97,7 +97,7 @@ function add_deterministic_export_constraints!(m, par)
     end
 
     # --- add constraint
-    JuMP.@constraint(m, export_capacity_1[t=1:par.stages, i=valid_buses]    , exp[t,i] <= sum(par.imp_exp[j][t,1] for j in par.bus_map_exp[i]))
+    JuMP.@constraint(m, export_capacity_1[t=1:par.stages, i=valid_buses]    , exp[t,i] <= sum(par.exp_max[j][t,1] for j in par.bus_map_exp[i]))
     JuMP.@constraint(m, export_capacity_2[t=1:par.stages, i=non_valid_buses], exp[t,i] <= 0.0       )    
 
 end
