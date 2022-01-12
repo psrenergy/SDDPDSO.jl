@@ -135,7 +135,7 @@ module SDDPDSO
         println("Writing results")
 
         clear_results(casepath)
-        export_results(x, n, d, par, sims, m)
+        export_results(x, n, d, par, sims, m);
 
 
 
@@ -150,8 +150,7 @@ module SDDPDSO
         model="none", 
         verbose=3)
 
-        return x, par, m, sims
-        
+        return
     end
 
     function set_deterministic_losses!(par, x)

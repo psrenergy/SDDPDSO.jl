@@ -105,7 +105,6 @@ end
 function calculate_convergence_table(x,m)
     sims_array   = zeros(x.max_iter)
     bounds_array = zeros(x.max_iter)
-    i = 1
     for i in 1:x.max_iter
         sims_value  = m.most_recent_training_results.log[i].simulation_value
         bound_value = m.most_recent_training_results.log[i].bound
