@@ -156,10 +156,6 @@ module SDDPDSO
 
     function set_deterministic_losses!(par, x)
         
-        # REQUIRES UPDATE!
-        par.flag_dem_rsp = false # falta implementar
-        # 
-        
         # --- build deterministic model
         m = build_deterministic_model(par)
         
@@ -171,10 +167,6 @@ module SDDPDSO
         
         # --- set losses per bus
         par.losses = get_bus_losses_from_deterministc(par, m);
-
-        # REQUIRES UPDATE!
-        par.flag_dem_rsp = x.flag_dem_rsp == 1
-        # 
     end
 
     # --- initialize

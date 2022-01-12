@@ -35,30 +35,6 @@ function set_objective_curtailment!(m, par, expr)
     end
 end
 
-function set_objective_demand_response_deficit!(m, par, expr)
-    if par.flag_dem_rsp
-        par.flag_debug && print("+ demand response deficit")
-
-        for t in 1:par.stages, i in 1:par.nload
-            JuMP.add_to_expression!(expr, par.def_cost * 1.02, m[:dr_def][t,i])
-        end
-
-        # par.flag_debug && begin @show brick end
-    end
-end
-
-function set_objective_demand_response_curtailment!(m, par, expr)
-    if par.flag_dem_rsp
-        par.flag_debug && print(" + demand response curtailment")
-
-        for t in 1:par.stages, i in 1:par.nload
-            JuMP.add_to_expression!(expr, par.def_cost * 1.03, m[:dr_cur][t,i])
-        end
-
-        # par.flag_debug && begin @show brick end
-    end
-end
-
 function set_objective_import!(m, par, expr)
     if par.flag_import
         par.flag_debug && print(" + grid import")

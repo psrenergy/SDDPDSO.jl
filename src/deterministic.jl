@@ -51,9 +51,10 @@ function add_deterministic_variables_model!(m, par)
     # demand response
     if par.flag_dem_rsp
         JuMP.@variables(m, begin
-            dr[t=1:par.stages, i=par.set_dem_rsp]     >= 0
-            dr_cur[t=1:par.stages, i=par.set_dem_rsp] >= 0
-            dr_def[t=1:par.stages, i=par.set_dem_rsp] >= 0
+            total_load[t=1:(par.stages+1), i=par.set_dem_rsp] >= 0
+            dr[t=1:par.stages, i=par.set_dem_rsp]         >= 0
+            dr_cur[t=1:par.stages, i=par.set_dem_rsp]     >= 0
+            dr_def[t=1:par.stages, i=par.set_dem_rsp]     >= 0
         end)
     end
 end
@@ -240,18 +241,20 @@ function add_deterministic_demand_response_constraints!(m, par)
     dr, dr_def, dr_cur, total_load = m[:dr], m[:dr_def], m[:dr_cur], m[:total_load]
 
     # Load sum over periods
-    JuMP.@constraint(m, dr_sum[i=par.set_dem_rsp],
-        total_load[i].out == total_load[i].in + dr[i] + dr_def[i] - dr_cur[i] 
+    JuMP.@constraint(m, dr_sum[t=par.stages, i=par.set_dem_rsp],
+        total_load[t+1,i] == total_load[t,i] + dr[t,i] 
     )
 
     # Shift
-    JuMP.@constraint(m, dr_shift_ub[i=par.set_dem_rsp], dr[i] <= par.demand[i][t] * (1 + par.dem_rsp_shift[i]))
-    JuMP.@constraint(m, dr_shift_lb[i=par.set_dem_rsp], dr[i] >= par.demand[i][t] * (1 - par.dem_rsp_shift[i]))
+    JuMP.@constraint(m, dr_shift_ub[t=par.stages,i=par.set_dem_rsp], dr[t,i] <= par.demand[i][t] * (1 + par.dem_rsp_shift[i]))
+    JuMP.@constraint(m, dr_shift_lb[t=par.stages,i=par.set_dem_rsp], dr[t,i] >= par.demand[i][t] * (1 - par.dem_rsp_shift[i]))
 
-    if mod(t,24) == 0
-        JuMP.@constraint(m, dr_integral[i=par.set_dem_rsp], total_load[i].out == sum(par.demand[i][1:t]))
+    for t in 1:par.stages
+        if mod(t,24) == 0
+            JuMP.@constraint(m, dr_integral[t=par.stages,i=par.set_dem_rsp], total_load[t,i] == sum(par.demand[i][1:t]))
+        end
     end
-end # NOT WORKING YET
+end
 
 function add_deterministic_objective!(m, par)
     par.flag_debug && print("> objective:")
@@ -262,8 +265,6 @@ function add_deterministic_objective!(m, par)
     set_objective_thermal!(m, par, expr)
     set_objective_deficit!(m, par, expr)
     set_objective_curtailment!(m, par, expr)
-    set_objective_demand_response_deficit!(m, par, expr)
-    set_objective_demand_response_curtailment!(m, par, expr)
     set_objective_import!(m, par, expr)
     set_objective_export!(m, par, expr)
 
