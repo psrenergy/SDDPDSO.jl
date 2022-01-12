@@ -135,7 +135,7 @@ module SDDPDSO
         println("Writing results")
 
         clear_results(casepath)
-        export_results(x, n, d, par, sims)
+        export_results(x, n, d, par, sims, m)
 
 
 

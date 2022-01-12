@@ -787,3 +787,41 @@ function export_losses_as_graf(par, filepath, filename, STAGES, SCENARIOS, AGENT
     # --- close graf
     PSRClassesInterface.close(graf)
 end
+
+function export_conv_table_as_graf(x, convergence_table, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_conv_table_as_graf(convergence_table, filepath, filename, x.max_iter, x.scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_conv_table_as_graf(convergence_table, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        stage_type = PSRI.STAGE_DAY,
+        initial_stage = INITIAL_STAGE,
+        initial_year  = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS                
+            v = collect(convergence_table[t,:])
+            PSRClassesInterface.write_registry(graf, v , t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
