@@ -1,0 +1,7 @@
+case 00: IEEE129 buses, 24 hours, 3 additional days, 10 training scenarios, 5 simulated scenarios
+case 01: IEEE129 buses, 24 hours, 3 additional days, 10 training scenarios, 5 simulated scenarios, using battery
+case 02: IEEE129 buses, 24 hours, 3 additional days, 10 training scenarios, 5 simulated scenarios, using demand response
+case 03: IEEE129 buses, 24 hours, 3 additional days, 10 training scenarios, 5 simulated scenarios, using battery and demand response
+case 04: IEEE129 buses, 24 hours, 3 additional days, 10 training scenarios, 5 simulated scenarios, using export capabilities
+case 05: IEEE129 buses, 24 hours, 3 additional days, 10 training scenarios, 5 simulated scenarios, using pre-allocated losses
+case 06: IEEE129 buses, 24 hours, 3 additional days, 10 training scenarios, 5 simulated scenarios, complete
