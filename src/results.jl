@@ -1,7 +1,7 @@
 function export_results(x, n, d, par, sims, m)
     
-    Demanda_Matriz = TransformaDemandaMatriz(par.bus_map_dem,par.demand,n.bus,par.stages)
-    export_3D_Matrix_as_graf(x,Demanda_Matriz, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_original_demand", d.bus_name)
+    D_Matrix = TransformaDemandaMatriz(par.bus_map_dem,par.demand,n.bus,par.stages)
+    export_3D_Matrix_as_graf(x,D_Matrix, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_original_demand", d.bus_name)
 
     if n.cir > 0
         CSV.write(
@@ -110,6 +110,7 @@ function export_results(x, n, d, par, sims, m)
 
     #Marginal cost export 
     export_as_graf(x, sims, :shadow_price, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_bus_marginal_cost", d.bus_name)
+    # export_weighted_shadow_price_as_graf(x, sims, D_Matrix, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_weighted_bus_marginal_cost", ["weighted bus marginal cost"])
 
     if par.flag_import
         CSV.write(
@@ -124,7 +125,7 @@ function export_results(x, n, d, par, sims, m)
         )
         export_as_graf(x, sims, :imp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_capacity", d.bus_name)
         export_imp_exp_cost_as_graf(x, sims, :imp, par.imp_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_imp_cost", d.bus_name)
-
+        export_imp_exp_use_as_graf(x, sims, :imp, par.imp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_imp_use", d.bus_name)
     end
 
     if par.flag_export
@@ -139,6 +140,8 @@ function export_results(x, n, d, par, sims, m)
         )
         export_as_graf(x, sims, :exp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_capacity", d.bus_name)
         export_imp_exp_cost_as_graf(x, sims, :exp, par.exp_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_exp_cost", d.bus_name)
+        export_imp_exp_use_as_graf(x, sims, :exp, par.exp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_exp_use", d.bus_name)
+
     end
 
     CSV.write(

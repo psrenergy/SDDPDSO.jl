@@ -736,12 +736,58 @@ function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict,
             imp_exp_calc_costs = zeros(n_agents)
             for i in 1:n_agents
                 if haskey(imp_exp_cost_dict,i)
-                    imp_exp_calc_costs[i] = imp_exp_cost_dict[i][t,1]*results_sim[s][t][result_name][i]
+                    imp_exp_calc_costs[i] = imp_exp_cost_dict[i][t]*results_sim[s][t][result_name][i]
                 else
                     imp_exp_calc_costs[i] = 0
                 end
             end
             PSRClassesInterface.write_registry(graf, imp_exp_calc_costs, t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
+
+function export_imp_exp_use_as_graf(x, results_sim, result_name, imp_exp_max_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_imp_exp_use_as_graf(results_sim, result_name, imp_exp_max_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+ 
+function export_imp_exp_use_as_graf(results_sim,result_name, imp_exp_max_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    n_agents = length(AGENTS)
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        stage_type = PSRI.STAGE_DAY,
+        initial_stage = INITIAL_STAGE,
+        initial_year  = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS         
+            imp_exp_calc_use = zeros(n_agents)
+            for i in 1:n_agents
+                if haskey(imp_exp_max_dict,i)
+                    imp_exp_calc_use[i] = 100*results_sim[s][t][result_name][i]/imp_exp_max_dict[i][t]
+                else
+                    imp_exp_calc_use[i] = 0
+                end
+            end
+            PSRClassesInterface.write_registry(graf, imp_exp_calc_use, t, s, 1)
         end
     end
 
@@ -825,3 +871,46 @@ function export_conv_table_as_graf(convergence_table, filepath, filename, STAGES
     # --- close graf
     PSRClassesInterface.close(graf)
 end
+
+function export_weighted_shadow_price_as_graf(x, results_sim, D_matrix, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_as_graf(results_sim, D_matrix, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+end
+
+function export_weighted_shadow_price_as_graf(results_sim, D_matrix, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+    FILE_NAME = joinpath(filepath, filename)
+
+    # --- open graf file
+    graf = PSRClassesInterface.open(
+        CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+        FILE_NAME              ,
+        
+        is_hourly = true       ,
+        
+        scenarios = SCENARIOS  ,
+        stages    = STAGES     ,
+        agents    = AGENTS     ,
+        unit      = UNIT       ,
+        # optional:
+        stage_type = PSRI.STAGE_DAY,
+        initial_stage = INITIAL_STAGE,
+        initial_year  = INITIAL_YEAR
+    )
+
+    # --- store data
+    for t = 1:STAGES
+        for s = 1:SCENARIOS                
+            original_demand = D_Matrix[:,t,1]
+            shadow_price    = results_sim[s][t][:shadow_price]
+            # weighted_shadow_price = sum(original_demand[i] * shadow_price[i] for i in )
+            weighted_shadow_price = sum(original_demand.*shadow_price)/sum(original_demand)
+            PSRClassesInterface.write_registry(graf, weighted_shadow_price, t, s, 1)
+        end
+    end
+
+    # --- close graf
+    PSRClassesInterface.close(graf)
+end
+
+

@@ -150,7 +150,7 @@ module SDDPDSO
         model="none", 
         verbose=3)
 
-        return
+        return par, sims
     end
 
     function set_deterministic_losses!(par, x)
