@@ -146,7 +146,7 @@ module SDDPDSO
         psrio = PSRIO.create()
 
         PSRIO.run(psrio, [joinpath(casepath,"results")], 
-        recipes=[raw".\deps\psrio-scripts\sddpdso\dashboard.lua"], 
+        recipes=[raw".\src\dashboard.lua"], 
         model="none", 
         verbose=3)
 
