@@ -5,22 +5,23 @@ renewable_curtailment = generic:load("DSO_renewable_curtailment");
 battery_charge        = generic:load("DSO_battery_charge");
 battery_discharge     = generic:load("DSO_battery_discharge");
 battery_storage       = generic:load("DSO_battery_storage");
+Weighted_Bus_Marginal_Cost = generic:load("DSO_weighted_bus_marginal_cost");
 Bus_Marginal_Cost     = generic:load("DSO_bus_marginal_cost");
 original_demand       = generic:load("DSO_original_demand");
-cir_use               = generic:load("DSO_cirUse");
-demand_response_load  = generic:load("DSO_demand_response_load");
+cir_use               = generic:load("DSO_cir_use");
+demand_response_load  = generic:load("DSO_dr_load");
 demand_response       = generic:load("DSO_original_demand");
 
 
-demand_response = demand_response:replace(demand_response_load)
-demand_response_upper = generic:load("DSO_DR_UpperBound");
-demand_response_lower = generic:load("DSO_DR_LowerBound");
+demand_response       = demand_response:replace(demand_response_load);
+demand_response_upper = generic:load("DSO_dr_upper_bound");
+demand_response_lower = generic:load("DSO_dr_lower_bound");
 
 average_losses  = generic:load("DSO_stage_average_losses");
 
 thermal_cost  = generic:load("DSO_thermal_gen_cost");
-imp_cost      = generic:load("DSO_imp_cost");
-exp_cost      = generic:load("DSO_energy_export");
+imp_cost      = generic:load("DSO_energy_import_cost");
+exp_cost      = generic:load("DSO_energy_export_cost");
 
 energy_imp      = generic:load("DSO_energy_import");
 energy_exp      = generic:load("DSO_energy_export");
@@ -28,8 +29,8 @@ energy_exp      = generic:load("DSO_energy_export");
 stage_objective = generic:load("DSO_stage_objective_function");
 
 thermal_use =  generic:load("DSO_thermal_use");
-imp_use     =  generic:load("DSO_imp_use");
-exp_use     =  generic:load("DSO_exp_use");
+imp_use     =  generic:load("DSO_energy_import_use");
+exp_use     =  generic:load("DSO_energy_export_use");
 
 convergence_data  = generic:load("DSO_convergence_data");
 
@@ -79,14 +80,12 @@ dashboard_generation:push(chart);
 
 -- DEMAND RESPONSE -- 
 dashboard_DR = Dashboard("Demand Response");
-
 dashboard_DR:push("# Demand Response");
 dashboard_DR:push("#### bla bla bla.");
-
 chart = Chart("DemandResponse");
-DR_upper = demand_response_upper:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Upper DR"), {color="yellow"};
-DR_lower = demand_response_lower:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Lower DR"), {color="yellow"};
-chart:add_area_range(DR_lower,DR_upper)
+DR_upper = demand_response_upper:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Upper DR");
+DR_lower = demand_response_lower:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Lower DR");
+chart:add_area_range(DR_upper,DR_lower);
 chart:add_line(original_demand:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Original Demand"), {color="blue"});
 chart:add_line(demand_response:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Demand Response"), {color="black"});
 dashboard_DR:push(chart);
@@ -137,6 +136,10 @@ dashboard_CircuitResult:push(chart);
 dashboard_OpCosts = Dashboard("Operation Cost");
 dashboard_OpCosts:push("# Operation Costs");
 dashboard_OpCosts:push("#### bla bla bla.");
+
+chart = Chart("Demand Weighed Bus Marginal Cost x Stage");
+chart:add_column(Weighted_Bus_Marginal_Cost:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE(), "Weighted Marginal Cost"), {color="blue"});
+dashboard_OpCosts:push(chart);
 
 chart = Chart("Bus_Marginal_Cost x Stage");
 chart:add_column(Bus_Marginal_Cost:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Marginal Cost"), {color="blue"});

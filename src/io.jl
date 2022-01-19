@@ -873,7 +873,7 @@ function export_conv_table_as_graf(convergence_table, filepath, filename, STAGES
 end
 
 function export_weighted_shadow_price_as_graf(x, results_sim, D_matrix, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_as_graf(results_sim, D_matrix, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+    return export_weighted_shadow_price_as_graf(results_sim, D_matrix, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
 
 function export_weighted_shadow_price_as_graf(results_sim, D_matrix, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
@@ -897,15 +897,14 @@ function export_weighted_shadow_price_as_graf(results_sim, D_matrix, filepath, f
         initial_stage = INITIAL_STAGE,
         initial_year  = INITIAL_YEAR
     )
-
+ 
     # --- store data
     for t = 1:STAGES
-        for s = 1:SCENARIOS                
-            original_demand = D_Matrix[:,t,1]
-            shadow_price    = results_sim[s][t][:shadow_price]
-            # weighted_shadow_price = sum(original_demand[i] * shadow_price[i] for i in )
-            weighted_shadow_price = sum(original_demand.*shadow_price)/sum(original_demand)
-            PSRClassesInterface.write_registry(graf, weighted_shadow_price, t, s, 1)
+        for s = 1:SCENARIOS              
+            original_demand = D_matrix[:,t,1]
+            shadow_price    = results_sim[s][t][:shadow_price] 
+            weighted_shadow_price = sum(original_demand.*shadow_price)/sum(original_demand) 
+            PSRClassesInterface.write_registry(graf, [weighted_shadow_price], t, s, 1)  
         end
     end
 
