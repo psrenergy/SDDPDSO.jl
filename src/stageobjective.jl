@@ -30,7 +30,7 @@ function set_stageobjective_curtailment!(m, par, expr)
             JuMP.add_to_expression!(expr, par.def_cost * 1.01, m[:cur][i])
         end
 
-        # brick = sum(m[:cur] .* par.def_cost .* 1.01)
+        brick = sum(m[:cur] .* par.def_cost .* 1.01)
         par.flag_debug && begin @show brick end
     end
 end
