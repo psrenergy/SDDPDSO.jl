@@ -12,8 +12,6 @@ module SDDPDSO
     using GLPK
 
     const PSRI = PSRClassesInterface
-    # using Statistics
-    # using Libdl
 
     # --- version check
     @static if VERSION < v"1.6"
@@ -22,7 +20,6 @@ module SDDPDSO
 
     # --- path
     PSRIO_FILEPATH   = joinpath(@__DIR__,"dashboard.lua")
-    PSRIO_FILEPATH_2 = joinpath(@__FILE__,"..","dashboard.lua")
 
     # --- includes
     include("types.jl")
@@ -145,11 +142,6 @@ module SDDPDSO
 
         PSRIO.run(psrio, [joinpath(casepath,"results")], 
         recipes=[PSRIO_FILEPATH],
-        model="none", 
-        verbose=3)
-
-        PSRIO.run(psrio, [joinpath(casepath,"results")], 
-        recipes=[realpath(PSRIO_FILEPATH_2)],
         model="none", 
         verbose=3)
 
