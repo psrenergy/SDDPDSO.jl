@@ -21,7 +21,8 @@ module SDDPDSO
     end
 
     # --- path
-    PATH  = pwd()
+    PSRIO_FILEPATH   = joinpath(@__DIR__,"dashboard.lua")
+    PSRIO_FILEPATH_2 = joinpath(@__FILE__,"..","dashboard.lua")
 
     # --- includes
     include("types.jl")
@@ -41,13 +42,6 @@ module SDDPDSO
     # --- main
     function main(ARGS)
         @show ARGS
-
-        # psrio = PSRIO.create()
-
-        # PSRIO.run(psrio, [joinpath(casepath,"results")], 
-        # recipes=[raw".\deps\psrio-scripts\sddpdso\dashboard.lua"], 
-        # model="none", 
-        # verbose=3)
     end
 
     # --- run
@@ -150,9 +144,12 @@ module SDDPDSO
         psrio = PSRIO.create()
 
         PSRIO.run(psrio, [joinpath(casepath,"results")], 
-        # recipes=[raw".\src\dashboard.lua"], 
-        # recipes=[realpath(joinpath("dashboard.lua"))],
-        recipes=[joinpath(PATH,"src","dashboard.lua")],
+        recipes=[PSRIO_FILEPATH],
+        model="none", 
+        verbose=3)
+
+        PSRIO.run(psrio, [joinpath(casepath,"results")], 
+        recipes=[realpath(PSRIO_FILEPATH_2)],
         model="none", 
         verbose=3)
 
