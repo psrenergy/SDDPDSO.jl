@@ -147,11 +147,13 @@ module SDDPDSO
         psrio = PSRIO.create()
 
         PSRIO.run(psrio, [joinpath(casepath,"results")], 
-        recipes=[raw".\src\dashboard.lua"], 
+        # recipes=[raw".\src\dashboard.lua"], 
+        # recipes=[realpath(joinpath("dashboard.lua"))],
+        recipes=[joinpath(pwd(),"src","dashboard.lua")],
         model="none", 
         verbose=3)
 
-        return par, sims
+        return x, par, m, sims
     end
 
     function set_deterministic_losses!(par, x)
