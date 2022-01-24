@@ -20,6 +20,9 @@ module SDDPDSO
         error("Julia version $VERSION not supported by SDDP-DSO, upgrade to 1.6 or later")
     end
 
+    # --- path
+    PATH  = pwd()
+
     # --- includes
     include("types.jl")
     include("io.jl")
@@ -149,7 +152,7 @@ module SDDPDSO
         PSRIO.run(psrio, [joinpath(casepath,"results")], 
         # recipes=[raw".\src\dashboard.lua"], 
         # recipes=[realpath(joinpath("dashboard.lua"))],
-        recipes=[joinpath(pwd(),"src","dashboard.lua")],
+        recipes=[joinpath(PATH,"src","dashboard.lua")],
         model="none", 
         verbose=3)
 
