@@ -109,8 +109,8 @@ function export_results(x, n, d, par, sims, m)
     end
 
     #Marginal cost export 
-    export_as_graf(x, sims, :shadow_price, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_bus_marginal_cost", d.bus_name)
-    export_weighted_shadow_price_as_graf(x, sims, D_Matrix, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_weighted_bus_marginal_cost", ["weighted bus marginal cost"])
+    # export_as_graf(x, sims, :shadow_price, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_bus_marginal_cost", d.bus_name)
+    export_weighted_shadow_price_as_graf(x, sims, D_Matrix, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_bus_marginal_cost", ["Bus Marginal Cost"])
 
     if par.flag_import
         CSV.write(
