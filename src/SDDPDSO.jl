@@ -9,15 +9,17 @@ module SDDPDSO
     using Statistics
     using PSRIO
     using Random
+    using GLPK
 
     const PSRI = PSRClassesInterface
-    # using Statistics
-    # using Libdl
 
     # --- version check
     @static if VERSION < v"1.6"
         error("Julia version $VERSION not supported by SDDP-DSO, upgrade to 1.6 or later")
     end
+
+    # --- path
+    PSRIO_FILEPATH   = joinpath(@__DIR__,"dashboard.lua")
 
     # --- includes
     include("types.jl")
@@ -37,13 +39,6 @@ module SDDPDSO
     # --- main
     function main(ARGS)
         @show ARGS
-
-        # psrio = PSRIO.create()
-
-        # PSRIO.run(psrio, [joinpath(casepath,"results")], 
-        # recipes=[raw".\deps\psrio-scripts\sddpdso\dashboard.lua"], 
-        # model="none", 
-        # verbose=3)
     end
 
     # --- run
@@ -146,11 +141,11 @@ module SDDPDSO
         psrio = PSRIO.create()
 
         PSRIO.run(psrio, [joinpath(casepath,"results")], 
-        recipes=[raw".\src\dashboard.lua"], 
+        recipes=[PSRIO_FILEPATH],
         model="none", 
         verbose=3)
 
-        return par, sims
+        return x, par, m, sims
     end
 
     function set_deterministic_losses!(par, x)
