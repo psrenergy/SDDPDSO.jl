@@ -4,14 +4,14 @@ function export_results(x, n, d, par, sims, m)
     export_3D_Matrix_as_graf(x,D_Matrix, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_original_demand", d.bus_name)
 
     if n.cir > 0
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","cirflw.csv"),
             simulate_create_result_table(sims,:flw,d.cir_name)
         )
 
         export_as_graf(x, sims, :flw, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_cirflw", d.cir_name)
 
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","usecir.csv"),
             export_result_usecir(sims,d.cir_capacity,d.cir_name)
         )
@@ -20,7 +20,7 @@ function export_results(x, n, d, par, sims, m)
     end
 
     if n.ther > 0
-        CSV.write(
+        par.flag_verbose &&  CSV.write(
             joinpath(x.PATH,"results","thermal_generation.csv"),
             simulate_create_result_table(sims,:gen_die,d.ter_name)
         )
@@ -30,13 +30,13 @@ function export_results(x, n, d, par, sims, m)
     end
 
     if n.gnd > 0
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","renewable_generation.csv"),
             simulate_create_result_table(sims,:gen_sol,d.gnd_name)
         )
         export_as_graf(x, sims, :gen_sol, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_renewable_generation", d.gnd_name)
 
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","renewable_curtailment.csv"),
             simulate_create_result_dif_table(sims,:gen_sol_max,:gen_sol,d.gnd_name)
         )
@@ -44,32 +44,32 @@ function export_results(x, n, d, par, sims, m)
  
     end
 
-    CSV.write(
+    par.flag_verbose && CSV.write(
         joinpath(x.PATH,"results","load_deficit.csv"),
         simulate_create_result_table(sims,:def,["def$i" for i in 1:n.load])
     )
     export_as_graf(x, sims, :def, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_load_deficit", ["def$i" for i in 1:n.load])
 
-    CSV.write(
+    par.flag_verbose && CSV.write(
         joinpath(x.PATH,"results","bus_curtailment.csv"),
         simulate_create_result_table(sims,:cur,["cur$i" for i in 1:n.bus])
     )
     export_as_graf(x, sims, :cur, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_bus_curtailment", ["cur$i" for i in 1:n.bus])
 
     if n.bat > 0 && (par.flag_bat)
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","battery_discharge.csv"),
             simulate_create_result_table(sims,:bat_d,d.bat_name)
         )
         export_as_graf(x, sims, :bat_d, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_discharge", d.bat_name)
 
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","battery_charge.csv"),
             simulate_create_result_table(sims,:bat_c,d.bat_name)
         )
         export_as_graf(x, sims, :bat_c, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_charge", d.bat_name)
 
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","battery_storage.csv"),
             simulate_create_result_table_state_var(sims,:storage,d.bat_name)
         )
@@ -83,25 +83,25 @@ function export_results(x, n, d, par, sims, m)
         Lower_DR = TransformaDemandaMatriz_LowerRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_shift)
         export_3D_Matrix_as_graf(x,Lower_DR, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_dr_lower_bound", d.bus_name)
     
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","dr_accumulated_load.csv"),
             simulate_create_result_table_state_var(sims,:total_load,d.load_name[par.set_dem_rsp])
         )
         export_StateVar_as_graf(x, sims, :total_load, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_dr_accumulated_load", d.load_name[par.set_dem_rsp])
 
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","dr_load.csv"),
             simulate_create_result_table(sims,:dr,d.load_name[par.set_dem_rsp])
         )
         export_as_graf_convertingArray(x, sims, :dr, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_dr_load", d.load_name[par.set_dem_rsp])
         
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","dr_deficit.csv"),
             simulate_create_result_table(sims,:dr_def,d.load_name[par.set_dem_rsp])
         )
         export_as_graf_convertingArray(x, sims, :dr_def, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_dr_deficit", d.load_name[par.set_dem_rsp])
 
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","dr_curtailment.csv"),
             simulate_create_result_table(sims,:dr_cur,d.load_name[par.set_dem_rsp])
         )
@@ -113,13 +113,13 @@ function export_results(x, n, d, par, sims, m)
     export_weighted_shadow_price_as_graf(x, sims, D_Matrix, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_bus_marginal_cost", ["Bus Marginal Cost"])
 
     if par.flag_import
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","energy_import.csv"),
             simulate_create_result_table(sims,:imp,d.bus_name)
         )
         export_as_graf(x, sims, :imp, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import", d.bus_name)
 
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","energy_import_capacity.csv"),
             simulate_create_result_table(sims,:imp_max,d.bus_name)
         )
@@ -129,12 +129,12 @@ function export_results(x, n, d, par, sims, m)
     end
 
     if par.flag_export
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","energy_export.csv"),
             simulate_create_result_table(sims,:exp,d.bus_name)
         )
         export_as_graf(x, sims, :exp, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export", d.bus_name)
-        CSV.write(
+        par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","energy_export_capacity.csv"),
             simulate_create_result_table(sims,:exp_max,d.bus_name)
         )
@@ -144,7 +144,7 @@ function export_results(x, n, d, par, sims, m)
 
     end
 
-    CSV.write(
+    par.flag_verbose && CSV.write(
         joinpath(x.PATH,"results","stage_objective_function.csv"),
         simulate_create_result_table(sims,:stage_objective,["stage_objective_function"])
     )
