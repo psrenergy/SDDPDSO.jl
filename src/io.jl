@@ -183,9 +183,9 @@ function import_injections(x::Execution, d::Data, is_export::Bool)
         # get row data
         cap, cst = inj_cap[i,:], inj_cst[i,:]
 
-        stg, scn = cap.stage, cap.scenario
+        stg = cap.stage
 
-        if (stg > x.stages) | (scn > 1)
+        if (stg > x.stages)
             continue
         end
 
