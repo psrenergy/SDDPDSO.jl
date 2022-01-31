@@ -144,7 +144,7 @@ dashboard_Losses = Dashboard("Losses");
 dashboard_Losses:push("# Losses Dashboard");
 dashboard_Losses:push("#### Graph 1");
 
-chart = Chart("Average Losses (%)");
+chart = Chart("Average Losses");
 chart:add_column(average_losses:aggregate_scenarios(BY_AVERAGE()), {color="red"});
 dashboard_Losses:push(chart);
 
