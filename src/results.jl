@@ -123,7 +123,7 @@ function export_results(x, n, d, par, sims, m)
             joinpath(x.PATH,"results","energy_import_capacity.csv"),
             simulate_create_result_table(sims,:imp_max,d.bus_name)
         )
-        export_as_graf(x, sims, :imp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_capacity", d.bus_name, UNIT ="MWh")
+        export_as_graf(x, sims, :imp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_capacity", d.bus_name, UNIT ="MW")
         export_imp_exp_cost_as_graf(x, sims, :imp, par.imp_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_cost", d.bus_name, UNIT ="\$")
         export_imp_exp_use_as_graf(x, sims, :imp, par.imp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_use", d.bus_name, UNIT ="%")
     end
@@ -138,7 +138,7 @@ function export_results(x, n, d, par, sims, m)
             joinpath(x.PATH,"results","energy_export_capacity.csv"),
             simulate_create_result_table(sims,:exp_max,d.bus_name)
         )
-        export_as_graf(x, sims, :exp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_capacity", d.bus_name, UNIT ="MWh")
+        export_as_graf(x, sims, :exp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_capacity", d.bus_name, UNIT ="MW")
         export_imp_exp_cost_as_graf(x, sims, :exp, par.exp_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_cost", d.bus_name, UNIT ="\$")
         export_imp_exp_use_as_graf(x, sims, :exp, par.exp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_use", d.bus_name, UNIT ="%")
 
@@ -157,7 +157,7 @@ function export_results(x, n, d, par, sims, m)
     
     #losses
     if par.flag_losses
-        export_losses_as_graf(x, par, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_average_losses", ["stage_average_losses (%)"], UNIT ="%")
+        export_losses_as_graf(x, par, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_average_losses", ["stage avg losses (%)"], UNIT ="%")
     end
 
 end

@@ -46,7 +46,7 @@ dashboard_generation = Dashboard("Generation");
 dashboard_generation:push("# Generation Dashboard");
 dashboard_generation:push("#### Graph 1");
 
-chart = Chart("Aggregated Generation");
+chart = Chart("Aggregated Generation x Stages");
 bat_c = battery_charge:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(),    "Liquid Battery");
 bat_d = battery_discharge:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Liquid Battery");
 chart:add_area_stacking(bat_d - bat_c, {color="yellow"});
@@ -97,7 +97,7 @@ dashboard_BatOperation = Dashboard("Battery Operation");
 dashboard_BatOperation:push("# Battery Operation Dashboard");
 dashboard_BatOperation:push("#### Graph 1");
 
-chart = Chart("Battery Operation");
+chart = Chart("Battery Operation x Stages");
 chart:add_area_stacking(battery_storage:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Battery Storage"), {color="red"});
 dashboard_BatOperation:push(chart);
 
@@ -106,7 +106,7 @@ dashboard_CircuitResult = Dashboard("System Use");
 dashboard_CircuitResult:push("# System Use Dashboard");
 dashboard_CircuitResult:push("#### Graph 1");
 
-chart = Chart("Thermal Avg Use x Stage");
+chart = Chart("Thermal Avg Use x Stages");
 chart:add_column(thermal_use:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Thermal Use"), {color="blue"});
 dashboard_CircuitResult:push(chart);
 
@@ -120,7 +120,7 @@ dashboard_OpCosts = Dashboard("Operation Cost");
 dashboard_OpCosts:push("# Operation Costs Dashboard");
 dashboard_OpCosts:push("#### Graph 1");
 
-chart = Chart("Bus Marginal Cost x Stages");
+chart = Chart("Bus Avg Marginal Cost x Stages");
 chart:add_column(Bus_Marginal_Cost:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Bus Marginal Cost"), {color="blue"});
 dashboard_OpCosts:push(chart);
 
@@ -144,7 +144,7 @@ dashboard_Losses = Dashboard("Losses");
 dashboard_Losses:push("# Losses Dashboard");
 dashboard_Losses:push("#### Graph 1");
 
-chart = Chart("Average Losses");
+chart = Chart("Average Losses x Stages");
 chart:add_column(average_losses:aggregate_scenarios(BY_AVERAGE()), {color="red"});
 dashboard_Losses:push(chart);
 
