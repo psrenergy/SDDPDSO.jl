@@ -67,12 +67,12 @@ dashboard_generation:push(chart);
 
 dashboard_generation:push("#### Graph 2");
 chart = Chart("Renewable Generation x Scenarios");
-chart:add_line(renewable_generation:aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Renew. Gen."), {color="green"});
+chart:add_line(renewable_generation:aggregate_agents(BY_AVERAGE(), "Renew. Gen."), {color="green"});
 dashboard_generation:push(chart);
 
 dashboard_generation:push("#### Graph 3");
 chart = Chart("Renewable Curtailment x Stages");
-chart:add_line(renewable_curtailment:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Renewable Curtailment"), {color="blue"});
+chart:add_line(renewable_curtailment:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Renewable Curtailment"), {color="blue"});
 dashboard_generation:push(chart);
 
 -- DEMAND RESPONSE -- 
@@ -107,12 +107,12 @@ dashboard_CircuitResult:push("# System Use Dashboard");
 dashboard_CircuitResult:push("#### Graph 1");
 
 chart = Chart("Thermal Avg Use x Stage");
-chart:add_column(thermal_use:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Thermal Use"), {color="blue"});
+chart:add_column(thermal_use:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Thermal Use"), {color="blue"});
 dashboard_CircuitResult:push(chart);
 
 dashboard_CircuitResult:push("#### Graph 2");
 chart = Chart("Cir Avg Use x Stage");
-chart:add_column(cir_use:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Cir Use"), {color="blue"});
+chart:add_column(cir_use:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Cir Use"), {color="blue"});
 dashboard_CircuitResult:push(chart);
 
 -- Operation Costs -- 
@@ -121,12 +121,12 @@ dashboard_OpCosts:push("# Operation Costs Dashboard");
 dashboard_OpCosts:push("#### Graph 1");
 
 chart = Chart("Bus Marginal Cost x Stages");
-chart:add_column(Bus_Marginal_Cost:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Bus Marginal Cost"), {color="blue"});
+chart:add_column(Bus_Marginal_Cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Bus Marginal Cost"), {color="blue"});
 dashboard_OpCosts:push(chart);
 
 dashboard_OpCosts:push("#### Graph 2");
 chart = Chart("Operational Costs x Stages");
-chart:add_area_stacking(thermal_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Thermal cost"), {color="red"});
+chart:add_area_stacking(thermal_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Thermal cost"), {color="red"});
 import_cost = imp_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy Cost");
 export_cost = exp_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy Cost");
 
@@ -135,7 +135,7 @@ if export_cost:loaded() then
 else
     chart:add_area_stacking(import_cost, {color="yellow"});
 end
-chart:add_line(stage_objective:aggregate_scenarios(BY_AVERAGE()):aggregate_blocks(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Stage Objective"), {color="black"});
+chart:add_line(stage_objective:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Stage Objective"), {color="black"});
 
 dashboard_OpCosts:push(chart);
 

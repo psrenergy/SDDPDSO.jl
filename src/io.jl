@@ -290,9 +290,9 @@ function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SC
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS     
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t
                 PSRClassesInterface.write_registry(graf, results_sim[s][t_day][result_name], i, s, t)
             end
         end
@@ -340,9 +340,9 @@ function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, fi
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS                
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t                
                 PSRClassesInterface.write_registry(graf, results_sim[s][t_day][result_name1]-results_sim[s][t_day][result_name2], i, s, t)
             end
         end
@@ -387,9 +387,9 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS      
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t     
                 aux = Float64[]
                 for v in results_sim[s][t_day][result_name]
                     push!(aux,v.in)
@@ -434,9 +434,9 @@ function export_as_graf_convertingArray(results_sim, result_name, filepath, file
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS                
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t               
                 len = length(results_sim[s][t_day][result_name])
                 converted_results = Vector{Float64}(undef,len)
                 for i in eachindex(results_sim[s][t_day][result_name])
@@ -480,9 +480,9 @@ function export_3D_Matrix_as_graf(D_Matrix, filepath, filename, STAGES, SCENARIO
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS                
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t                
                 results = D_Matrix[:,t_day,1]
                 PSRClassesInterface.write_registry(graf, results, i, s, t)
             end
@@ -604,9 +604,9 @@ function export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filenam
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS         
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t        
                 cirflw = abs.(results_sim[s][t_day][:flw])
                 usecir = (cirflw ./ cir_cap) .* 100
                 
@@ -651,8 +651,8 @@ function export_results_cost_as_graf(results_sim,result_name, results_cost, file
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            for s = 1:SCENARIOS         
+        for s = 1:SCENARIOS
+            for t = 1:24             
                 results_calc_cost = results_sim[s][t][result_name].*results_cost
                 PSRClassesInterface.write_registry(graf, results_calc_cost, i, s, t)
             end
@@ -692,11 +692,11 @@ function export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, ST
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:STAGES
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS         
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t        
                 die_use = (results_sim[s][t_day][:gen_die]./die_cap).*100
-                PSRClassesInterface.write_registry(graf, die_use, t, s, 1)
+                PSRClassesInterface.write_registry(graf, die_use, i, s, t)
             end
         end
     end
@@ -735,9 +735,9 @@ function export_stage_objective_as_graf(results_sim, filepath, filename, STAGES,
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS                
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t               
                 PSRClassesInterface.write_registry(graf, [results_sim[s][t_day][:stage_objective]], i, s, t)
             end
         end
@@ -777,9 +777,9 @@ function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict,
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS         
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t         
                 imp_exp_calc_costs = zeros(n_agents)
                 for i in 1:n_agents
                     if haskey(imp_exp_cost_dict,i)
@@ -827,9 +827,9 @@ function export_imp_exp_use_as_graf(results_sim,result_name, imp_exp_max_dict, f
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS         
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t         
                 imp_exp_calc_use = zeros(n_agents)
                 for i in 1:n_agents
                     if haskey(imp_exp_max_dict,i)
@@ -878,9 +878,9 @@ function export_losses_as_graf(par, filepath, filename, STAGES, SCENARIOS, AGENT
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS                
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t               
                 PSRClassesInterface.write_registry(graf, [stage_average_losses[t_day]], i, s, t)
             end
         end
@@ -958,9 +958,9 @@ function export_weighted_shadow_price_as_graf(results_sim, D_matrix, filepath, f
     days = floor(Int64,STAGES/24)
 
     for i in 1:days
-        for t = 1:24
-            t_day = 24*(i-1) + t
-            for s = 1:SCENARIOS              
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t              
                 original_demand = D_matrix[:,t_day,1]
                 shadow_price    = results_sim[s][t_day][:shadow_price] 
                 weighted_shadow_price = sum(original_demand.*shadow_price)/sum(original_demand) 
