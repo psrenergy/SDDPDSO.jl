@@ -33,7 +33,6 @@ dashboard_Convergence:push("#### Graph 1");
 chart = Chart("Simulation & Lower Bound x Iterations");
 chart:add_line(convergence_data:select_agents({"Simulation Value"}):aggregate_scenarios(BY_AVERAGE()), {color = "blue"});
 chart:add_line(convergence_data:select_agents({"Lower Bound"}):aggregate_scenarios(BY_AVERAGE()), {color = "red"});
-
 dashboard_Convergence:push(chart);
 
 dashboard_Convergence:push("#### Graph 2");
@@ -56,6 +55,14 @@ chart:add_line_stacking(demand_response:aggregate_scenarios(BY_AVERAGE()):aggreg
 
 import = energy_imp:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy");
 export = energy_exp:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy");
+
+-- if export:loaded() then 
+--     if import:loaded() then 
+--         chart:add_area_stacking(import - export, {color="blue"});
+--     else
+--         chart:add_line_stacking(-export, {color="blue"});
+--     end
+-- end
 
 if export:loaded() then 
     chart:add_area_stacking(import - export, {color="blue"});
@@ -130,11 +137,21 @@ chart:add_area_stacking(thermal_cost:aggregate_scenarios(BY_AVERAGE()):aggregate
 import_cost = imp_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy Cost");
 export_cost = exp_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy Cost");
 
+-- if export_cost:loaded() then 
+--     if import_cost:loaded() then
+--         chart:add_area_stacking(import_cost - export_cost, {color="yellow"});
+--     else
+--         chart:add_area_stacking(-export_cost, {color="yellow"});
+--     end
+-- end
+
 if export_cost:loaded() then 
     chart:add_area_stacking(import_cost - export_cost, {color="yellow"});
 else
     chart:add_area_stacking(import_cost, {color="yellow"});
 end
+
+
 chart:add_line(stage_objective:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Stage Objective"), {color="black"});
 
 dashboard_OpCosts:push(chart);

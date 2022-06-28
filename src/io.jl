@@ -291,9 +291,10 @@ function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SC
 
     for i in 1:days
         for s = 1:SCENARIOS
-            for t = 1:24     
+            for t = 1:STAGES     
                 t_day = 24*(i-1) + t
                 PSRClassesInterface.write_registry(graf, results_sim[s][t_day][result_name], i, s, t)
+                # PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name], t, s, 1)
             end
         end
     end
