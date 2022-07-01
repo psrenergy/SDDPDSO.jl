@@ -9,8 +9,8 @@ Bus_Marginal_Cost     = generic:load("DSO_bus_marginal_cost");
 original_demand       = generic:load("DSO_original_demand");
 cir_use               = generic:load("DSO_cir_use");
 demand_response_load  = generic:load("DSO_dr_load");
-demand_response       = generic:load("DSO_original_demand");
-demand_response       = demand_response:replace(demand_response_load);
+demand_original       = generic:load("DSO_original_demand");
+demand_response       = demand_original:replace(demand_response_load);
 demand_response_upper = generic:load("DSO_dr_upper_bound");
 demand_response_lower = generic:load("DSO_dr_lower_bound");
 average_losses        = generic:load("DSO_stage_average_losses");
@@ -31,13 +31,13 @@ dashboard_Convergence:push("# Convergence Data");
 dashboard_Convergence:push("#### Graph 1");
 
 chart = Chart("Simulation & Lower Bound x Iterations");
-chart:add_line(convergence_data:select_agents({"Simulation Value"}):aggregate_scenarios(BY_AVERAGE()), {color = "blue"});
-chart:add_line(convergence_data:select_agents({"Lower Bound"}):aggregate_scenarios(BY_AVERAGE()), {color = "red"});
+chart:add_line(convergence_data:select_agents({"Simulation Value"}):aggregate_scenarios(BY_AVERAGE()),{xUnit="Iterations",color = "blue"});
+chart:add_line(convergence_data:select_agents({"Lower Bound"}):aggregate_scenarios(BY_AVERAGE()),{xUnit="Iterations",color = "red"});
 dashboard_Convergence:push(chart);
 
 dashboard_Convergence:push("#### Graph 2");
 chart = Chart("Convergence (% Difference)");
-chart:add_column(convergence_data:select_agents({"Difference (%)"}):aggregate_scenarios(BY_AVERAGE()), {color="blue"});
+chart:add_column(convergence_data:select_agents({"Difference (%)"}):aggregate_scenarios(BY_AVERAGE()), {xUnit="Iterations",color="blue"});
 dashboard_Convergence:push(chart);
 
 -- GENERATION -- 
@@ -51,7 +51,15 @@ bat_d = battery_discharge:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_
 chart:add_area_stacking(bat_d - bat_c, {color="yellow"});
 chart:add_area_stacking(thermal_generation:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Thermal"), {color="red"});
 chart:add_area_stacking(renewable_generation:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Renewable"), {color="green"});
-chart:add_line_stacking(demand_response:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Demand Response"), {color="black"});
+
+demand_response_values = demand_response:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Attended Demand")
+demand_original_values = demand_original:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Demand")
+
+if demand_response_values:loaded() then 
+    chart:add_line_stacking(demand_response_values, {color="black"});
+else
+    chart:add_line_stacking(demand_original_values, {color="black"});
+end
 
 import = energy_imp:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy");
 export = energy_exp:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy");
@@ -101,7 +109,7 @@ if demand_response_load:loaded() then
     chart:add_line(original_demand:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Original Demand"), {color="blue"});
 end
 
-chart:add_line(demand_response:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Demand Response"), {color="black"});
+chart:add_line(demand_response:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Attended Demand"), {color="black"});
 dashboard_DR:push(chart);
 
 -- Battery Operation -- 
