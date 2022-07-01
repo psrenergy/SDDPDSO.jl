@@ -493,53 +493,54 @@ function export_3D_Matrix_as_graf(D_Matrix, filepath, filename, STAGES, SCENARIO
     PSRClassesInterface.close(graf)
 end
 
-function TransformaDemandaMatriz(MapaDemanda,MatrizDemanda,qtd_buses,n_stages)
+function TransformaDemandaMatriz(MapaDemanda,MatrizDemanda,par,qtd_buses,n_stages)
     Demand_Matrix=zeros(qtd_buses,n_stages,1)
     for bus in 1:qtd_buses, stg in 1:n_stages
+        losses_value = par.flag_losses ? par.losses[bus][stg] : 0
         if haskey(MapaDemanda,bus)==true    
-
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
-
-            Demand_Matrix[bus,stg,1]=demanda
+            Demand_Matrix[bus,stg,1] = demanda + losses_value
         else
-            Demand_Matrix[bus,stg,1]=0
+            Demand_Matrix[bus,stg,1]= 0 + losses_value
         end
     end
     return Demand_Matrix
 end
 
-function TransformaDemandaMatriz_UpperRD(MapaDemanda,MatrizDemanda,qtd_buses,n_stages,dem_rsp_buses,dem_rsp_shifts)
+function TransformaDemandaMatriz_UpperRD(MapaDemanda,MatrizDemanda,qtd_buses,n_stages,dem_rsp_buses,dem_rsp_shifts,par)
     Demand_Matrix=zeros(qtd_buses,n_stages,1)
     for bus in 1:qtd_buses, stg in 1:n_stages
+        losses_value = par.flag_losses ? par.losses[bus][stg] : 0
         if haskey(MapaDemanda,bus)    
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
             if mapa in dem_rsp_buses
-                Demand_Matrix[bus,stg,1]=demanda*(1+dem_rsp_shifts[mapa])
+                Demand_Matrix[bus,stg,1]=demanda*(1+dem_rsp_shifts[mapa]) + losses_value
             else
-                Demand_Matrix[bus,stg,1]=demanda
+                Demand_Matrix[bus,stg,1]=demanda+losses_value
             end
         else
-            Demand_Matrix[bus,stg,1]=0
+            Demand_Matrix[bus,stg,1]=0+losses_value
         end
     end
     return Demand_Matrix
 end
 
-function TransformaDemandaMatriz_LowerRD(MapaDemanda,MatrizDemanda,qtd_buses,n_stages,dem_rsp_buses,dem_rsp_shifts)
+function TransformaDemandaMatriz_LowerRD(MapaDemanda,MatrizDemanda,qtd_buses,n_stages,dem_rsp_buses,dem_rsp_shifts,par)
     Demand_Matrix=zeros(qtd_buses,n_stages,1)
     for bus in 1:qtd_buses, stg in 1:n_stages
+        losses_value = par.flag_losses ? par.losses[bus][stg] : 0
         if haskey(MapaDemanda,bus)    
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
             if mapa in dem_rsp_buses
-                Demand_Matrix[bus,stg,1]=demanda*(1-dem_rsp_shifts[mapa])
+                Demand_Matrix[bus,stg,1]=demanda*(1-dem_rsp_shifts[mapa]) + losses_value
             else
-                Demand_Matrix[bus,stg,1]=demanda
+                Demand_Matrix[bus,stg,1]=demanda+losses_value
             end
         else
-            Demand_Matrix[bus,stg,1]=0
+            Demand_Matrix[bus,stg,1]=0+losses_value
         end
     end
     return Demand_Matrix
@@ -747,11 +748,11 @@ function export_stage_objective_as_graf(results_sim, filepath, filename, STAGES,
     PSRClassesInterface.close(graf)
 end
 
-function export_imp_exp_cost_as_graf(x, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+function export_imp_exp_cost_as_graf(x,par, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
  
-function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+function export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
 
     n_agents = length(AGENTS)
     FILE_NAME = joinpath(filepath, filename)
@@ -783,8 +784,9 @@ function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict,
                 t_day = 24*(i-1) + t         
                 imp_exp_calc_costs = zeros(n_agents)
                 for i in 1:n_agents
-                    if haskey(imp_exp_cost_dict,i)
-                        imp_exp_calc_costs[i] = imp_exp_cost_dict[i][t_day]*results_sim[s][t_day][result_name][i]
+                    if haskey(par.bus_map_imp,i)
+                        bus_imp = par.bus_map_imp[i][1]
+                        imp_exp_calc_costs[i] = imp_exp_cost_dict[bus_imp][t_day]*results_sim[s][t_day][result_name][i]
                     else
                         imp_exp_calc_costs[i] = 0
                     end

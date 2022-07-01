@@ -56,30 +56,35 @@ chart:add_line_stacking(demand_response:aggregate_scenarios(BY_AVERAGE()):aggreg
 import = energy_imp:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy");
 export = energy_exp:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy");
 
--- if export:loaded() then 
---     if import:loaded() then 
---         chart:add_area_stacking(import - export, {color="blue"});
---     else
---         chart:add_line_stacking(-export, {color="blue"});
---     end
--- end
-
 if export:loaded() then 
-    chart:add_area_stacking(import - export, {color="blue"});
+    if import:loaded() then 
+        chart:add_area_stacking(import - export, {color="blue"});
+    else
+        chart:add_line_stacking(-export, {color="blue"});
+    end
 else
-    chart:add_area_stacking(import, {color="blue"});
+    if import:loaded() then 
+        chart:add_area_stacking(import, {color="blue"});
+    end
 end
+
+-- chesf
+-- if export:loaded() then 
+--     chart:add_area_stacking(import - export, {color="blue"});
+-- else
+--     chart:add_area_stacking(import, {color="blue"});
+-- end
 
 dashboard_generation:push(chart);
 
 dashboard_generation:push("#### Graph 2");
 chart = Chart("Renewable Generation x Scenarios");
-chart:add_line(renewable_generation:aggregate_agents(BY_AVERAGE(), "Renew. Gen."), {color="green"});
+chart:add_line(renewable_generation:aggregate_agents(BY_SUM(), "Renew. Gen."), {color="green"});
 dashboard_generation:push(chart);
 
 dashboard_generation:push("#### Graph 3");
 chart = Chart("Renewable Curtailment x Stages");
-chart:add_line(renewable_curtailment:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Renewable Curtailment"), {color="blue"});
+chart:add_line(renewable_curtailment:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Renewable Curtailment"), {color="blue"});
 dashboard_generation:push(chart);
 
 -- DEMAND RESPONSE -- 
@@ -137,19 +142,24 @@ chart:add_area_stacking(thermal_cost:aggregate_scenarios(BY_AVERAGE()):aggregate
 import_cost = imp_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy Cost");
 export_cost = exp_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy Cost");
 
--- if export_cost:loaded() then 
---     if import_cost:loaded() then
---         chart:add_area_stacking(import_cost - export_cost, {color="yellow"});
---     else
---         chart:add_area_stacking(-export_cost, {color="yellow"});
---     end
--- end
-
 if export_cost:loaded() then 
-    chart:add_area_stacking(import_cost - export_cost, {color="yellow"});
+    if import_cost:loaded() then
+        chart:add_area_stacking(import_cost - export_cost, {color="yellow"});
+    else
+        chart:add_area_stacking(-export_cost, {color="yellow"});
+    end
 else
-    chart:add_area_stacking(import_cost, {color="yellow"});
+    if import_cost:loaded() then
+        chart:add_area_stacking(import_cost, {color="yellow"});
+    end
 end
+
+-- chesf
+-- if export_cost:loaded() then 
+--     chart:add_area_stacking(import_cost - export_cost, {color="yellow"});
+-- else
+--     chart:add_area_stacking(import_cost, {color="yellow"});
+-- end
 
 
 chart:add_line(stage_objective:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Stage Objective"), {color="black"});
