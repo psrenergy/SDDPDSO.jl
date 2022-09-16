@@ -6,7 +6,7 @@
 [codecov-img]: https://codecov.io/gh/psrenergy/SDDPDSO.jl/coverage.svg?branch=master
 [codecov-url]: https://codecov.io/gh/psrenergy/SDDPDSO.jl?branch=master
 
-SDDO-DSO stands for Stochastic Dual Dynamic Programming for Distribution System Operation
+SDDP-DSO stands for Stochastic Dual Dynamic Programming for Distribution System Operation
 
 | **Build Status** | **Coverage** | **Documentation** |
 |:-----------------:|:-----------------:|:-----------------:|
