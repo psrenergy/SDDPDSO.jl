@@ -311,6 +311,7 @@ function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SC
 end
 
 
+
 function export_dif_as_graf(x, results_sim, result_name1, result_name2, filepath, filename, AGENTS; UNIT::String="", CSV=false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
     return export_dif_as_graf(results_sim, result_name1, result_name2, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
@@ -748,14 +749,25 @@ function export_stage_objective_as_graf(results_sim, filepath, filename, STAGES,
     PSRClassesInterface.close(graf)
 end
 
-function export_imp_exp_cost_as_graf(x,par, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+function export_imp_exp_cost_as_graf(x,par, results_sim, results_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_imp_exp_cost_as_graf(par,results_sim, results_name, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
  
-function export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-
-    n_agents = length(AGENTS)
+function export_imp_exp_cost_as_graf(par,results_sim, results_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    n_agents  = length(AGENTS)
     FILE_NAME = joinpath(filepath, filename)
+
+    if results_name == :imp
+        println("Import situation")
+        bus_map_dict = par.bus_map_imp
+        cost_dict    = par.imp_cost
+    elseif results_name == :exp
+        println("Export situation")
+        bus_map_dict = par.bus_map_exp
+        cost_dict    = par.exp_cost
+    else
+        error("Wrong key provided for export_imp_cost_as_graf function")
+    end
 
     # --- open graf file
     graf = PSRClassesInterface.open(
@@ -784,9 +796,10 @@ function export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_d
                 t_day = 24*(i-1) + t         
                 imp_exp_calc_costs = zeros(n_agents)
                 for i in 1:n_agents
-                    if haskey(par.bus_map_imp,i)
-                        bus_imp = par.bus_map_imp[i][1]
-                        imp_exp_calc_costs[i] = imp_exp_cost_dict[bus_imp][t_day]*results_sim[s][t_day][result_name][i]
+                    if haskey(bus_map_dict,i)
+                        results_sim == :exp ? println("Exporting: bus $i OK") : nothing
+                        bus_number = bus_map_dict[i][1]
+                        imp_exp_calc_costs[i] = cost_dict[bus_number][t_day]*results_sim[s][t_day][results_name][i]
                     else
                         imp_exp_calc_costs[i] = 0
                     end
@@ -799,6 +812,60 @@ function export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_d
     PSRClassesInterface.close(graf)
 end
 
+
+
+# --
+# function export_imp_exp_cost_as_graf(x,par, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+#     return export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+# end
+ 
+# function export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+#     n_agents  = length(AGENTS)
+#     FILE_NAME = joinpath(filepath, filename)
+
+#     # --- open graf file
+#     graf = PSRClassesInterface.open(
+#         CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+#         FILE_NAME              ,
+        
+#         is_hourly = true       ,
+        
+#         scenarios = SCENARIOS  ,
+#         stages    = STAGES     ,
+#         agents    = AGENTS     ,
+#         unit      = UNIT       ,
+#         # optional:
+#         stage_type = PSRI.STAGE_DAY,
+#         initial_stage = INITIAL_STAGE,
+#         initial_year  = INITIAL_YEAR
+#     )
+
+#     # --- store data
+#     days = floor(Int64,STAGES/24)
+
+#     for i in 1:days
+#         for s = 1:SCENARIOS
+#             for t = 1:24     
+#                 t_day = 24*(i-1) + t         
+#                 imp_exp_calc_costs = zeros(n_agents)
+#                 for i in 1:n_agents
+#                     if haskey(par.bus_map_imp,i)
+#                         bus_imp = par.bus_map_imp[i][1]
+#                         imp_exp_calc_costs[i] = imp_exp_cost_dict[bus_imp][t_day]*results_sim[s][t_day][result_name][i]
+#                     else
+#                         imp_exp_calc_costs[i] = 0
+#                     end
+#                 end
+#                 PSRClassesInterface.write_registry(graf, imp_exp_calc_costs, i, s, t)
+#             end
+#         end
+#     end
+#     # --- close graf
+#     PSRClassesInterface.close(graf)
+# end
+# -- 
 function export_imp_exp_use_as_graf(x, results_sim, result_name, imp_exp_max_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
     return export_imp_exp_use_as_graf(results_sim, result_name, imp_exp_max_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end

@@ -28,7 +28,7 @@ function export_results(x, n, d, par, sims, m)
         export_gen_die_use_as_graf(x, sims, par.gen_cap, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_use", d.ter_name,UNIT = "%")
         export_results_cost_as_graf(x, sims,:gen_die, par.gen_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_gen_cost", d.ter_name,UNIT = "\$")
     end
-
+    
     if n.gnd > 0
         par.flag_verbose && CSV.write(
             joinpath(x.PATH,"results","renewable_generation.csv"),
@@ -124,7 +124,10 @@ function export_results(x, n, d, par, sims, m)
             simulate_create_result_table(sims,:imp_max,d.bus_name)
         )
         export_as_graf(x, sims, :imp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_capacity", d.bus_name,UNIT = "MW")
-        export_imp_exp_cost_as_graf(x,par, sims, :imp, par.imp_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_cost", d.bus_name,UNIT = "\$")
+
+        export_imp_exp_cost_as_graf(x,par, sims, :imp, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_cost", d.bus_name,UNIT = "\$")
+        
+        
         export_imp_exp_use_as_graf(par, sims, :imp, par.imp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_import_use", d.bus_name,UNIT = "%")
     end
 
@@ -139,7 +142,7 @@ function export_results(x, n, d, par, sims, m)
             simulate_create_result_table(sims,:exp_max,d.bus_name)
         )
         export_as_graf(x, sims, :exp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_capacity", d.bus_name,UNIT = "MW")
-        export_imp_exp_cost_as_graf(x,par, sims, :exp, par.exp_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_cost", d.bus_name,UNIT = "\$")
+        export_imp_exp_cost_as_graf(x,par, sims, :exp, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_cost", d.bus_name,UNIT = "\$")
         export_imp_exp_use_as_graf(par, sims, :exp, par.exp_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_energy_export_use", d.bus_name,UNIT = "%")
 
     end
