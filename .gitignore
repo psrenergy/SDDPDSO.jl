@@ -66,3 +66,4 @@ test/data/example_Validacao/dso_sddp.dat
 test/data/example_Validacao/reports/report_thermal_attributes.csv
 test/data/example_Validacao/dso_dr_shift.dat
 test/data/example_Validacao/reports/report_load_attributes.csv
+src/new_runtests-local.jl

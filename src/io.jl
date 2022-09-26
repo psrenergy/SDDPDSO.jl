@@ -185,7 +185,7 @@ function import_injections(x::Execution, d::Data, is_export::Bool)
 
         stg = cap.stage
 
-        if (stg > x.stages)
+        if (stg > x.stages) 
             continue
         end
 
@@ -287,16 +287,30 @@ function export_as_graf(results_sim, result_name, filepath, filename, STAGES, SC
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS                
+    days = floor(Int64,STAGES/24)
 
-            PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name], t, s, 1)
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:STAGES     
+                t_day = 24*(i-1) + t
+                PSRClassesInterface.write_registry(graf, results_sim[s][t_day][result_name], i, s, t)
+                # PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name], t, s, 1)
+            end
         end
     end
+
+    
+    # for t = 1:STAGES
+    #     for s = 1:SCENARIOS                
+    #         PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name], 1, s, t)
+    #     end
+    # end
 
     # --- close graf
     PSRClassesInterface.close(graf)
 end
+
+
 
 function export_dif_as_graf(x, results_sim, result_name1, result_name2, filepath, filename, AGENTS; UNIT::String="", CSV=false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
     return export_dif_as_graf(results_sim, result_name1, result_name2, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
@@ -325,12 +339,16 @@ function export_dif_as_graf(results_sim, result_name1,result_name2, filepath, fi
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS                
-            PSRClassesInterface.write_registry(graf, results_sim[s][t][result_name1]-results_sim[s][t][result_name2], t, s, 1)
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t                
+                PSRClassesInterface.write_registry(graf, results_sim[s][t_day][result_name1]-results_sim[s][t_day][result_name2], i, s, t)
+            end
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
@@ -368,14 +386,19 @@ function export_StateVar_as_graf(results_sim, result_name, filepath, filename, S
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS      
-            aux = Float64[]
-            for v in results_sim[s][t][result_name]
-                push!(aux,v.in)
-                # push!(aux,v.out)
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t     
+                aux = Float64[]
+                for v in results_sim[s][t_day][result_name]
+                    push!(aux,v.in)
+                    # push!(aux,v.out)
+                end
+                PSRClassesInterface.write_registry(graf, aux, i, s, t)
             end
-            PSRClassesInterface.write_registry(graf, aux, t, s,  1)
         end
     end
 
@@ -410,17 +433,21 @@ function export_as_graf_convertingArray(results_sim, result_name, filepath, file
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS                
-            len = length(results_sim[s][t][result_name])
-            converted_results = Vector{Float64}(undef,len)
-            for i in eachindex(results_sim[s][t][result_name])
-                converted_results[i]= results_sim[s][t][result_name][i]
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t               
+                len = length(results_sim[s][t_day][result_name])
+                converted_results = Vector{Float64}(undef,len)
+                for i in eachindex(results_sim[s][t_day][result_name])
+                    converted_results[i]= results_sim[s][t_day][result_name][i]
+                end
+                PSRClassesInterface.write_registry(graf, converted_results, i, s, t)
             end
-            PSRClassesInterface.write_registry(graf, converted_results, t, s, 1)
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
@@ -452,64 +479,69 @@ function export_3D_Matrix_as_graf(D_Matrix, filepath, filename, STAGES, SCENARIO
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS                
-            results = D_Matrix[:,t,1]
-            PSRClassesInterface.write_registry(graf, results, t, s, 1)
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t                
+                results = D_Matrix[:,t_day,1]
+                PSRClassesInterface.write_registry(graf, results, i, s, t)
+            end
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
 
-function TransformaDemandaMatriz(MapaDemanda,MatrizDemanda,qtd_buses,n_stages)
+function TransformaDemandaMatriz(MapaDemanda,MatrizDemanda,par,qtd_buses,n_stages)
     Demand_Matrix=zeros(qtd_buses,n_stages,1)
     for bus in 1:qtd_buses, stg in 1:n_stages
+        losses_value = par.flag_losses ? par.losses[bus][stg] : 0
         if haskey(MapaDemanda,bus)==true    
-
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
-
-            Demand_Matrix[bus,stg,1]=demanda
+            Demand_Matrix[bus,stg,1] = demanda + losses_value
         else
-            Demand_Matrix[bus,stg,1]=0
+            Demand_Matrix[bus,stg,1]= 0 + losses_value
         end
     end
     return Demand_Matrix
 end
 
-function TransformaDemandaMatriz_UpperRD(MapaDemanda,MatrizDemanda,qtd_buses,n_stages,dem_rsp_buses,dem_rsp_shifts)
+function TransformaDemandaMatriz_UpperRD(MapaDemanda,MatrizDemanda,qtd_buses,n_stages,dem_rsp_buses,dem_rsp_shifts,par)
     Demand_Matrix=zeros(qtd_buses,n_stages,1)
     for bus in 1:qtd_buses, stg in 1:n_stages
+        losses_value = par.flag_losses ? par.losses[bus][stg] : 0
         if haskey(MapaDemanda,bus)    
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
             if mapa in dem_rsp_buses
-                Demand_Matrix[bus,stg,1]=demanda*(1+dem_rsp_shifts[mapa])
+                Demand_Matrix[bus,stg,1]=demanda*(1+dem_rsp_shifts[mapa]) + losses_value
             else
-                Demand_Matrix[bus,stg,1]=demanda
+                Demand_Matrix[bus,stg,1]=demanda+losses_value
             end
         else
-            Demand_Matrix[bus,stg,1]=0
+            Demand_Matrix[bus,stg,1]=0+losses_value
         end
     end
     return Demand_Matrix
 end
 
-function TransformaDemandaMatriz_LowerRD(MapaDemanda,MatrizDemanda,qtd_buses,n_stages,dem_rsp_buses,dem_rsp_shifts)
+function TransformaDemandaMatriz_LowerRD(MapaDemanda,MatrizDemanda,qtd_buses,n_stages,dem_rsp_buses,dem_rsp_shifts,par)
     Demand_Matrix=zeros(qtd_buses,n_stages,1)
     for bus in 1:qtd_buses, stg in 1:n_stages
+        losses_value = par.flag_losses ? par.losses[bus][stg] : 0
         if haskey(MapaDemanda,bus)    
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
             if mapa in dem_rsp_buses
-                Demand_Matrix[bus,stg,1]=demanda*(1-dem_rsp_shifts[mapa])
+                Demand_Matrix[bus,stg,1]=demanda*(1-dem_rsp_shifts[mapa]) + losses_value
             else
-                Demand_Matrix[bus,stg,1]=demanda
+                Demand_Matrix[bus,stg,1]=demanda+losses_value
             end
         else
-            Demand_Matrix[bus,stg,1]=0
+            Demand_Matrix[bus,stg,1]=0+losses_value
         end
     end
     return Demand_Matrix
@@ -572,18 +604,22 @@ function export_result_usecir_as_graf(n, results_sim, cir_cap, filepath, filenam
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS         
-            cirflw = abs.(results_sim[s][t][:flw])
-            usecir = (cirflw ./ cir_cap) .* 100
-            
-            for i in 1:n.cir                  
-                usecir[i] == Inf ? 0.0 : usecir[i]
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t        
+                cirflw = abs.(results_sim[s][t_day][:flw])
+                usecir = (cirflw ./ cir_cap) .* 100
+                
+                for i in 1:n.cir                  
+                    usecir[i] == Inf ? 0.0 : usecir[i]
+                end
+                PSRClassesInterface.write_registry(graf, usecir, i, s, t)
             end
-            PSRClassesInterface.write_registry(graf, usecir, t, s, 1)
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
@@ -615,13 +651,16 @@ function export_results_cost_as_graf(results_sim,result_name, results_cost, file
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS         
-            results_calc_cost = results_sim[s][t][result_name].*results_cost
-            PSRClassesInterface.write_registry(graf, results_calc_cost, t, s, 1)
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24             
+                results_calc_cost = results_sim[s][t][result_name].*results_cost
+                PSRClassesInterface.write_registry(graf, results_calc_cost, i, s, t)
+            end
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
@@ -653,13 +692,17 @@ function export_gen_die_use_as_graf(results_sim, die_cap, filepath, filename, ST
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS         
-            die_use = (results_sim[s][t][:gen_die]./die_cap).*100
-            PSRClassesInterface.write_registry(graf, die_use, t, s, 1)
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t        
+                die_use = (results_sim[s][t_day][:gen_die]./die_cap).*100
+                PSRClassesInterface.write_registry(graf, die_use, i, s, t)
+            end
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
@@ -692,25 +735,39 @@ function export_stage_objective_as_graf(results_sim, filepath, filename, STAGES,
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS                
+    days = floor(Int64,STAGES/24)
 
-            PSRClassesInterface.write_registry(graf, [results_sim[s][t][:stage_objective]], t, s, 1)
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t               
+                PSRClassesInterface.write_registry(graf, [results_sim[s][t_day][:stage_objective]], i, s, t)
+            end
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
 
-function export_imp_exp_cost_as_graf(x, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-    return export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+function export_imp_exp_cost_as_graf(x,par, results_sim, results_name, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    return export_imp_exp_cost_as_graf(par,results_sim, results_name, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
  
-function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
-
-    n_agents = length(AGENTS)
+function export_imp_exp_cost_as_graf(par,results_sim, results_name, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+    n_agents  = length(AGENTS)
     FILE_NAME = joinpath(filepath, filename)
+
+    if results_name == :imp
+        println("Import situation")
+        bus_map_dict = par.bus_map_imp
+        cost_dict    = par.imp_cost
+    elseif results_name == :exp
+        println("Export situation")
+        bus_map_dict = par.bus_map_exp
+        cost_dict    = par.exp_cost
+    else
+        error("Wrong key provided for export_imp_cost_as_graf function")
+    end
 
     # --- open graf file
     graf = PSRClassesInterface.open(
@@ -731,24 +788,84 @@ function export_imp_exp_cost_as_graf(results_sim,result_name, imp_exp_cost_dict,
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS         
-            imp_exp_calc_costs = zeros(n_agents)
-            for i in 1:n_agents
-                if haskey(imp_exp_cost_dict,i)
-                    imp_exp_calc_costs[i] = imp_exp_cost_dict[i][t]*results_sim[s][t][result_name][i]
-                else
-                    imp_exp_calc_costs[i] = 0
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t         
+                imp_exp_calc_costs = zeros(n_agents)
+                for i in 1:n_agents
+                    if haskey(bus_map_dict,i)
+                        results_sim == :exp ? println("Exporting: bus $i OK") : nothing
+                        bus_number = bus_map_dict[i][1]
+                        imp_exp_calc_costs[i] = cost_dict[bus_number][t_day]*results_sim[s][t_day][results_name][i]
+                    else
+                        imp_exp_calc_costs[i] = 0
+                    end
                 end
+                PSRClassesInterface.write_registry(graf, imp_exp_calc_costs, i, s, t)
             end
-            PSRClassesInterface.write_registry(graf, imp_exp_calc_costs, t, s, 1)
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
 
+
+
+# --
+# function export_imp_exp_cost_as_graf(x,par, results_sim,result_name, imp_exp_cost_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+#     return export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
+# end
+ 
+# function export_imp_exp_cost_as_graf(par,results_sim,result_name, imp_exp_cost_dict, filepath, filename, STAGES, SCENARIOS, AGENTS, UNIT; CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
+
+#     n_agents  = length(AGENTS)
+#     FILE_NAME = joinpath(filepath, filename)
+
+#     # --- open graf file
+#     graf = PSRClassesInterface.open(
+#         CSV ? PSRClassesInterface.OpenCSV.Writer : PSRClassesInterface.OpenBinary.Writer ,
+        
+#         FILE_NAME              ,
+        
+#         is_hourly = true       ,
+        
+#         scenarios = SCENARIOS  ,
+#         stages    = STAGES     ,
+#         agents    = AGENTS     ,
+#         unit      = UNIT       ,
+#         # optional:
+#         stage_type = PSRI.STAGE_DAY,
+#         initial_stage = INITIAL_STAGE,
+#         initial_year  = INITIAL_YEAR
+#     )
+
+#     # --- store data
+#     days = floor(Int64,STAGES/24)
+
+#     for i in 1:days
+#         for s = 1:SCENARIOS
+#             for t = 1:24     
+#                 t_day = 24*(i-1) + t         
+#                 imp_exp_calc_costs = zeros(n_agents)
+#                 for i in 1:n_agents
+#                     if haskey(par.bus_map_imp,i)
+#                         bus_imp = par.bus_map_imp[i][1]
+#                         imp_exp_calc_costs[i] = imp_exp_cost_dict[bus_imp][t_day]*results_sim[s][t_day][result_name][i]
+#                     else
+#                         imp_exp_calc_costs[i] = 0
+#                     end
+#                 end
+#                 PSRClassesInterface.write_registry(graf, imp_exp_calc_costs, i, s, t)
+#             end
+#         end
+#     end
+#     # --- close graf
+#     PSRClassesInterface.close(graf)
+# end
+# -- 
 function export_imp_exp_use_as_graf(x, results_sim, result_name, imp_exp_max_dict, filepath, filename, AGENTS; UNIT::String="", CSV = false, INITIAL_STAGE=1, INITIAL_YEAR=1900)
     return export_imp_exp_use_as_graf(results_sim, result_name, imp_exp_max_dict, filepath, filename, x.stages, x.sim_scenarios, AGENTS, UNIT; CSV, INITIAL_STAGE, INITIAL_YEAR)
 end
@@ -777,20 +894,24 @@ function export_imp_exp_use_as_graf(results_sim,result_name, imp_exp_max_dict, f
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS         
-            imp_exp_calc_use = zeros(n_agents)
-            for i in 1:n_agents
-                if haskey(imp_exp_max_dict,i)
-                    imp_exp_calc_use[i] = 100*results_sim[s][t][result_name][i]/imp_exp_max_dict[i][t]
-                else
-                    imp_exp_calc_use[i] = 0
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t         
+                imp_exp_calc_use = zeros(n_agents)
+                for i in 1:n_agents
+                    if haskey(imp_exp_max_dict,i)
+                        imp_exp_calc_use[i] = 100*results_sim[s][t_day][result_name][i]/imp_exp_max_dict[i][t_day]
+                    else
+                        imp_exp_calc_use[i] = 0
+                    end
                 end
+                PSRClassesInterface.write_registry(graf, imp_exp_calc_use, i, s, t)
             end
-            PSRClassesInterface.write_registry(graf, imp_exp_calc_use, t, s, 1)
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
@@ -824,12 +945,16 @@ function export_losses_as_graf(par, filepath, filename, STAGES, SCENARIOS, AGENT
     )
 
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS                
-            PSRClassesInterface.write_registry(graf, [stage_average_losses[t]], t, s, 1)
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t               
+                PSRClassesInterface.write_registry(graf, [stage_average_losses[t_day]], i, s, t)
+            end
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
@@ -861,13 +986,14 @@ function export_conv_table_as_graf(convergence_table, filepath, filename, STAGES
     )
 
     # --- store data
+
     for t = 1:STAGES
         for s = 1:SCENARIOS                
             v = collect(convergence_table[t,:])
             PSRClassesInterface.write_registry(graf, v , t, s, 1)
         end
     end
-
+    
     # --- close graf
     PSRClassesInterface.close(graf)
 end
@@ -899,15 +1025,19 @@ function export_weighted_shadow_price_as_graf(results_sim, D_matrix, filepath, f
     )
  
     # --- store data
-    for t = 1:STAGES
-        for s = 1:SCENARIOS              
-            original_demand = D_matrix[:,t,1]
-            shadow_price    = results_sim[s][t][:shadow_price] 
-            weighted_shadow_price = sum(original_demand.*shadow_price)/sum(original_demand) 
-            PSRClassesInterface.write_registry(graf, [weighted_shadow_price], t, s, 1)  
+    days = floor(Int64,STAGES/24)
+
+    for i in 1:days
+        for s = 1:SCENARIOS
+            for t = 1:24     
+                t_day = 24*(i-1) + t              
+                original_demand = D_matrix[:,t_day,1]
+                shadow_price    = results_sim[s][t_day][:shadow_price] 
+                weighted_shadow_price = sum(original_demand.*shadow_price)/sum(original_demand) 
+                PSRClassesInterface.write_registry(graf, [weighted_shadow_price], i, s, t)  
+            end
         end
     end
-
     # --- close graf
     PSRClassesInterface.close(graf)
 end
