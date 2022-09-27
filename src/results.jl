@@ -25,8 +25,8 @@ function export_results(x, n, d, par, sims, m)
             simulate_create_result_table(sims,:gen_die,d.ter_name)
         )
         export_as_graf(x, sims, :gen_die, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_generation", d.ter_name,UNIT = "MW")
-        export_gen_die_use_as_graf(x, sims, par.gen_cap, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_use", d.ter_name,UNIT = "%")
-        export_results_cost_as_graf(x, sims,:gen_die, par.gen_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_gen_cost", d.ter_name,UNIT = "\$")
+        export_gen_die_use_as_graf(x, sims, par.ter_p_max, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_use", d.ter_name,UNIT = "%")
+        export_results_cost_as_graf(x, sims,:gen_die, par.ter_cost, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_thermal_ter_cost", d.ter_name,UNIT = "\$")
     end
     
     if n.gnd > 0

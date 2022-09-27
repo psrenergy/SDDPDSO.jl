@@ -14,12 +14,12 @@ function add_variables_model!(m, par)
     par.flag_debug && println("> adding control variables")
     # Define the control variables
     JuMP.@variables(m, begin           
-        gen_die[i=1:par.ngen]     >= 0
+        gen_die[i=1:par.nter]     >= 0
             
-        gen_sol[i=1:par.nsol]     >= 0
-        gen_sol_max[i=1:par.nsol] 
+        gen_sol[i=1:par.nren]     >= 0
+        gen_sol_max[i=1:par.nren] 
         
-        flw[i=1:par.nlin]         
+        flw[i=1:par.ncir]         
     
         def[i=1:par.nload]        >= 0
         cur[i=1:par.nbus]         >= 0
@@ -110,11 +110,11 @@ function add_network_constraints!(m, par)
 
     flw, ang = m[:flw], m[:bus_ang]
     
-    JuMP.@constraint(m, kirchoff_second[i=1:par.nlin],flw[i] == 100.0 * (1 / par.cir_x[i]) * (ang[par.cir_bus_to[i]] - ang[par.cir_bus_fr[i]]))
+    JuMP.@constraint(m, kirchoff_second[i=1:par.ncir],flw[i] == 100.0 * (1 / par.cir_x[i]) * (ang[par.cir_bus_to[i]] - ang[par.cir_bus_fr[i]]))
     
     if par.flag_sec_law
-        JuMP.@constraint(m, flow_capacity_p[i=1:par.nlin],flw[i] <= +par.cir_cap[i])
-        JuMP.@constraint(m, flow_capacity_n[i=1:par.nlin],flw[i] >= -par.cir_cap[i])
+        JuMP.@constraint(m, flow_capacity_p[i=1:par.ncir],flw[i] <= +par.cir_cap[i])
+        JuMP.@constraint(m, flow_capacity_n[i=1:par.ncir],flw[i] >= -par.cir_cap[i])
     end
 end
 
@@ -123,8 +123,8 @@ function add_generation_constraints!(m, par)
 
     gen_die = m[:gen_die]
 
-    JuMP.@constraint(m, gen_capacity_max[i=1:par.ngen],gen_die[i] <= +par.gen_cap[i])
-    JuMP.@constraint(m, gen_capacity_min[i=1:par.ngen],gen_die[i] >= 0.0)
+    JuMP.@constraint(m, ter_p_maxacity_max[i=1:par.nter],gen_die[i] <= +par.ter_p_max[i])
+    JuMP.@constraint(m, ter_p_maxacity_min[i=1:par.nter],gen_die[i] >= 0.0)
 end
 
 function add_battery_constraints!(m, par)
@@ -137,8 +137,8 @@ function add_battery_constraints!(m, par)
     )
     
     # --- battery capacity constraint
-    JuMP.@constraint(m, bat_cap_c_max[i=1:par.nbat], bat_c[i] - (bat_d[i] / par.bat_d_eff[i]) <= par.bat_cap[i])
-    JuMP.@constraint(m, bat_cap_d_max[i=1:par.nbat], bat_d[i] - (bat_c[i] * par.bat_c_eff[i]) <= par.bat_cap[i])     
+    JuMP.@constraint(m, bat_p_max_c_max[i=1:par.nbat], bat_c[i] - (bat_d[i] / par.bat_d_eff[i]) <= par.bat_p_max[i])
+    JuMP.@constraint(m, bat_p_max_d_max[i=1:par.nbat], bat_d[i] - (bat_c[i] * par.bat_c_eff[i]) <= par.bat_p_max[i])     
 end
 
 function add_solar_generation_constraints!(m, par)
@@ -147,7 +147,7 @@ function add_solar_generation_constraints!(m, par)
     gen_sol, gen_sol_max = m[:gen_sol], m[:gen_sol_max]
 
     # --- solar capacity constraint
-    JuMP.@constraint(m, sol_cap_max[i=1:par.nsol], gen_sol[i] <= gen_sol_max[i])   
+    JuMP.@constraint(m, ren_p_max_max[i=1:par.nren], gen_sol[i] <= gen_sol_max[i])   
 end
 
 function add_energy_balance_constraints!(m, par, t)
@@ -157,7 +157,7 @@ function add_energy_balance_constraints!(m, par, t)
 
         # generation
         gen_sol = haskey(par.bus_map_sol,i) ? m[:gen_sol][par.bus_map_sol[i]] : 0.0
-        gen_die = haskey(par.bus_map_gen,i) ? m[:gen_die][par.bus_map_gen[i]] : 0.0
+        gen_die = haskey(par.bus_map_ter,i) ? m[:gen_die][par.bus_map_ter[i]] : 0.0
 
         # battery
         if par.flag_bat
@@ -262,8 +262,8 @@ function parameterize_solar_generation_scenarios!(m, par, t)
 
     # Parameterize the subproblem.
     SDDP.parameterize(m, 1:par.scenarios) do ω
-        for i = 1:par.nsol
-            JuMP.fix(gen_sol_max[i], par.sol_scn[t,ω,i])
+        for i = 1:par.nren
+            JuMP.fix(gen_sol_max[i], par.ren_scn[t,ω,i])
         end
     end
 end
@@ -287,8 +287,8 @@ function parameterize_scenarios!(m, par, t)
     SDDP.parameterize(m, 1:par.scenarios) do ω
         
         # parametrize renewable generation scenarios
-        for i = 1:par.nsol
-            JuMP.fix(gen_sol_max[i], par.sol_scn[t,ω,i])
+        for i = 1:par.nren
+            JuMP.fix(gen_sol_max[i], par.ren_scn[t,ω,i])
         end
 
         # parametrize import/export capacity scenarios
@@ -299,7 +299,7 @@ function parameterize_scenarios!(m, par, t)
 
         # parametrize the objective function
         SDDP.@stageobjective(m, 
-            par.gen_cost'gen_die
+            par.ter_cost'gen_die
             + sum(imp[i] * par.imp_cost[par.bus_map_imp[i][1]][t,ω] for i in 1:par.nbus if haskey(par.bus_map_imp, i)) 
             - sum(exp[i] * par.exp_cost[par.bus_map_exp[i][1]][t,ω] for i in 1:par.nbus if haskey(par.bus_map_exp, i)) 
             + sum(def * par.def_cost) + sum(cur * par.def_cost)

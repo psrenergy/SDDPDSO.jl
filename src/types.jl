@@ -408,11 +408,11 @@ mutable struct Problem
 
     # number of elements
     nbat   :: Int64
-    ngen   :: Int64
-    nsol   :: Int64
+    nter   :: Int64
+    nren   :: Int64
     nelv   :: Int64
     nbus   :: Int64
-    nlin   :: Int64
+    ncir   :: Int64
     nload  :: Int64
     nstate :: Int64
     ndays  :: Int64
@@ -424,15 +424,15 @@ mutable struct Problem
     bat_e_max   :: Vector{Float64} # [MWh ]
     bat_c_eff   :: Vector{Float64} # [%   ]
     bat_d_eff   :: Vector{Float64} # [%   ]
-    bat_cap     :: Vector{Float64} # [MW  ]
+    bat_p_max   :: Vector{Float64} # [MW  ]
     
     # diesel generator
-    gen_cost :: Vector{Float64}
-    gen_cap  :: Vector{Float64}
+    ter_cost  :: Vector{Float64}
+    ter_p_max :: Vector{Float64}
 
     # solar rooftop
-    sol_cap :: Vector{Float64}
-    sol_scn :: Array{Float64,3}
+    ren_p_max :: Vector{Float64}
+    ren_scn   :: Array{Float64,3}
 
     # import/export energy form transmission grid
     imp_cost :: Dict{Int64, Matrix{Float64}}
@@ -479,7 +479,7 @@ mutable struct Problem
 
     # map
     bus_map_sol :: Dict{Int64,Vector{Int64}}
-    bus_map_gen :: Dict{Int64,Vector{Int64}}
+    bus_map_ter :: Dict{Int64,Vector{Int64}}
     bus_map_bat :: Dict{Int64,Vector{Int64}}
     bus_map_elv :: Dict{Int64,Vector{Int64}}
     bus_map_dem :: Dict{Int64,Vector{Int64}}

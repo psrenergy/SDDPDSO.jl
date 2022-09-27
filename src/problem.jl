@@ -27,11 +27,11 @@ function add_dimensions!(par, x, n)
     par.scenarios     = x.scenarios 
     par.sim_scenarios = x.sim_scenarios      
     par.nbat          = n.bat       
-    par.ngen          = n.ther
-    par.nsol          = n.gnd
+    par.nter          = n.ther
+    par.nren          = n.gnd
     par.nelv          = 0       
     par.nbus          = n.bus       
-    par.nlin          = n.cir
+    par.ncir          = n.cir
     par.nload         = n.load
     par.nstate        = x.markov_states 
 end
@@ -42,20 +42,20 @@ function add_batteries!(par, d)
     par.bat_e_max = d.bat_Emax
     par.bat_c_eff = d.bat_charge_effic  
     par.bat_d_eff = d.bat_discharge_effic 
-    par.bat_cap   = d.bat_Pmax   
+    par.bat_p_max   = d.bat_Pmax   
 end
 
 function add_thermal_plants!(par, d)
-    par.gen_cost = d.ter_cost # [$/MW]
-    par.gen_cap  = d.ter_capacity  # [MW]
+    par.ter_cost = d.ter_cost # [$/MW]
+    par.ter_p_max  = d.ter_capacity  # [MW]
 end
 
 function add_solar_plants!(par, x, n, d)
-    par.sol_cap = d.gnd_capacity                              # [MW]   : solar plant capacity
+    par.ren_p_max = d.gnd_capacity                              # [MW]   : solar plant capacity
     gnd_scn = get_gnd_scenarios(x, d)                   # [p.u.] :
-    par.sol_scn = zeros(Float64, x.stages, x.scenarios, n.gnd) # [p.u.] : rooftop generation cenarios scn => [stg x plant]
+    par.ren_scn = zeros(Float64, x.stages, x.scenarios, n.gnd) # [p.u.] : rooftop generation cenarios scn => [stg x plant]
     for i in 1:n.gnd
-        par.sol_scn[:,:,i] .= gnd_scn[d.gnd_code[i]] .* d.gnd_capacity[i]
+        par.ren_scn[:,:,i] .= gnd_scn[d.gnd_code[i]] .* d.gnd_capacity[i]
     end
 end
 
@@ -108,7 +108,7 @@ end
 
 function map_elements!(par, n, d)
     par.bus_map_sol = reverse_map_to_dict(d.gnd2bus, n.gnd) 
-    par.bus_map_gen = reverse_map_to_dict(d.ter2bus, n.ther)
+    par.bus_map_ter = reverse_map_to_dict(d.ter2bus, n.ther)
     par.bus_map_bat = reverse_map_to_dict(d.bat2bus, n.bat) 
     par.bus_map_elv = Dict()
     par.bus_map_dem = reverse_map_to_dict(d.lod2bus, n.load)
@@ -134,11 +134,11 @@ end
 function filter_sets!(par)
     # set
     par.set_bus     = collect(1:par.nbus)
-    par.set_cir     = collect(1:par.nlin)
+    par.set_cir     = collect(1:par.ncir)
     par.set_dem     = collect(1:par.nload)
     par.set_bat     = collect(1:par.nbat)
-    par.set_gnd     = collect(1:par.nsol)
-    par.set_ter     = collect(1:par.ngen)
+    par.set_gnd     = collect(1:par.nren)
+    par.set_ter     = collect(1:par.nter)
     
     if par.flag_dem_rsp
         par.set_dem_rsp = Int64[i for i in 1:par.nload if par.dem_rsp_shift[i] > 0.0]
@@ -163,10 +163,10 @@ function setup_parameters!(par, x, n, d, opt)
     (par.nbat > 0) && (par.flag_bat) && add_batteries!(par, d)
 
     # diesel generator
-    (par.ngen > 0) && add_thermal_plants!(par, d)
+    (par.nter > 0) && add_thermal_plants!(par, d)
 
     # solar rooftop nbus => [stg x scn]
-    (par.nsol > 0) && add_solar_plants!(par, x, n, d)
+    (par.nren > 0) && add_solar_plants!(par, x, n, d)
 
     # import/export energy form transmission grid
     (par.flag_import | par.flag_export) && add_injections!(par, x, d)
@@ -184,7 +184,7 @@ function setup_parameters!(par, x, n, d, opt)
     par.flag_dem_rsp && add_demand_response!(par, x, n, d)
 
     # circuit   
-    (par.nlin > 0) && add_circuits!(par, d)
+    (par.ncir > 0) && add_circuits!(par, d)
 
     # markov
     par.flag_markov && add_markov!(par,x)

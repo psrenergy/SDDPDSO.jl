@@ -1,10 +1,10 @@
 function set_objective_thermal!(m, par, expr)
    
-    if par.ngen > 0
+    if par.nter > 0
         par.flag_debug && print(" + thermal")
 
-        for t in 1:par.stages, i in 1:par.ngen
-            JuMP.add_to_expression!(expr, par.gen_cost[i], m[:gen_die][t,i])
+        for t in 1:par.stages, i in 1:par.nter
+            JuMP.add_to_expression!(expr, par.ter_cost[i], m[:gen_die][t,i])
         end
 
         # par.flag_debug && begin @show brick end

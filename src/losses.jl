@@ -66,7 +66,7 @@ function get_bus_losses_from_deterministc(par, m) # change name...
 
     for t in 1:par.stages
 
-        for c in 1:par.nlin
+        for c in 1:par.ncir
             # losses per circuit [p.u.]
             cir_losses = calculate_losses_rf2(par.cir_r[c], cir_flw[t,c], false)
 

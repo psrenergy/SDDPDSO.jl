@@ -5,14 +5,14 @@ function add_deterministic_variables_model!(m, par)
     JuMP.@variables(m, begin
         
         # thermal
-        gen_die[t=1:par.stages, i=1:par.ngen] >= 0
+        gen_die[t=1:par.stages, i=1:par.nter] >= 0
         
         # renewable
-        gen_sol[t=1:par.stages, i=1:par.nsol]     >= 0
-        gen_sol_max[t=1:par.stages, i=1:par.nsol] 
+        gen_sol[t=1:par.stages, i=1:par.nren]     >= 0
+        gen_sol_max[t=1:par.stages, i=1:par.nren] 
         
         # circuit energy flow
-        flw[t=1:par.stages, i=1:par.nlin]     
+        flw[t=1:par.stages, i=1:par.ncir]     
         
         # bus angles
         bus_ang[t=1:par.stages, i=1:par.nbus] >= 0
@@ -108,13 +108,13 @@ function add_deterministic_network_constraints!(m, par)
 
     flw, ang = m[:flw], m[:bus_ang]
     
-    JuMP.@constraint(m, kirchoff_second[t=1:par.stages, i=1:par.nlin],
+    JuMP.@constraint(m, kirchoff_second[t=1:par.stages, i=1:par.ncir],
         flw[t,i] == 100.0 * (1 / par.cir_x[i]) * (ang[t,par.cir_bus_to[i]] - ang[t,par.cir_bus_fr[i]])
     )
     
     if par.flag_sec_law
-        JuMP.@constraint(m, flow_capacity_p[t=1:par.stages, i=1:par.nlin], flw[t,i] <= +par.cir_cap[i])
-        JuMP.@constraint(m, flow_capacity_n[t=1:par.stages, i=1:par.nlin], flw[t,i] >= -par.cir_cap[i])
+        JuMP.@constraint(m, flow_capacity_p[t=1:par.stages, i=1:par.ncir], flw[t,i] <= +par.cir_cap[i])
+        JuMP.@constraint(m, flow_capacity_n[t=1:par.stages, i=1:par.ncir], flw[t,i] >= -par.cir_cap[i])
     end
 end
 
@@ -123,8 +123,8 @@ function add_deterministic_generation_constraints!(m, par)
 
     gen_die = m[:gen_die]
 
-    JuMP.@constraint(m, gen_capacity_max[t=1:par.stages, i=1:par.ngen],gen_die[i] <= +par.gen_cap[i])
-    JuMP.@constraint(m, gen_capacity_min[t=1:par.stages, i=1:par.ngen],gen_die[i] >= 0.0)
+    JuMP.@constraint(m, ter_p_maxacity_max[t=1:par.stages, i=1:par.nter],gen_die[i] <= +par.ter_p_max[i])
+    JuMP.@constraint(m, ter_p_maxacity_min[t=1:par.stages, i=1:par.nter],gen_die[i] >= 0.0)
 end
 
 function add_deterministic_battery_constraints!(m, par)
@@ -158,13 +158,13 @@ function add_deterministic_battery_constraints!(m, par)
     )
     
     # --- battery capacity constraint
-    JuMP.@constraint(m, bat_cap_c_max[t=1:par.stages,i=1:par.nbat],
-        bat_c[t,i] - (bat_d[t,i] / par.bat_d_eff[i]) <= par.bat_cap[i]
+    JuMP.@constraint(m, bat_p_max_c_max[t=1:par.stages,i=1:par.nbat],
+        bat_c[t,i] - (bat_d[t,i] / par.bat_d_eff[i]) <= par.bat_p_max[i]
     )
 
     # --- battery capacity constraint
-    JuMP.@constraint(m, bat_cap_d_max[t=1:par.stages,i=1:par.nbat],
-        bat_d[t,i] - (bat_c[t,i] * par.bat_c_eff[i]) <= par.bat_cap[i]
+    JuMP.@constraint(m, bat_p_max_d_max[t=1:par.stages,i=1:par.nbat],
+        bat_d[t,i] - (bat_c[t,i] * par.bat_c_eff[i]) <= par.bat_p_max[i]
     )
 end
 
@@ -175,7 +175,7 @@ function add_deterministic_energy_balance_constraints!(m, par)
 
         # generation
         gen_sol = haskey(par.bus_map_sol,i) ? m[:gen_sol][t,par.bus_map_sol[i]] : 0.0
-        gen_die = haskey(par.bus_map_gen,i) ? m[:gen_die][t,par.bus_map_gen[i]] : 0.0
+        gen_die = haskey(par.bus_map_ter,i) ? m[:gen_die][t,par.bus_map_ter[i]] : 0.0
 
         # battery
         if par.flag_bat
@@ -279,7 +279,7 @@ function add_deterministic_renewable_capacity_constraints!(m, par)
     gen_sol, gen_sol_max = m[:gen_sol], m[:gen_sol_max]
 
     # --- solar capacity constraint
-    JuMP.@constraint(m, sol_cap_max[t=1:par.stages,i=1:par.nsol], gen_sol[t,i] <= gen_sol_max[t,i])   
+    JuMP.@constraint(m, ren_p_max_max[t=1:par.stages,i=1:par.nren], gen_sol[t,i] <= gen_sol_max[t,i])   
 end
 
 function add_deterministic_renewable_generation!(m, par)
@@ -288,8 +288,8 @@ function add_deterministic_renewable_generation!(m, par)
     gen_sol_max = m[:gen_sol_max]
 
     # Parameterize the subproblem.
-    for t = 1:par.stages, i = 1:par.nsol
-        JuMP.fix(gen_sol_max[t,i], mean(par.sol_scn[t,:,i]))
+    for t = 1:par.stages, i = 1:par.nren
+        JuMP.fix(gen_sol_max[t,i], mean(par.ren_scn[t,:,i]))
     end
 end
 

@@ -70,12 +70,12 @@ end
 """
     map_tec_bus
 """
-function map_tec_bus(gen2bus::Vector{Int32}, gen2tec::Vector{Int32}, ntec, ngen)
+function map_tec_bus(gen2bus::Vector{Int32}, gen2tec::Vector{Int32}, ntec, nter)
     (ntec <= 0) && return Int32[]
 
     tec2bus = zeros(Int32, ntec)
 
-    for i in 1:ngen
+    for i in 1:nter
         tec_i = gen2tec[i]
         if tec_i != 0
             tec2bus[tec_i] = gen2bus[i]
