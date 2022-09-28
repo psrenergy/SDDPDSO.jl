@@ -1,5 +1,8 @@
-using Documenter
+# --- include DSO module
+push!(LOAD_PATH,"../src/")
 using SDDPDSO
+
+using Documenter
 
 makedocs(;
     modules=[SDDPDSO],
