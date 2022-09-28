@@ -1,5 +1,7 @@
 """
     set_maps!
+
+set map structures between all elements
 """
 function set_maps!(data, n, d)
 
@@ -28,6 +30,8 @@ end
 
 """
     set_dimensions!
+
+set dimensions of all elements 
 """
 function set_dimensions!(data, n)
 
@@ -67,6 +71,8 @@ end
 
 """
     set_data!
+
+controller for set-like functions
 """
 function set_data!(data, n, d)
 
