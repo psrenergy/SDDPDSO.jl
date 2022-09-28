@@ -42,6 +42,13 @@ module SDDPDSO
     end
 
     # --- run
+    function run(x::Execution, solver)
+        x, par, m, sims = run(x.PATH, solver)
+
+        return !isempty(sims)        
+    end
+
+    # --- run
     function run(casepath::String, solver)
 
         # ===================
