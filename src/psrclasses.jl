@@ -94,6 +94,8 @@ end
 
 """
     set_data_load!
+    
+get load data from json
 """
 function set_data_load!(data, d)
     d.load_name     = PSRI.get_name(data, "PSRLoad")
@@ -102,6 +104,8 @@ end
 
 """
     set_data_thermal!
+
+get thermal data from json
 """
 function set_data_thermal!(data, d, n)
     d.ter_name     = PSRI.get_name(data, "PSRThermalPlant")
@@ -123,6 +127,8 @@ end
 
 """
     set_data_renewable!
+
+get renewable data from json
 """
 function set_data_renewable!(data, d)
     d.gnd_name     = PSRI.get_name(data, "PSRGndPlant")
@@ -133,6 +139,8 @@ end
 
 """
     set_data_hydro!
+
+get hydro data from json
 """
 function set_data_hydro!(data, d)
     d.hid_name     = PSRI.get_name(data, "PSRHydroPlant")
@@ -143,6 +151,8 @@ end
 
 """
     set_data_bus!
+    
+get bus data from json
 """
 function set_data_bus!(data, d)
     d.bus_name     = PSRI.get_name(data, "PSRBus")
@@ -151,6 +161,8 @@ end
 
 """
     set_data_circuit!
+
+get circuit data from json
 """
 function set_data_circuit!(data, d)
     d.cir_name     = PSRI.get_name(data, "PSRSerie")
@@ -164,6 +176,8 @@ end
 
 """
     set_data_battery!
+
+get battery data from json 
 """
 function set_data_battery!(data, d)
     d.bat_code             = PSRI.get_code(data, "PSRBattery")
