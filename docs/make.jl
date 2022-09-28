@@ -1,3 +1,4 @@
+Pkg.instantiate()
 using Documenter
 
 # --- include DSO module
