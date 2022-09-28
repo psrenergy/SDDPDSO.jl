@@ -3,7 +3,7 @@ Pkg.instantiate()
 using Documenter
 
 # --- include DSO module
-Pkg.activate(@__DIR__())
+Pkg.activate(dirname(@__DIR__()))
 Pkg.instantiate()
 using SDDPDSO
 
