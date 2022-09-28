@@ -26,24 +26,24 @@ exp_use               = generic:load("DSO_energy_export_use");
 convergence_data      = generic:load("DSO_convergence_data");
 
 -- Model Convergence -- 
-dashboard_Convergence = Dashboard("Convergence Data");
-dashboard_Convergence:push("# Convergence Data");
-dashboard_Convergence:push("#### Graph 1");
+tab_convergence = Tab("Convergence Data");
+tab_convergence:push("# Convergence Data");
+tab_convergence:push("#### Graph 1");
 
 chart = Chart("Simulation & Lower Bound x Iterations");
-chart:add_line(convergence_data:select_agents({"Simulation Value"}):aggregate_scenarios(BY_AVERAGE()),{xUnit="Iterations",color = "blue"});
-chart:add_line(convergence_data:select_agents({"Lower Bound"}):aggregate_scenarios(BY_AVERAGE()),{xUnit="Iterations",color = "red"});
-dashboard_Convergence:push(chart);
+chart:add_line(convergence_data:set_stage_type(0):select_agents({"Simulation Value"}):aggregate_scenarios(BY_AVERAGE()),{xUnit="Iterations",color = "blue"});
+chart:add_line(convergence_data:set_stage_type(0):select_agents({"Lower Bound"}):aggregate_scenarios(BY_AVERAGE()),{xUnit="Iterations",color = "red"});
+tab_convergence:push(chart);
 
-dashboard_Convergence:push("#### Graph 2");
+tab_convergence:push("#### Graph 2");
 chart = Chart("Convergence (% Difference)");
-chart:add_column(convergence_data:select_agents({"Difference (%)"}):aggregate_scenarios(BY_AVERAGE()), {xUnit="Iterations",color="blue"});
-dashboard_Convergence:push(chart);
+chart:add_column(convergence_data:set_stage_type(0):select_agents({"Difference (%)"}):aggregate_scenarios(BY_AVERAGE()), {xUnit="Iterations",color="blue"});
+tab_convergence:push(chart);
 
 -- GENERATION -- 
-dashboard_generation = Dashboard("Generation");
-dashboard_generation:push("# Generation Dashboard");
-dashboard_generation:push("#### Graph 1");
+tab_generation = Tab("Generation");
+tab_generation:push("# Generation Dashboard");
+tab_generation:push("#### Graph 1");
 
 chart = Chart("Aggregated Generation");
 bat_c = battery_charge:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(),    "Liquid Battery");
@@ -76,29 +76,22 @@ else
     end
 end
 
--- chesf
--- if export:loaded() then 
---     chart:add_area_stacking(import - export, {color="blue"});
--- else
---     chart:add_area_stacking(import, {color="blue"});
--- end
+tab_generation:push(chart);
 
-dashboard_generation:push(chart);
-
-dashboard_generation:push("#### Graph 2");
+tab_generation:push("#### Graph 2");
 chart = Chart("Renewable Generation x Scenarios");
-chart:add_line(renewable_generation:aggregate_agents(BY_SUM(), "Renew. Gen."), {color="green"});
-dashboard_generation:push(chart);
+chart:add_line(renewable_generation:aggregate_stages(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Renew. Gen."), {color="green"});
+tab_generation:push(chart);
 
-dashboard_generation:push("#### Graph 3");
+tab_generation:push("#### Graph 3");
 chart = Chart("Renewable Curtailment x Stages");
-chart:add_line(renewable_curtailment:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Renewable Curtailment"), {color="blue"});
-dashboard_generation:push(chart);
+chart:add_line(renewable_curtailment:aggregate_stages(BY_AVERAGE()):aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Renewable Curtailment"), {color="blue"});
+tab_generation:push(chart);
 
 -- DEMAND RESPONSE -- 
-dashboard_DR = Dashboard("Demand Response");
-dashboard_DR:push("# Demand Response Dashboard");
-dashboard_DR:push("#### Graph 1");
+tab_DR = Tab("Demand Response");
+tab_DR:push("# Demand Response Dashboard");
+tab_DR:push("#### Graph 1");
 chart = Chart("Demand Response x Stages");
 
 DR_upper = demand_response_upper:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Upper DR");
@@ -110,41 +103,41 @@ if demand_response_load:loaded() then
 end
 
 chart:add_line(demand_response:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Attended Demand"), {color="black"});
-dashboard_DR:push(chart);
+tab_DR:push(chart);
 
 -- Battery Operation -- 
-dashboard_BatOperation = Dashboard("Battery Operation");
-dashboard_BatOperation:push("# Battery Operation Dashboard");
-dashboard_BatOperation:push("#### Graph 1");
+tab_BatOperation = Tab("Battery Operation");
+tab_BatOperation:push("# Battery Operation Dashboard");
+tab_BatOperation:push("#### Graph 1");
 
 chart = Chart("Battery Operation");
-chart:add_area_stacking(battery_storage:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Battery Storage"), {color="red"});
-dashboard_BatOperation:push(chart);
+chart:add_area_stacking(battery_storage:aggregate_scenarios(BY_AVERAGE()):aggregate_stages(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Battery Storage"), {color="red"});
+tab_BatOperation:push(chart);
 
 -- System use results -- 
-dashboard_CircuitResult = Dashboard("System Use");
-dashboard_CircuitResult:push("# System Use Dashboard");
-dashboard_CircuitResult:push("#### Graph 1");
+tab_CircuitResult = Tab("System Use");
+tab_CircuitResult:push("# System Use Dashboard");
+tab_CircuitResult:push("#### Graph 1");
 
 chart = Chart("Thermal Avg Use x Stage");
 chart:add_column(thermal_use:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Thermal Use"), {color="blue"});
-dashboard_CircuitResult:push(chart);
+tab_CircuitResult:push(chart);
 
-dashboard_CircuitResult:push("#### Graph 2");
+tab_CircuitResult:push("#### Graph 2");
 chart = Chart("Cir Avg Use x Stage");
 chart:add_column(cir_use:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Cir Use"), {color="blue"});
-dashboard_CircuitResult:push(chart);
+tab_CircuitResult:push(chart);
 
 -- Operation Costs -- 
-dashboard_OpCosts = Dashboard("Operation Cost");
-dashboard_OpCosts:push("# Operation Costs Dashboard");
-dashboard_OpCosts:push("#### Graph 1");
+tab_OpCosts = Tab("Operation Cost");
+tab_OpCosts:push("# Operation Costs Dashboard");
+tab_OpCosts:push("#### Graph 1");
 
 chart = Chart("Bus Marginal Cost x Stages");
 chart:add_column(Bus_Marginal_Cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Bus Marginal Cost"), {color="blue"});
-dashboard_OpCosts:push(chart);
+tab_OpCosts:push(chart);
 
-dashboard_OpCosts:push("#### Graph 2");
+tab_OpCosts:push("#### Graph 2");
 chart = Chart("Operational Costs x Stages");
 chart:add_area_stacking(thermal_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Thermal cost"), {color="red"});
 import_cost = imp_cost:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Interchange Energy Cost");
@@ -172,17 +165,27 @@ end
 
 chart:add_line(stage_objective:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_AVERAGE(), "Stage Objective"), {color="black"});
 
-dashboard_OpCosts:push(chart);
+tab_OpCosts:push(chart);
 
 -- Losses Results -- 
-dashboard_Losses = Dashboard("Losses");
-dashboard_Losses:push("# Losses Dashboard");
-dashboard_Losses:push("#### Graph 1");
+tab_Losses = Tab("Losses");
+tab_Losses:push("# Losses Dashboard");
+tab_Losses:push("#### Graph 1");
 
 chart = Chart("Average Losses (%)");
 chart:add_column(average_losses:aggregate_scenarios(BY_AVERAGE()), {color="red"});
-dashboard_Losses:push(chart);
+tab_Losses:push(chart);
 
--- Dashboards -- 
+-- Dashboard -- 
 
-(dashboard_Convergence + dashboard_generation + dashboard_DR + dashboard_BatOperation + dashboard_CircuitResult + dashboard_OpCosts + dashboard_Losses):save("dashboard");
+-- Dashboard initialize
+DSO_dashboard = Dashboard();
+
+DSO_dashboard:push(tab_convergence);
+DSO_dashboard:push(tab_generation);
+DSO_dashboard:push(tab_DR);
+DSO_dashboard:push(tab_BatOperation);
+DSO_dashboard:push(tab_CircuitResult);
+DSO_dashboard:push(tab_OpCosts);
+DSO_dashboard:push(tab_Losses);
+DSO_dashboard:save("DSO_Dashboard");
