@@ -8,4 +8,6 @@ SDDPDSO.set_data_hydro!
 SDDPDSO.set_data_bus!
 SDDPDSO.set_data_circuit!
 SDDPDSO.set_data_battery!
+SDDPDSO.set_data!
+SDDPDSO.set_maps!
 ```

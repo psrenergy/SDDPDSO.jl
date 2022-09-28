@@ -9,8 +9,8 @@ using Test
 # ---
 casepath = joinpath(".", "data", "case_studies", "case_06")
 
-# --- initialize DSO
-DSO.initialize(casepath)
+# # ---
+# opt = HiGHS.Optimizer
 
 # --- Solver definition
 opt = HiGHS.Optimizer

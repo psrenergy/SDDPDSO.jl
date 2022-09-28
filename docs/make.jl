@@ -1,8 +1,12 @@
+using Pkg
+Pkg.instantiate()
+using Documenter
+
 # --- include DSO module
-push!(LOAD_PATH,"../src/")
+Pkg.activate(dirname(@__DIR__()))
+Pkg.instantiate()
 using SDDPDSO
 
-using Documenter
 
 makedocs(;
     modules=[SDDPDSO],
