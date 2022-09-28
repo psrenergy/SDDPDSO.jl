@@ -160,7 +160,7 @@ function export_results(x, n, d, par, sims, m)
     
     #losses
     if par.flag_losses
-        export_losses_as_graf(x, par, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_average_losses", ["stage_average_losses (%)"],UNIT = "%")
+        export_losses_as_graf(x, par, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_average_losses", ["Stage Avg Losses (%)"],UNIT = "%")
     end
 
 end

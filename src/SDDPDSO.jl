@@ -9,7 +9,7 @@ module SDDPDSO
     using Statistics
     using PSRIO
     using Random
-    using GLPK
+    using HiGHS
 
     const PSRI = PSRClassesInterface
 

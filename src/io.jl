@@ -656,7 +656,8 @@ function export_results_cost_as_graf(results_sim,result_name, results_cost, file
     for i in 1:days
         for s = 1:SCENARIOS
             for t = 1:24             
-                results_calc_cost = results_sim[s][t][result_name].*results_cost
+                t_day = 24*(i-1) + t
+                results_calc_cost = results_sim[s][t_day][result_name].*results_cost
                 PSRClassesInterface.write_registry(graf, results_calc_cost, i, s, t)
             end
         end

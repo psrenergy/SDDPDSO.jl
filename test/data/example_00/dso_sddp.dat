@@ -1,2 +1,0 @@
-sddp_stages,sddp_scenarios,sim_scenarios,deficit_cost,demand_factor,max_iter,flag_import,flag_export,flag_dem_rsp,flag_bat,flag_sec_law,flag_losses,flag_verbose,flag_debug
-24,5,5,4000,1,150,1,1,1,1,1,1,0,0
