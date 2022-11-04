@@ -1,0 +1,2 @@
+sddp_stages,sddp_scenarios,sim_scenarios,deficit_cost,demand_factor,max_iter,max_time,flag_CSV,flag_import,flag_export,flag_bat,flag_dem_rsp,flag_losses
+24,10,5,4000,1,70,1,0,1,1,1,1,1
