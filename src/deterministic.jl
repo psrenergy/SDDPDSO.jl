@@ -246,12 +246,13 @@ function add_deterministic_demand_response_constraints!(m, par)
     )
 
     # Shift
-    JuMP.@constraint(m, dr_shift_ub[t=par.stages,i=par.set_dem_rsp], dr[t,i] <= par.demand[i][t] * (1 + par.dem_rsp_shift[i]))
-    JuMP.@constraint(m, dr_shift_lb[t=par.stages,i=par.set_dem_rsp], dr[t,i] >= par.demand[i][t] * (1 - par.dem_rsp_shift[i]))
+    JuMP.@constraint(m, dr_shift_ub[t=par.stages,i=par.set_dem_rsp], dr[t,i] <= par.demand[i][t] * (1 + par.dem_rsp_upper[t,i]))
+    JuMP.@constraint(m, dr_shift_lb[t=par.stages,i=par.set_dem_rsp], dr[t,i] >= par.demand[i][t] * (1 - par.dem_rsp_lower[t,i]))
+
 
     for T in 1:par.stages
         if mod(T,24) == 0
-            JuMP.@constraint(m, [t = T,i=par.set_dem_rsp], total_load[t,i] == sum(par.demand[i][1:t]))
+            JuMP.@constraint(m, [t = T, i = par.set_dem_rsp], total_load[t,i] == sum(par.demand[i][1:t]))
         end
     end
 end

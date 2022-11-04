@@ -90,7 +90,7 @@ end
 
 function add_demand_response!(par, x, n, d)
     par.dem_rsp_tariff = []
-    par.dem_rsp_shift  = get_demand_response_shift(x, n, d) # d.dr_max_shift .* 0.2
+    par.dem_rsp_upper, par.dem_rsp_lower = get_demand_response_shift(x, n, d)
 end
 
 function add_circuits!(par, d)
@@ -141,7 +141,7 @@ function filter_sets!(par)
     par.set_ter     = collect(1:par.ngen)
     
     if par.flag_dem_rsp
-        par.set_dem_rsp = Int64[i for i in 1:par.nload if par.dem_rsp_shift[i] > 0.0]
+        par.set_dem_rsp = Int64[i for i in 1:par.nload if par.dem_rsp_upper[i] > 0.0]
     end
 end
 
@@ -206,13 +206,18 @@ function get_load(x, d)
 end
 
 function get_demand_response_shift(x, n, d)
-    shift = import_demand_response_shift(x, d)
+    # --- 
+    ub = import_demand_response_shift(x, n, d, true)
+    lb = import_demand_response_shift(x, n, d, false)
 
-    d.dr_max_shift = zeros(Float64, n.load)
+    # ---
+    d.dr_upper, d.dr_lower = zeros(Float64, x.stages, n.load), zeros(Float64, x.stages, n.load)
 
-    for load in 1:n.load
-        d.dr_max_shift[load] = shift[d.load_code[load]]
+    # ---
+    for t in 1:x.stages, l in 1:n.load
+        d.dr_upper[t,l] = ub[d.load_code[l]][t]
+        d.dr_lower[t,l] = lb[d.load_code[l]][t]
     end
 
-    return d.dr_max_shift
+    return d.dr_upper, d.dr_upper
 end

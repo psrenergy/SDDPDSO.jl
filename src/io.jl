@@ -127,23 +127,23 @@ end
 """
     import_demand_response_shift
 """
-function import_demand_response_shift(x::Execution, d::Data)
+function import_demand_response_shift(x::Execution, n::Sizes, d::Data, upper=true)
     
-    # --- read external hourly scenarios cost data
-    dr_shift = import_csvfile(x.PATH,"dso_dr_shift.dat")[1,:]
-    
-    # dr_shift_scn = Dict(code => 0.0 for code in d.bus_code[d.lod2bus])
-    dr_shift_scn = Dict(code => 0.0 for code in d.load_code)
+    # ---
+    bound = upper ? "upper" : "lower"
 
-    # CHANGE TO LOAD CODES
-    valid_load_codes = [code for code in d.load_code if hasproperty(dr_shift,"$code")]
-    # valid_load_codes = [code for code in d.bus_code[d.lod2bus] if hasproperty(dr_shift,"$code")]
+    # --- read hourly data for upper and lower bounds on demand response     
+    dr_csv = import_csvfile(x.PATH,"dso_dr_" * bound * ".dat")
+    dr     = Dict(code => zeros(Float64, x.stages) for code in d.load_code)
     
-    for code in valid_load_codes
-        dr_shift_scn[code] = dr_shift["$code"]
+    # ---
+    for code in d.load_code
+        if hasproperty(dr_csv,"$code")
+            dr[code] = dr_csv[!,"$code"]
+        end
     end
     
-    return dr_shift_scn
+    return dr
 end
 
 """
@@ -517,7 +517,7 @@ function TransformaDemandaMatriz_UpperRD(MapaDemanda,MatrizDemanda,qtd_buses,n_s
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
             if mapa in dem_rsp_buses
-                Demand_Matrix[bus,stg,1]=demanda*(1+dem_rsp_shifts[mapa]) + losses_value
+                Demand_Matrix[bus,stg,1]=demanda*(1+dem_rsp_shifts[stg,mapa]) + losses_value
             else
                 Demand_Matrix[bus,stg,1]=demanda+losses_value
             end
@@ -536,7 +536,7 @@ function TransformaDemandaMatriz_LowerRD(MapaDemanda,MatrizDemanda,qtd_buses,n_s
             mapa=MapaDemanda[bus][1]
             demanda=MatrizDemanda[mapa][stg]
             if mapa in dem_rsp_buses
-                Demand_Matrix[bus,stg,1]=demanda*(1-dem_rsp_shifts[mapa]) + losses_value
+                Demand_Matrix[bus,stg,1]=demanda*(1-dem_rsp_shifts[stg,mapa]) + losses_value
             else
                 Demand_Matrix[bus,stg,1]=demanda+losses_value
             end

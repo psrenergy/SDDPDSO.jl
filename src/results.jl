@@ -77,10 +77,10 @@ function export_results(x, n, d, par, sims, m)
     end
 
     if par.flag_dem_rsp
-        Upper_DR = TransformaDemandaMatriz_UpperRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_shift,par)
+        Upper_DR = TransformaDemandaMatriz_UpperRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_upper,par)
         export_3D_Matrix_as_graf(x,Upper_DR, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_dr_upper_bound", d.bus_name,UNIT = "MW")
     
-        Lower_DR = TransformaDemandaMatriz_LowerRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_shift,par)
+        Lower_DR = TransformaDemandaMatriz_LowerRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_lower,par)
         export_3D_Matrix_as_graf(x,Lower_DR, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_dr_lower_bound", d.bus_name,UNIT = "MW")
     
         par.flag_verbose && CSV.write(

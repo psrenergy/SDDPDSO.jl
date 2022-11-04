@@ -232,7 +232,8 @@ mutable struct Data
     demandElCost  :: Vector{Float64}
 
     # --- Demand Response
-    dr_max_shift :: Vector{Float64}
+    dr_upper     :: Matrix{Float64}
+    dr_lower     :: Matrix{Float64}
 
     # --- Load Data
     load_code     :: Vector{Int32}
@@ -459,7 +460,8 @@ mutable struct Problem
     
     # demand response
     dem_rsp_tariff :: Vector{Float64} # [$/MWh] tariff
-    dem_rsp_shift  :: Vector{Float64} # [  MWh]
+    dem_rsp_upper  :: Matrix{Float64}
+    dem_rsp_lower  :: Matrix{Float64}
 
     # circuit
     cir_x      :: Vector{Float64}
