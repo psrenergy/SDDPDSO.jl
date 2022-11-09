@@ -62,14 +62,15 @@ function set_objective_export!(m, par, expr)
     end
 end
 
-function set_objective_rd_incentive!(m, par, expr)
+function set_objective_rd_incentive!(m, par, expr, t)
     if par.flag_rd_incentive
         par.flag_debug && print(" - demand response incentive")
 
-        for t in 1:par.stages, b in par.nbus
-            if haskey(par.bus_map_rsp, b) & haskey(par.bus_map_dem, b)
-                i, j = par.bus_map_rsp[b], par.bus_map_dem[b]
-                JuMP.add_to_expression!(expr, par.dr_incentive[t,i], m[:dr][t,i] - par.demand[t,j])
+        for t in 1:par.stages, b in 1:par.nbus
+            if haskey(par.bus_map_rsp, b)
+                for i in par.bus_map_rsp[b]
+                    JuMP.add_to_expression!(expr, par.dr_incentive[t,i], m[:dr][i] - par.demand[i][t])
+                end
             end
         end
     end

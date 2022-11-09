@@ -252,7 +252,7 @@ function add_stageobjective!(m, par, t)
     set_stageobjective_demand_response_curtailment!(m, par, expr)
     set_stageobjective_import!(m, par, expr, t)
     set_stageobjective_export!(m, par, expr, t)
-    set_objective_rd_incentive!(m, par, expr)
+    set_objective_rd_incentive!(m, par, expr, t)
 
     # Define the objective for each stage `t`. Note that we can use `t` as an
     # index for t = 1, 2, ..., 24    
