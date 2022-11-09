@@ -32,7 +32,7 @@ end
 #     x.max_iter = 1
 #     println("Running tests with all possible executions")
 #     for i in 1:lastindex(execution_combinations)
-#         x.flag_export, x.flag_import, x.flag_dem_rsp, x.flag_bat, x.flag_sec_law, x.flag_losses = execution_combinations[i]
+#         x.flag_export, x.flag_import, x.flag_rd_active, x.flag_bat, x.flag_sec_law, x.flag_losses = execution_combinations[i]
 #         println("Configurations: [export, import, dem_rsp, bat, sec_law, losses]")
 #         println("Actual configuration: $(execution_combinations[i]) \n")
 #         # --- Test 01 - 

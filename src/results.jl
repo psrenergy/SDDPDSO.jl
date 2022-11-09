@@ -76,7 +76,7 @@ function export_results(x, n, d, par, sims, m)
         export_StateVar_as_graf(x, sims, :storage, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_battery_storage", d.bat_name,UNIT = "MWh")
     end
 
-    if par.flag_dem_rsp
+    if par.flag_rd_active
         Upper_DR = TransformaDemandaMatriz_UpperRD(par.bus_map_dem,par.demand,n.bus,par.stages,par.set_dem_rsp,par.dem_rsp_upper,par)
         export_3D_Matrix_as_graf(x,Upper_DR, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_dr_upper_bound", d.bus_name,UNIT = "MW")
     
@@ -153,7 +153,7 @@ function export_results(x, n, d, par, sims, m)
     )
     export_stage_objective_as_graf(x, sims, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_stage_objective_function", ["stage_objective_function"],UNIT = "\$")
 
-    if par.flag_bat || par.flag_dem_rsp
+    if par.flag_bat || par.flag_rd_active
         convergence_table = calculate_convergence_table(x,m);
         export_conv_table_as_graf(x, convergence_table, joinpath(x.PATH,"results"),CSV = par.flag_CSV, "DSO_convergence_data", ["Simulation Value", "Lower Bound", "Difference (%)"]);                                  
     end

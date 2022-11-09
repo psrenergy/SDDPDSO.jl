@@ -316,26 +316,28 @@ mutable struct Data
     end
 end
 mutable struct Execution
-    PATH          :: String
-    DEBUG         :: Int64
-    stages        :: Int64
-    scenarios     :: Int64
-    sim_scenarios :: Int64
-    markov_states :: Int64
-    deficit_cost  :: Float64
-    demand_factor :: Float64
-    max_iter      :: Int64
-    max_time      :: Float64
-    flag_markov   :: Int64
-    flag_export   :: Int64
-    flag_import   :: Int64
-    flag_dem_rsp  :: Int64
-    flag_bat      :: Int64
-    flag_sec_law  :: Int64
-    flag_losses   :: Int64
-    flag_debug    :: Int64
-    flag_verbose  :: Int64
-    flag_CSV      :: Int64
+    PATH             :: String
+    DEBUG            :: Int64
+    stages           :: Int64
+    scenarios        :: Int64
+    sim_scenarios    :: Int64
+    markov_states    :: Int64
+    deficit_cost     :: Float64
+    demand_factor    :: Float64
+    max_iter         :: Int64
+    max_time         :: Float64
+    flag_markov      :: Int64
+    flag_export      :: Int64
+    flag_import      :: Int64
+    flag_rd_active   :: Int64
+    flag_bat         :: Int64
+    flag_sec_law     :: Int64
+    flag_losses      :: Int64
+    flag_debug       :: Int64
+    flag_verbose     :: Int64
+    flag_CSV         :: Int64
+    flag_rd_integral :: Int64 
+    flag_rd_incentive :: Bool
 
     function Execution()
         return new(
@@ -353,6 +355,8 @@ mutable struct Execution
             0    ,
             0    ,
             0    ,
+            0    ,
+            1    ,
             0    ,
             1    ,
             0
@@ -384,7 +388,10 @@ mutable struct Execution
             _check_input(sddp_dso, "flag_losses"      ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_debug"       ,     0,   Int64, "expected integer", false),
             _check_input(sddp_dso, "flag_verbose"     ,     0,   Int64, "expected integer", false),
-            _check_input(sddp_dso, "flag_csv"         ,     1,   Int64, "expected integer", false)
+            _check_input(sddp_dso, "flag_csv"         ,     1,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_rd_integral" ,     1,   Int64, "expected integer", false),
+            _check_input(sddp_dso, "flag_rd_incentive",     0,   Int64, "expected integer", false),
+            
         )
     end 
     function read_execution_parameters(path::String)
@@ -498,17 +505,19 @@ mutable struct Problem
     hrinj_cap :: Dict{Int64, Matrix{Float64}}
 
     # flags
-    flag_sec_law  :: Bool
-    flag_import   :: Bool
-    flag_export   :: Bool
-    flag_markov   :: Bool
-    flag_losses   :: Bool
-    flag_dem_rsp  :: Bool
-    flag_bat      :: Bool
-    flag_debug    :: Bool
-    flag_verbose  :: Bool
-    flag_CSV      :: Bool
-    flag_add_days :: Bool
+    flag_sec_law      :: Bool
+    flag_import       :: Bool
+    flag_export       :: Bool
+    flag_markov       :: Bool
+    flag_losses       :: Bool
+    flag_bat          :: Bool
+    flag_debug        :: Bool
+    flag_verbose      :: Bool
+    flag_CSV          :: Bool
+    flag_add_days     :: Bool
+    flag_rd_active    :: Bool
+    flag_rd_integral  :: Bool
+    flag_rd_incentive :: Bool
 
     Problem() = new()
 end

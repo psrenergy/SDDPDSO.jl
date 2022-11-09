@@ -49,7 +49,7 @@ function add_deterministic_variables_model!(m, par)
     end
 
     # demand response
-    if par.flag_dem_rsp
+    if par.flag_rd_active
         JuMP.@variables(m, begin
             total_load[t=1:(par.stages+1), i=par.set_dem_rsp] >= 0
             dr[t=1:par.stages, i=par.set_dem_rsp]         >= 0
@@ -188,7 +188,7 @@ function add_deterministic_energy_balance_constraints!(m, par)
 
         # load
         dem     = haskey(par.bus_map_dem,i) ? sum(par.demand[j][t] for j in par.bus_map_dem[i]) : 0.0
-        if par.flag_dem_rsp
+        if par.flag_rd_active
             dem = haskey(par.bus_map_rsp,i) ? m[:dr][t, par.bus_map_rsp[i]] : dem
         end
 
@@ -249,10 +249,12 @@ function add_deterministic_demand_response_constraints!(m, par)
     JuMP.@constraint(m, dr_shift_ub[t=par.stages,i=par.set_dem_rsp], dr[t,i] <= par.demand[i][t] * (1 + par.dem_rsp_upper[t,i]))
     JuMP.@constraint(m, dr_shift_lb[t=par.stages,i=par.set_dem_rsp], dr[t,i] >= par.demand[i][t] * (1 - par.dem_rsp_lower[t,i]))
 
-
-    for T in 1:par.stages
-        if mod(T,24) == 0
-            JuMP.@constraint(m, [t = T, i = par.set_dem_rsp], total_load[t,i] == sum(par.demand[i][1:t]))
+    # load integral
+    if par.flag_rd_integral
+        for T in 1:par.stages
+            if mod(T,24) == 0
+                JuMP.@constraint(m, [t = T, i = par.set_dem_rsp], total_load[t,i] == sum(par.demand[i][1:t]))
+            end
         end
     end
 end
@@ -312,7 +314,7 @@ function build_deterministic_model(par)
 
     add_deterministic_renewable_generation!(m, par)
     
-    par.flag_dem_rsp && add_deterministic_demand_response_constraints!(m, par)
+    par.flag_rd_active && add_deterministic_demand_response_constraints!(m, par)
     
     par.flag_import && add_deterministic_import_constraints!(m, par)
     

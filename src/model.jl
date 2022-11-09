@@ -7,7 +7,7 @@ function add_variables_model!(m, par)
         JuMP.@variable(m, par.bat_e_max[i] >= storage[i=1:par.nbat] >= par.bat_e_min[i], SDDP.State, initial_value = par.bat_e_ini[i])
     end
     # --- demand response
-    if par.flag_dem_rsp
+    if par.flag_rd_active
         JuMP.@variable(m, sum(par.demand[i]) >= total_load[i=par.set_dem_rsp] >= 0.0, SDDP.State, initial_value = 0.0)
     end
 
@@ -52,7 +52,7 @@ function add_variables_model!(m, par)
     end
 
     # demand response
-    if par.flag_dem_rsp
+    if par.flag_rd_active
         JuMP.@variables(m, begin
             dr[i=par.set_dem_rsp]     >= 0
             dr_cur[i=par.set_dem_rsp] >= 0
@@ -170,7 +170,7 @@ function add_energy_balance_constraints!(m, par, t)
 
         # load
         dem     = haskey(par.bus_map_dem,i) ? sum(par.demand[j][t] for j in par.bus_map_dem[i]) : 0.0
-        if par.flag_dem_rsp
+        if par.flag_rd_active
             dem = haskey(par.bus_map_rsp,i) ? m[:dr][par.bus_map_rsp[i]] : dem
         end
 
@@ -231,9 +231,11 @@ function add_demand_response_constraints!(m, par, t)
     JuMP.@constraint(m, dr_shift_ub[i=par.set_dem_rsp], dr[i] <= par.demand[i][t] * (1 + par.dem_rsp_upper[t,i]))
     JuMP.@constraint(m, dr_shift_lb[i=par.set_dem_rsp], dr[i] >= par.demand[i][t] * (1 - par.dem_rsp_lower[t,i]))
 
-
-    if mod(t,24) == 0
-        JuMP.@constraint(m, dr_integral[i=par.set_dem_rsp], total_load[i].out == sum(par.demand[i][1:t]))
+    # load integral
+    if par.flag_rd_integral
+        if mod(t,24) == 0
+            JuMP.@constraint(m, dr_integral[i=par.set_dem_rsp], total_load[i].out == sum(par.demand[i][1:t]))
+        end
     end
 end
 
@@ -327,7 +329,7 @@ function build_model(par)
     
         add_energy_balance_constraints!(subproblem, par, t)
     
-        par.flag_dem_rsp && add_demand_response_constraints!(subproblem, par, t)
+        par.flag_rd_active && add_demand_response_constraints!(subproblem, par, t)
 
         par.flag_import && add_import_constraints!(subproblem, par, t)
 

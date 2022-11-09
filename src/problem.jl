@@ -1,14 +1,16 @@
 function add_dso_flags!(par, x)
-    par.flag_sec_law = x.flag_sec_law == 1
-    par.flag_import  = x.flag_import  == 1
-    par.flag_export  = x.flag_export  == 1
-    par.flag_markov  = x.flag_markov  == 1
-    par.flag_losses  = x.flag_losses  == 1
-    par.flag_dem_rsp = x.flag_dem_rsp == 1
-    par.flag_bat     = x.flag_bat     == 1
-    par.flag_debug   = x.flag_debug   == 1
-    par.flag_verbose = par.flag_debug ? true : (x.flag_verbose == 1)
-    par.flag_CSV     = x.flag_CSV   == 1
+    par.flag_sec_law      = x.flag_sec_law      == 1
+    par.flag_import       = x.flag_import       == 1
+    par.flag_export       = x.flag_export       == 1
+    par.flag_markov       = x.flag_markov       == 1
+    par.flag_losses       = x.flag_losses       == 1
+    par.flag_rd_active    = x.flag_rd_active    == 1
+    par.flag_bat          = x.flag_bat          == 1
+    par.flag_debug        = x.flag_debug        == 1
+    par.flag_CSV          = x.flag_CSV          == 1
+    par.flag_rd_integral  = x.flag_rd_integral  == 1
+    par.flag_rd_incentive = x.flag_rd_incentive == 1
+    par.flag_verbose      = par.flag_debug ? true : (x.flag_verbose == 1)
 end
 
 function add_sddp_parameters!(par, x, opt)
@@ -113,7 +115,7 @@ function map_elements!(par, n, d)
     par.bus_map_elv = Dict()
     par.bus_map_dem = reverse_map_to_dict(d.lod2bus, n.load)
 
-    if par.flag_dem_rsp
+    if par.flag_rd_active
         par.bus_map_rsp = reverse_map_to_dict(d.lod2bus, n.load)
         for i in keys(par.bus_map_rsp)
             filter!(x -> x ∈ par.set_dem_rsp, par.bus_map_rsp[i])
@@ -140,7 +142,7 @@ function filter_sets!(par)
     par.set_gnd     = collect(1:par.nsol)
     par.set_ter     = collect(1:par.ngen)
     
-    if par.flag_dem_rsp
+    if par.flag_rd_active
         par.set_dem_rsp = Int64[i for i in 1:par.nload if par.dem_rsp_upper[i] > 0.0]
     end
 end
@@ -181,7 +183,7 @@ function setup_parameters!(par, x, n, d, opt)
     par.flag_losses && add_losses!(par, x, n, d)
 
     # demand response
-    par.flag_dem_rsp && add_demand_response!(par, x, n, d)
+    par.flag_rd_active && add_demand_response!(par, x, n, d)
 
     # circuit   
     (par.nlin > 0) && add_circuits!(par, d)

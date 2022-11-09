@@ -36,7 +36,7 @@ function set_stageobjective_curtailment!(m, par, expr)
 end
 
 function set_stageobjective_demand_response_deficit!(m, par, expr)
-    if par.flag_dem_rsp
+    if par.flag_rd_active
         par.flag_debug && print(" + demand response deficit")
 
         for i in par.set_dem_rsp
@@ -48,7 +48,7 @@ function set_stageobjective_demand_response_deficit!(m, par, expr)
 end
 
 function set_stageobjective_demand_response_curtailment!(m, par, expr)
-    if par.flag_dem_rsp
+    if par.flag_rd_active
         par.flag_debug && print(" + demand response curtailment")
 
         for i in par.set_dem_rsp
