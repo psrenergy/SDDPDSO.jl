@@ -91,8 +91,8 @@ function add_losses!(par, x, n, d)
 end
 
 function add_demand_response!(par, x, n, d)
-    par.dem_rsp_tariff = []
-    par.dem_rsp_upper, par.dem_rsp_lower = get_demand_response_shift(x, n, d)
+    par.dr_ub, par.dr_lb = get_demand_response_shift(x, n, d)
+    par.dr_incentive     = get_demand_response_incentive(x, n, d)
 end
 
 function add_circuits!(par, d)
@@ -143,7 +143,7 @@ function filter_sets!(par)
     par.set_ter     = collect(1:par.ngen)
     
     if par.flag_rd_active
-        par.set_dem_rsp = Int64[i for i in 1:par.nload if par.dem_rsp_upper[i] > 0.0]
+        par.set_dem_rsp = Int64[i for i in 1:par.nload if any(par.dr_ub[:,i] .> 0.0)]
     end
 end
 
@@ -213,13 +213,29 @@ function get_demand_response_shift(x, n, d)
     lb = import_demand_response_shift(x, n, d, false)
 
     # ---
-    d.dr_upper, d.dr_lower = zeros(Float64, x.stages, n.load), zeros(Float64, x.stages, n.load)
+    d.dr_ub, d.dr_lb = zeros(Float64, x.stages, n.load), zeros(Float64, x.stages, n.load)
 
     # ---
     for t in 1:x.stages, l in 1:n.load
-        d.dr_upper[t,l] = ub[d.load_code[l]][t]
-        d.dr_lower[t,l] = lb[d.load_code[l]][t]
+        d.dr_ub[t,l] = ub[d.load_code[l]][t]
+        d.dr_lb[t,l] = lb[d.load_code[l]][t]
     end
 
-    return d.dr_upper, d.dr_upper
+    return d.dr_ub, d.dr_lb
 end
+
+function get_demand_response_incentive(x, n, d)
+    # --- 
+    incetive = import_demand_response_incentive(x, n, d)
+
+    # ---
+    d.dr_incentive = zeros(Float64, x.stages, n.load)
+
+    # ---
+    for t in 1:x.stages, l in 1:n.load
+        d.dr_incentive[t,l] = incetive[d.load_code[l]][t]
+    end
+
+    return d.dr_incentive
+end
+

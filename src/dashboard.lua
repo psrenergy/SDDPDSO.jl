@@ -11,8 +11,8 @@ cir_use               = generic:load("DSO_cir_use");
 demand_response_load  = generic:load("DSO_dr_load");
 demand_original       = generic:load("DSO_original_demand");
 demand_response       = demand_original:replace(demand_response_load);
-demand_response_upper = generic:load("DSO_dr_upper_bound");
-demand_response_lower = generic:load("DSO_dr_lower_bound");
+demand_response_upper = generic:load("DSO_dr_ub_bound");
+demand_response_lower = generic:load("DSO_dr_lb_bound");
 average_losses        = generic:load("DSO_stage_average_losses");
 thermal_cost          = generic:load("DSO_thermal_gen_cost");
 imp_cost              = generic:load("DSO_energy_import_cost");
@@ -94,9 +94,9 @@ tab_DR:push("# Demand Response Dashboard");
 tab_DR:push("#### Graph 1");
 chart = Chart("Demand Response x Stages");
 
-DR_upper = demand_response_upper:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Upper DR");
-DR_lower = demand_response_lower:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Lower DR");
-chart:add_area_range(DR_upper,DR_lower);
+dr_ub = demand_response_upper:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Upper DR");
+dr_lb = demand_response_lower:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Lower DR");
+chart:add_area_range(dr_ub,dr_lb);
 
 if demand_response_load:loaded() then 
     chart:add_line(original_demand:aggregate_scenarios(BY_AVERAGE()):aggregate_agents(BY_SUM(), "Original Demand"), {color="blue"});

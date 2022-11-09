@@ -228,8 +228,8 @@ function add_demand_response_constraints!(m, par, t)
     )
 
     # Shift
-    JuMP.@constraint(m, dr_shift_ub[i=par.set_dem_rsp], dr[i] <= par.demand[i][t] * (1 + par.dem_rsp_upper[t,i]))
-    JuMP.@constraint(m, dr_shift_lb[i=par.set_dem_rsp], dr[i] >= par.demand[i][t] * (1 - par.dem_rsp_lower[t,i]))
+    JuMP.@constraint(m, dr_shift_ub[i=par.set_dem_rsp], dr[i] <= par.demand[i][t] * (1 + par.dr_ub[t,i]))
+    JuMP.@constraint(m, dr_shift_lb[i=par.set_dem_rsp], dr[i] >= par.demand[i][t] * (1 - par.dr_lb[t,i]))
 
     # load integral
     if par.flag_rd_integral
@@ -252,6 +252,7 @@ function add_stageobjective!(m, par, t)
     set_stageobjective_demand_response_curtailment!(m, par, expr)
     set_stageobjective_import!(m, par, expr, t)
     set_stageobjective_export!(m, par, expr, t)
+    set_objective_rd_incentive!(m, par, expr)
 
     # Define the objective for each stage `t`. Note that we can use `t` as an
     # index for t = 1, 2, ..., 24    

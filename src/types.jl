@@ -232,8 +232,9 @@ mutable struct Data
     demandElCost  :: Vector{Float64}
 
     # --- Demand Response
-    dr_upper     :: Matrix{Float64}
-    dr_lower     :: Matrix{Float64}
+    dr_incentive :: Matrix{Float64}    
+    dr_ub        :: Matrix{Float64}
+    dr_lb        :: Matrix{Float64}
 
     # --- Load Data
     load_code     :: Vector{Int32}
@@ -316,28 +317,28 @@ mutable struct Data
     end
 end
 mutable struct Execution
-    PATH             :: String
-    DEBUG            :: Int64
-    stages           :: Int64
-    scenarios        :: Int64
-    sim_scenarios    :: Int64
-    markov_states    :: Int64
-    deficit_cost     :: Float64
-    demand_factor    :: Float64
-    max_iter         :: Int64
-    max_time         :: Float64
-    flag_markov      :: Int64
-    flag_export      :: Int64
-    flag_import      :: Int64
-    flag_rd_active   :: Int64
-    flag_bat         :: Int64
-    flag_sec_law     :: Int64
-    flag_losses      :: Int64
-    flag_debug       :: Int64
-    flag_verbose     :: Int64
-    flag_CSV         :: Int64
-    flag_rd_integral :: Int64 
-    flag_rd_incentive :: Bool
+    PATH              :: String
+    DEBUG             :: Int64
+    stages            :: Int64
+    scenarios         :: Int64
+    sim_scenarios     :: Int64
+    markov_states     :: Int64
+    deficit_cost      :: Float64
+    demand_factor     :: Float64
+    max_iter          :: Int64
+    max_time          :: Float64
+    flag_markov       :: Int64
+    flag_export       :: Int64
+    flag_import       :: Int64
+    flag_rd_active    :: Int64
+    flag_bat          :: Int64
+    flag_sec_law      :: Int64
+    flag_losses       :: Int64
+    flag_debug        :: Int64
+    flag_verbose      :: Int64
+    flag_CSV          :: Int64
+    flag_rd_integral  :: Int64 
+    flag_rd_incentive :: Int64
 
     function Execution()
         return new(
@@ -466,9 +467,9 @@ mutable struct Problem
     def_cost      :: Float64
     
     # demand response
-    dem_rsp_tariff :: Vector{Float64} # [$/MWh] tariff
-    dem_rsp_upper  :: Matrix{Float64}
-    dem_rsp_lower  :: Matrix{Float64}
+    dr_incentive :: Matrix{Float64} # [$/MWh] tariff
+    dr_ub        :: Matrix{Float64}
+    dr_lb        :: Matrix{Float64}
 
     # circuit
     cir_x      :: Vector{Float64}

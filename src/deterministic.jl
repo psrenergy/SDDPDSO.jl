@@ -246,8 +246,8 @@ function add_deterministic_demand_response_constraints!(m, par)
     )
 
     # Shift
-    JuMP.@constraint(m, dr_shift_ub[t=par.stages,i=par.set_dem_rsp], dr[t,i] <= par.demand[i][t] * (1 + par.dem_rsp_upper[t,i]))
-    JuMP.@constraint(m, dr_shift_lb[t=par.stages,i=par.set_dem_rsp], dr[t,i] >= par.demand[i][t] * (1 - par.dem_rsp_lower[t,i]))
+    JuMP.@constraint(m, dr_shift_ub[t=par.stages,i=par.set_dem_rsp], dr[t,i] <= par.demand[i][t] * (1 + par.dr_ub[t,i]))
+    JuMP.@constraint(m, dr_shift_lb[t=par.stages,i=par.set_dem_rsp], dr[t,i] >= par.demand[i][t] * (1 - par.dr_lb[t,i]))
 
     # load integral
     if par.flag_rd_integral
